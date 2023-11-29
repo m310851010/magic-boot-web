@@ -1,0 +1,60 @@
+<div class="login-box">
+  <div style="width: 50%; text-align: center">
+    <img src="assets/login/login-box-bg.svg" alt="" style="width: 37%" />
+    <h1 style="color: #fff; margin-top: 15px">X-Magic开发平台</h1>
+  </div>
+
+  <div style="width: 50%">
+    <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
+      <h1>登录</h1>
+      <nz-form-item>
+        <nz-form-control nzErrorTip="请输入用户名">
+          <nz-input-group nzPrefixIcon="user" nzSize="large">
+            <input type="text" nz-input autocomplete="off" formControlName="username" placeholder="用户名" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="请输入密码">
+          <ma-input-password
+            placeholder="密码"
+            nzSize="large"
+            nzPrefixIcon="lock"
+            formControlName="password"
+          ></ma-input-password>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="请输入验证码">
+          <div class="ant-input" style="padding: 0">
+            <div class="login-verify" (click.once)="changeCaptcha()">
+              <img *ngIf="captcha" class="full-size" [src]="captcha?.captcha" title="点击切换验证码" />
+              <img *ngIf="!captcha" src="./assets/images/loading.gif" style="margin-top: 7px" />
+            </div>
+
+            <input
+              nz-input
+              nzBorderless
+              nzSize="large"
+              style="width: 50%"
+              placeholder="验证码"
+              formControlName="verifyCode"
+            />
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div nz-row class="login-form-margin">
+        <div nz-col [nzSpan]="12" [nzPush]="12">
+          <a class="login-form-forgot">忘记密码？</a>
+        </div>
+      </div>
+
+      <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'" nzSize="large">登录</button>
+      立即
+      <a>注册</a>
+    </form>
+  </div>
+</div>

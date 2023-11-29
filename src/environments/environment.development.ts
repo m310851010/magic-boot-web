@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  basePath: '',
+  basePath: '/api'
 };

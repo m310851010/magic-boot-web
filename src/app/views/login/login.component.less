@@ -1,0 +1,51 @@
+:host {
+  height: 100%;
+  display: flex;
+}
+
+.login-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  &:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    margin-left: -48%;
+    background-image: url(../../../assets/login/login-bg.svg);
+    background-position: 100%;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    content: '';
+  }
+}
+
+.login-form {
+  width: 404px;
+  max-width: 100%;
+  margin-left: 80px;
+}
+
+.login-form-margin {
+  margin-bottom: 16px;
+}
+
+.login-form-forgot {
+  float: right;
+}
+
+.login-form-button {
+  width: 100%;
+}
+.login-verify {
+  width: 50%;
+  height: 38px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  cursor: pointer;
+}
