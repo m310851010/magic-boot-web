@@ -1,9 +1,10 @@
 import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
+import { HttpError } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxFormUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
@@ -59,9 +60,11 @@ export class LoginComponent implements OnInit {
     }
     this.loginService.login({ ...this.validateForm.value, ...this.captcha }).subscribe({
       next: () => this.router.navigate(['/']),
-      error: error => {
+      error: (error: HttpError) => {
         console.log(error);
-        this.changeCaptcha();
+        if (!error.httpError) {
+          this.changeCaptcha();
+        }
       }
     });
   }

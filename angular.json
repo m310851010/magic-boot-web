@@ -77,7 +77,7 @@
                   "maximumWarning": "2kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "bundles"
             },
             "development": {
               "buildOptimizer": false,
