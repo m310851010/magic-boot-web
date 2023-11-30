@@ -5,7 +5,7 @@
   </div>
 
   <div style="width: 50%">
-    <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
+    <form nz-form [formGroup]="validateForm" class="login-form">
       <h1>登录</h1>
       <nz-form-item>
         <nz-form-control nzErrorTip="请输入用户名">
@@ -30,8 +30,11 @@
         <nz-form-control nzErrorTip="请输入验证码">
           <div class="ant-input" style="padding: 0">
             <div class="login-verify" (click.once)="changeCaptcha()">
-              <img *ngIf="captcha" class="full-size" [src]="captcha?.captcha" title="点击切换验证码" />
-              <img *ngIf="!captcha" src="./assets/images/loading.gif" style="margin-top: 7px" />
+              @if (captcha) {
+              <img class="full-size" [src]="captcha?.captcha" title="点击切换验证码" />
+              } @else {
+              <img src="./assets/images/loading.gif" style="margin-top: 7px" />
+              }
             </div>
 
             <input
@@ -52,7 +55,16 @@
         </div>
       </div>
 
-      <button nz-button class="login-form-button login-form-margin" [nzType]="'primary'" nzSize="large">登录</button>
+      <button
+        nz-button
+        class="login-form-button login-form-margin"
+        nzType="primary"
+        nzSize="large"
+        (click)="!loginLoading && submitForm()"
+        [nzLoading]="loginLoading"
+      >
+        登录
+      </button>
       立即
       <a>注册</a>
     </form>

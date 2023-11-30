@@ -24,13 +24,17 @@ export class LoginService {
     const randoms = this.getRandoms(loginModel.captchaToken);
     const sp = sm3(loginModel.password);
     return this.http
-      .post<string>('/login', {
-        u,
-        v,
-        m,
-        p: sm3(sp + randoms[0]),
-        s: sm3(`${u}|${sp}|${m}|${randoms[1]}|post`)
-      })
+      .post<string>(
+        '/login',
+        {
+          u,
+          v,
+          m,
+          p: sm3(sp + randoms[0]),
+          s: sm3(`${u}|${sp}|${m}|${randoms[1]}|post`)
+        },
+        { context: new HttpContext().set(LOADING_ENABLED, false) }
+      )
       .pipe(
         tap(token => {
           this.storageService.setItem(this.TOKEN_KEY, token);

@@ -14,6 +14,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { InputPasswordComponent } from '@commons/component/input-password';
 
 import { LoginService, CaptchaInfo } from './login.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'np-login',
@@ -35,6 +36,8 @@ import { LoginService, CaptchaInfo } from './login.service';
 export class LoginComponent implements OnInit {
   validateForm!: FormGroup;
   captcha?: CaptchaInfo;
+
+  loginLoading = false;
   constructor(
     protected fb: FormBuilder,
     protected router: Router,
@@ -58,15 +61,18 @@ export class LoginComponent implements OnInit {
     if (!NzxFormUtils.validate(this.validateForm, { updateValueAndValidity: true })) {
       return;
     }
-    this.loginService.login({ ...this.validateForm.value, ...this.captcha }).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (error: HttpError) => {
-        console.log(error);
-        if (!error.httpError) {
-          this.changeCaptcha();
+    this.loginLoading = true;
+    this.loginService
+      .login({ ...this.validateForm.value, ...this.captcha })
+      .pipe(finalize(() => (this.loginLoading = false)))
+      .subscribe({
+        next: () => this.router.navigate(['/']),
+        error: (error: HttpError) => {
+          if (!error.httpError) {
+            this.changeCaptcha();
+          }
         }
-      }
-    });
+      });
   }
 
   /**
