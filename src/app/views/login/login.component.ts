@@ -2,6 +2,7 @@ import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { HttpError } from '@xmagic/nzx-antd/http-interceptor';
@@ -14,7 +15,6 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { InputPasswordComponent } from '@commons/component/input-password';
 
 import { LoginService, CaptchaInfo } from './login.service';
-import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'np-login',
