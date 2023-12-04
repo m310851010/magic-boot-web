@@ -1,15 +1,16 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { filter, Observable, switchMap } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import { LOADING_ENABLED, NzxStorageService } from '@xmagic/nzx-antd/service';
 // @ts-ignore
 import { sm3 } from 'sm-crypto';
 
+import { TOKEN_KEY } from '@commons/service/user.service';
+
 @Injectable()
 export class LoginService {
-  readonly TOKEN_KEY = 'AUTH_TOKEN';
   constructor(
     protected http: HttpClient,
     protected storageService: NzxStorageService
@@ -37,7 +38,7 @@ export class LoginService {
       )
       .pipe(
         tap(token => {
-          this.storageService.setItem(this.TOKEN_KEY, token);
+          this.storageService.setItem(TOKEN_KEY, token);
         })
       );
   }
@@ -48,13 +49,6 @@ export class LoginService {
       return [];
     }
     return [token!.substring(0, idx), token!.substring(idx! + 1)];
-  }
-
-  /**
-   * 退出登录
-   */
-  logout(): Observable<void> {
-    return this.http.post<void>('/logout', null).pipe(finalize(() => this.removeToken()));
   }
 
   /**
@@ -82,20 +76,6 @@ export class LoginService {
           });
         })
       );
-  }
-
-  /**
-   * 获取token
-   */
-  getToken(): string | null {
-    return this.storageService.getItem<string>(this.TOKEN_KEY);
-  }
-
-  /**
-   * 删除token
-   */
-  removeToken(): void {
-    this.storageService.removeItem(this.TOKEN_KEY);
   }
 }
 

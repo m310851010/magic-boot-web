@@ -45,6 +45,13 @@ export class UserService {
   }
 
   /**
+   * 获取token
+   */
+  getToken(): string | null {
+    return this.storageService.getItem<string>(TOKEN_KEY);
+  }
+
+  /**
    * 删除token
    */
   removeToken(): void {
