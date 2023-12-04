@@ -14,7 +14,6 @@
   display: flex;
   align-items: center;
   margin-right: 20px;
-  color: var(--header-color);
   white-space: nowrap;
 }
 
@@ -36,8 +35,6 @@
     z-index: 10;
     min-height: 100%;
     padding-bottom: 37px;
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.35);
-
     .ant-layout-sider-children {
       display: flex;
       flex-direction: column;
@@ -110,7 +107,6 @@
 nz-header {
   padding: 0;
   width: 100%;
-  z-index: 2;
 }
 
 nz-content {
@@ -124,14 +120,4 @@ nz-content {
   height: 100%;
   overflow: auto;
   position: relative;
-}
-
-.inner-content-mask {
-  z-index: 9999;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100%;
-  background: #ffffff01;
 }

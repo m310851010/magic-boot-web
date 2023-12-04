@@ -5,7 +5,6 @@ import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 import { UserInfo } from '@commons/service/user-info';
 import { UserService } from '@commons/service/user.service';
 
-import { LoginService } from '../../../views/login/login.service';
 import { UpdatePasswordService } from '../update-password/update-password.service';
 
 @Component({

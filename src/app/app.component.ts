@@ -6,6 +6,8 @@ import { NzxModalModule, NzxModalWrapService } from '@xmagic/nzx-antd/modal';
 import { loadingService } from '@xmagic/nzx-antd/service';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 
+import { UserService } from '@commons/service/user.service';
+
 @Component({
   selector: 'ma-root',
   standalone: true,
@@ -19,6 +21,7 @@ export class AppComponent implements OnInit {
     private modalService: NzxModalWrapService,
     private loading: HttpLoadingService,
     private notifyService: LogoutService,
+    private userService: UserService,
     private router: Router
   ) {}
 
@@ -26,7 +29,7 @@ export class AppComponent implements OnInit {
     this.loading.subscribe(status => loadingService.loading(status));
 
     this.notifyService.onLogout(error => {
-      // this.authService.removeToken();
+      this.userService.removeToken();
       this.modalService.closeAll();
       if (error.timeout) {
         this.modalService
