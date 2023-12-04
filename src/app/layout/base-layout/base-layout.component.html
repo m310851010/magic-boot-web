@@ -2,16 +2,16 @@
   <nz-sider
     class="menu-sidebar"
     [nzCollapsible]="true"
-    nzTheme="light"
+    nzTheme="dark"
     [nzWidth]="sliderWidth + 'px'"
-    nzBreakpoint="md"
+    nzBreakpoint="lg"
     [nzCollapsedWidth]="48"
     [(nzCollapsed)]="isCollapsed"
     [nzTrigger]="triggerTemplate"
     nz-resizable
+    [nzDisabled]="isCollapsed"
     [nzMinWidth]="220"
-    (nzResizeEnd)="onResize($event)"
-    nzPreview
+    (nzResize)="onResize($event)"
   >
     <nz-resize-handles [nzDirections]="['right']"></nz-resize-handles>
 
