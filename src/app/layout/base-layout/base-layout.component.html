@@ -1,0 +1,56 @@
+<nz-layout class="app-layout">
+  <nz-sider
+    class="menu-sidebar"
+    [nzCollapsible]="true"
+    nzTheme="light"
+    [nzWidth]="sliderWidth + 'px'"
+    nzBreakpoint="md"
+    [nzCollapsedWidth]="48"
+    [(nzCollapsed)]="isCollapsed"
+    [nzTrigger]="triggerTemplate"
+    nz-resizable
+    [nzMinWidth]="220"
+    (nzResizeEnd)="onResize($event)"
+    nzPreview
+  >
+    <nz-resize-handles [nzDirections]="['right']"></nz-resize-handles>
+
+    <div class="sidebar-logo">
+      <img src="./assets/xmagic-red.svg" alt="logo" />
+      <h1>X-Magic</h1>
+    </div>
+
+    <div class="scroll-container">
+      <np-slider-menu [isCollapsed]="isCollapsed" (menuClick)="handleMenuClick($event)"></np-slider-menu>
+    </div>
+  </nz-sider>
+
+  <nz-layout>
+    <nz-header>
+      <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+        <ng-container *ngTemplateOutlet="triggerTemplate"></ng-container>
+      </span>
+
+      <div class="layout-header-left">
+        <np-header-app [appInfos]="appInfos"></np-header-app>
+      </div>
+
+      <div class="layout-header-action">
+        <np-header-menu-search [appInfos]="appInfos"></np-header-menu-search>
+        <np-header-notify></np-header-notify>
+        <np-header-username></np-header-username>
+      </div>
+    </nz-header>
+
+    <nz-content>
+      <div class="inner-content">
+        <div class="inner-content-mask"></div>
+        <ng-content></ng-content>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>
+
+<ng-template #triggerTemplate>
+  <span class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'" nzTheme="outline"></span>
+</ng-template>

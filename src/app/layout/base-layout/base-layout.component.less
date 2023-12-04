@@ -1,0 +1,147 @@
+.app-layout {
+  height: 100%;
+}
+
+.layout-header-left {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-header-action {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  color: var(--header-color);
+  white-space: nowrap;
+}
+
+.header-action-item {
+  display: flex;
+  height: 48px;
+  padding: 0 10px;
+  font-size: 1.2em;
+  cursor: pointer;
+  align-items: center;
+  &:not(.clear-hover):hover {
+    background-color: #f6f6f6;
+  }
+}
+
+:host ::ng-deep {
+  .menu-sidebar {
+    position: relative;
+    z-index: 10;
+    min-height: 100%;
+    padding-bottom: 37px;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.35);
+
+    .ant-layout-sider-children {
+      display: flex;
+      flex-direction: column;
+     /* background: var(--sider-background);*/
+
+      .scroll-container {
+        flex: 1;
+        overflow: auto;
+        padding-right: 1px;
+
+        &::-webkit-scrollbar-thumb {
+          background-color: #90939980;
+        }
+      }
+    }
+
+    .ant-layout-sider-trigger {
+      border-top: 1px solid #f2f2f3;
+    }
+  }
+
+  .ant-layout-header {
+    height: 48px;
+    line-height: 48px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgb(0 21 41 / 8%);
+    display: flex;
+
+    .ant-tabs-bottom > .ant-tabs-nav {
+      margin-top: 0;
+    }
+  }
+}
+
+.header-trigger {
+  height: 48px;
+  padding: 0 20px;
+  margin-right: 15px;
+
+}
+
+.trigger {
+  font-size: 17px;
+  cursor: pointer;
+  transition: all 0.3s, padding 0s;
+  color: rgba(0, 0, 0, 0.85);
+  &:hover {
+    color: #0960bd;
+  }
+}
+
+.sidebar-logo {
+  position: relative;
+  height: 48px;
+  padding-left: 9px;
+  overflow: hidden;
+  line-height: 48px;
+  transition: all 0.3s;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.85);
+
+  img {
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    vertical-align: middle;
+  }
+
+  h1 {
+    display: inline-block;
+    margin: 0 0 0 12px;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 600;
+    font-size: 14px;
+    font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+    vertical-align: middle;
+  }
+}
+
+nz-header {
+  padding: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+nz-content {
+  margin: 10px;
+  flex: 1;
+}
+
+.inner-content {
+  padding-right: 5px;
+  background: #f0f2f5;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+.inner-content-mask {
+  z-index: 9999;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  background: #ffffff01;
+}

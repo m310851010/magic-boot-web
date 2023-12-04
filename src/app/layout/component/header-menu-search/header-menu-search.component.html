@@ -1,0 +1,25 @@
+<span>
+  <i nz-icon nzType="search"></i>
+  <input
+    type="text"
+    class="input-search"
+    (click)="$event.stopPropagation()"
+    [class.hidden]="hiddenSearch"
+    autocomplete="off"
+    nz-input
+    placeholder="搜索菜单"
+    [(ngModel)]="inputValue"
+    (ngModelChange)="inputValueChange($event)"
+    [nzAutocomplete]="auto"
+  />
+</span>
+
+<nz-autocomplete [nzBackfill]="true" #auto>
+  <nz-auto-option
+    *ngFor="let item of autoOptions"
+    [nzValue]="item.name"
+    (selectionChange)="onSelectionChange($event, item)"
+  >
+    {{ item.name }}
+  </nz-auto-option>
+</nz-autocomplete>

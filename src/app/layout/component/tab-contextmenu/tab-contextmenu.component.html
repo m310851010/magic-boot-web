@@ -1,0 +1,41 @@
+<nz-dropdown-menu #menu="nzDropdownMenu" class="iframe-contextmenu">
+  <ul nz-menu class="tabs-dropdown-menu">
+    <li nz-menu-item (click)="refreshTab()">
+      <span title>
+        <i nz-icon nzType="reload"></i>
+        <span class="nav-text">刷新</span>
+      </span>
+    </li>
+    <li nz-menu-item [nzDisabled]="!canCloseOne" (click)="canCloseOne && closeTab('one')">
+      <span title>
+        <i nz-icon nzType="close"></i>
+        <span class="nav-text">关闭</span>
+      </span>
+    </li>
+    <li nz-menu-item [nzDisabled]="!canCloseOther" (click)="canCloseOther && closeTab('other')">
+      <span title>
+        <i nz-icon nzType="pic-center"></i>
+        <span class="nav-text">关闭其他</span>
+      </span>
+    </li>
+    <li nz-menu-item [nzDisabled]="!canCloseLeft" (click)="canCloseLeft && closeTab('left')">
+      <span title>
+        <i nz-icon nzType="vertical-left"></i>
+        <span class="nav-text">关闭左侧</span>
+      </span>
+    </li>
+    <li nz-menu-item [nzDisabled]="!canCloseRight" (click)="canCloseRight && closeTab('right')">
+      <span title>
+        <i nz-icon nzType="vertical-right"></i>
+        <span class="nav-text">关闭右侧</span>
+      </span>
+    </li>
+    <li nz-menu-item [nzDisabled]="!canCloseAll" (click)="canCloseAll && closeTab('all')">
+      <span title>
+        <i nz-icon nzType="line"></i>
+        <span class="nav-text">关闭全部</span>
+      </span>
+    </li>
+  </ul>
+</nz-dropdown-menu>
+<ng-content></ng-content>
