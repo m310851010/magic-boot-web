@@ -48,8 +48,7 @@ export class LoginComponent implements OnInit {
     this.validateForm = this.fb.group({
       username: ['admin', [Validators.required]],
       password: ['000000', [Validators.required]],
-      verifyCode: ['', [Validators.required]],
-      rememberMe: [true]
+      verifyCode: ['', [Validators.required]]
     });
     this.changeCaptcha();
   }

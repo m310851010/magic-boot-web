@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
 import { HttpLoadingService, LogoutService } from '@xmagic/nzx-antd/http-interceptor';
-import { NzxModalModule, NzxModalWrapService } from '@xmagic/nzx-antd/modal';
+import { NzxModalModule, NzxModalService } from '@xmagic/nzx-antd/modal';
 import { loadingService } from '@xmagic/nzx-antd/service';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 
@@ -18,7 +18,7 @@ import { UserService } from '@commons/service/user.service';
 })
 export class AppComponent implements OnInit {
   constructor(
-    private modalService: NzxModalWrapService,
+    private modalService: NzxModalService,
     private loading: HttpLoadingService,
     private notifyService: LogoutService,
     private userService: UserService,

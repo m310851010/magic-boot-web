@@ -21,18 +21,16 @@ export class LoginService {
    * @param loginModel 登录数据
    */
   login(loginModel: LoginModel): Observable<string> {
-    const { username: u, verifyCode: v, rememberMe: m } = loginModel;
-    const randoms = this.getRandoms(loginModel.captchaToken);
-    const sp = sm3(loginModel.password);
+    const { username, verifyCode, uuid } = loginModel;
+    const password = sm3(loginModel.password);
     return this.http
       .post<string>(
-        '/login',
+        '/system/security/login',
         {
-          u,
-          v,
-          m,
-          p: sm3(sp + randoms[0]),
-          s: sm3(`${u}|${sp}|${m}|${randoms[1]}|post`)
+          username,
+          code: verifyCode,
+          uuid,
+          password
         },
         { context: new HttpContext().set(LOADING_ENABLED, false) }
       )
@@ -43,39 +41,13 @@ export class LoginService {
       );
   }
 
-  private getRandoms(token?: string): string[] {
-    const idx = token?.indexOf('l');
-    if (idx == null || idx === -1) {
-      return [];
-    }
-    return [token!.substring(0, idx), token!.substring(idx! + 1)];
-  }
-
   /**
    * 获取验证码
    */
   getCaptcha(): Observable<CaptchaInfo> {
-    return this.http
-      .get('/verifyCode.jpg', {
-        observe: 'response',
-        responseType: 'blob',
-        context: new HttpContext().set(LOADING_ENABLED, false)
-      })
-      .pipe(
-        filter(v => !!v.body),
-        switchMap(resp => {
-          return new Observable<CaptchaInfo>(subscriber => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              const captchaToken = resp.headers.get('token');
-              const captcha = reader.result;
-              subscriber.next({ captchaToken, captcha } as CaptchaInfo);
-              subscriber.complete();
-            };
-            reader.readAsDataURL(resp.body!);
-          });
-        })
-      );
+    return this.http.get<CaptchaInfo>('/system/security/verification/code', {
+      context: new HttpContext().set(LOADING_ENABLED, false)
+    });
   }
 }
 
@@ -95,10 +67,6 @@ export interface LoginModel extends CaptchaInfo {
    * 验证码
    */
   verifyCode: string;
-  /**
-   * 记住密码
-   */
-  rememberMe: boolean;
 }
 
 /**
@@ -106,11 +74,11 @@ export interface LoginModel extends CaptchaInfo {
  */
 export interface CaptchaInfo {
   /**
-   * 验证码token
+   * uuid 唯一标识
    */
-  captchaToken: string;
+  uuid: string;
   /**
    * 验证码
    */
-  captcha: string;
+  img: string;
 }

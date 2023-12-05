@@ -24,10 +24,11 @@ export class NzxAntdConfigService extends NzxAntdService {
     handleError: (req, error) => {
       if (error.httpError) {
         this.messageService.error(DEFAULT_STATUS_MESSAGE_MAP[error.code] || DEFAULT_STATUS_MESSAGE_MAP['other']);
+      } else if (error.code === 403) {
+        this.messageService.error('抱歉，您当前无权访问！');
       } else if (error.code < 1024) {
         this.messageService.error(error.message);
       }
-
       return throwError(() => error);
     }
   };

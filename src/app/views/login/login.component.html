@@ -35,7 +35,7 @@
           <div class="ant-input" style="padding: 0">
             <div class="login-verify" (click.once)="changeCaptcha()">
               @if (captcha) {
-              <img class="full-size" [src]="captcha.captcha" title="点击切换验证码" />
+              <img class="full-size" [src]="'data:image/png;base64,' + captcha.img" title="点击切换验证码" />
               } @else {
               <img src="./assets/images/loading.gif" style="margin-top: 7px" />
               }
@@ -45,7 +45,7 @@
               nz-input
               nzBorderless
               nzSize="large"
-              style="width: 50%"
+              style="width: 40%"
               placeholder="验证码"
               formControlName="verifyCode"
             />

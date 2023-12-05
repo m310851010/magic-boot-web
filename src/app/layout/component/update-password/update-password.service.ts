@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { NzxModalWrapService } from '@xmagic/nzx-antd/modal';
+import { NzxModalService } from '@xmagic/nzx-antd/modal';
 
 import { UserService } from '@commons/service/user.service';
 
@@ -10,7 +10,7 @@ import { UpdatePasswordComponent } from './update-password.component';
 @Injectable()
 export class UpdatePasswordService {
   constructor(
-    private modalService: NzxModalWrapService,
+    private modalService: NzxModalService,
     private userService: UserService
   ) {}
 
