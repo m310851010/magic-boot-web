@@ -46,7 +46,7 @@ export class LayoutService {
 
   constructor() {}
 
-  setAppList(apps: AppInfo[]) {
+  setAppList(apps: AppInfo[]): void {
     if (!apps || !apps.length) {
       this.appMap = {};
       this.tabMap = {};
@@ -72,7 +72,7 @@ export class LayoutService {
    * 切换应用
    * @param app
    */
-  switchAppChange(app: AppInfo) {
+  switchAppChange(app: AppInfo): void {
     this.selected = app;
     this.switchAppEvent.next(app);
   }
@@ -356,32 +356,33 @@ export class LayoutService {
     return document.getElementById(`${appCode}__${tabId}`) as HTMLIFrameElement;
   }
 
-  findMenu(key: string, appCode: string): { menu: Menu | null; trace: Menu[] } {
-    const app = this.appMap[appCode];
-    // 处理选中的菜单
-    const menus = app.menus;
-    let foundMenu: Menu | null = null;
-    const trace: Menu[] = [];
+  private findPath(tree: Menu[], id: string, path: Menu[] = []): Menu[] | undefined {
+    for (const item of tree) {
+      const tempPath = [...path];
+      item.selected = false;
+      item.open = false;
 
-    NzxUtils.forEachTree(menus, (item, parent, level) => {
-      if (level === 0) {
-        trace.length = 0;
+      tempPath.push(item);
+      if (item.id === id) {
+        setTimeout(() => (item.selected = true));
+        return tempPath;
       }
-      if (parent && trace.indexOf(parent) === -1) {
-        trace.push(parent);
+      if (item.children) {
+        const result = this.findPath(item.children!, id, tempPath);
+        if (result) {
+          return result;
+        }
       }
-
-      if (item.id === key) {
-        foundMenu = item;
-        trace.push(item);
-        return false;
-      }
-      return true;
-    });
-    return { menu: foundMenu, trace };
+    }
+    return undefined;
   }
 
-  destroy() {
+  findMenu(key: string, appCode: string): Menu[] | undefined {
+    const app = this.appMap[appCode];
+    return this.findPath(app.menus, key);
+  }
+
+  destroy(): void {
     this.appMap = {};
     this.tabMap = {};
     this.selected = undefined;

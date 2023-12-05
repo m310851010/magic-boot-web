@@ -5,7 +5,7 @@ import { LayoutComponent } from './layout.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: '**',
     component: LayoutComponent,
     title: '主页'
   }

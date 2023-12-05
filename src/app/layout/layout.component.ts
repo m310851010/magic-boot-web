@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { filter } from 'rxjs';
 
 import { AppInfo, Menu } from '@commons/service/user-info';
 
@@ -10,16 +11,26 @@ import { LayoutService } from './component/layout.service';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.less'
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   pathTraces: Menu[] = [];
   selected?: AppInfo;
 
   constructor(
-    protected layoutService: LayoutService,
-    protected router: Router
-  ) {}
+    private layoutService: LayoutService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {
+    activatedRoute.url.subscribe(value => {
+      console.log('url:', value);
+    });
+
+    activatedRoute.queryParams.subscribe(value => {
+      console.log('queryParams:', value);
+    });
+  }
 
   ngOnInit(): void {
+    this.router.navigate([`/main`], { queryParams: { x: 'yyyy' } });
     this.layoutService.switchAppEvent.subscribe(app => (this.selected = app));
   }
 
@@ -28,10 +39,10 @@ export class LayoutComponent {
    * @param menuItem 当前点击的菜单项
    */
   handleMenuClick(menuItem: Menu): void {
-    const { menu, trace } = this.layoutService.findMenu(menuItem.id, this.selected!.appCode);
-    if (menu) {
-      this.pathTraces = trace;
-      this.router.navigate([`/home${menu.url}`]);
+    const result = this.layoutService.findMenu(menuItem.id, this.selected!.appCode);
+    this.pathTraces = result || [];
+    if (result) {
+      this.router.navigate([`/main${result.map(v => `/${v.id}`)}`]);
     }
   }
 }
