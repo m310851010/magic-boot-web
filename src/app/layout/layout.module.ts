@@ -25,12 +25,10 @@ import { InputPasswordComponent } from '@commons/component/input-password';
 import { StrengthMeterComponent } from '@commons/component/strength-meter';
 
 import { BaseLayoutComponent } from './base-layout/base-layout.component';
-import { HeaderAppComponent } from './component/header-app/header-app.component';
 import { HeaderMenuSearchComponent } from './component/header-menu-search/header-menu-search.component';
 import { HeaderNotifyComponent } from './component/header-notify/header-notify.component';
 import { HeaderUsernameComponent } from './component/header-username/header-username.component';
 import { LayoutService } from './component/layout.service';
-import { MenuInfoService } from './component/menu-info.service';
 import { PageProgressComponent } from './component/page-progress/page-progress.component';
 import { SliderMenuComponent } from './component/slider-menu/slider-menu.component';
 import { TabContextmenuComponent } from './component/tab-contextmenu/tab-contextmenu.component';
@@ -47,7 +45,6 @@ import { LayoutComponent } from './layout.component';
     HeaderNotifyComponent,
     HeaderMenuSearchComponent,
     HeaderUsernameComponent,
-    HeaderAppComponent,
     SliderMenuComponent,
     LayoutComponent
   ],
@@ -79,6 +76,6 @@ import { LayoutComponent } from './layout.component';
     NzInputModule,
     NgTemplateOutlet
   ],
-  providers: [MenuInfoService, LayoutService]
+  providers: [LayoutService]
 })
 export class LayoutModule {}

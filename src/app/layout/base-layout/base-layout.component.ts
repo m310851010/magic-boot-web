@@ -4,10 +4,10 @@ import { Subject } from 'rxjs';
 
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
 
+import { MenuInfoService } from '@commons/service/menu-info.service';
 import { AppInfo, Menu } from '@commons/service/user-info';
 
 import { LayoutService } from '../component/layout.service';
-import { MenuInfoService } from '../component/menu-info.service';
 import { UpdatePasswordService } from '../component/update-password/update-password.service';
 
 @Component({
@@ -23,29 +23,20 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
    */
   isCollapsed = false;
   /**
-   * 所有应用
+   * 所有菜单
    */
-  appInfos: AppInfo[] = [];
+  menus: Menu[] = [];
 
   @Output() menuClick = new EventEmitter<Menu>();
   private destroy$ = new Subject<void>();
 
   constructor(
-    protected menuService: MenuInfoService,
-    protected layoutService: LayoutService,
-    protected router: Router
+    private menuService: MenuInfoService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.menuService.getMenus().subscribe(v => {
-      if (v) {
-        // @ts-ignore
-        v = [{ menus: v, appCode: 'default' }];
-        this.appInfos = v;
-        this.layoutService.setAppList(v);
-        this.layoutService.switchAppChange(v[0]);
-      }
-    });
+    this.menuService.getMenus().subscribe(menus => (this.menus = menus));
   }
 
   /**
@@ -64,6 +55,5 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
     this.menuService.clearCache();
-    this.layoutService.destroy();
   }
 }

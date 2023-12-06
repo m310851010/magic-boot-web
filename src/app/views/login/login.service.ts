@@ -7,7 +7,7 @@ import { LOADING_ENABLED, NzxStorageService } from '@xmagic/nzx-antd/service';
 // @ts-ignore
 import { sm3 } from 'sm-crypto';
 
-import { TOKEN_KEY } from '@commons/service/user.service';
+import { Constant } from '@commons/constant';
 
 @Injectable()
 export class LoginService {
@@ -34,11 +34,7 @@ export class LoginService {
         },
         { context: new HttpContext().set(LOADING_ENABLED, false) }
       )
-      .pipe(
-        tap(token => {
-          this.storageService.setItem(TOKEN_KEY, token);
-        })
-      );
+      .pipe(tap(token => this.storageService.setItem(Constant.AUTH_TOKEN_KEY, token)));
   }
 
   /**

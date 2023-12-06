@@ -21,7 +21,11 @@
     </div>
 
     <div class="scroll-container">
-      <np-slider-menu [isCollapsed]="isCollapsed" (menuClick)="handleMenuClick($event)"></np-slider-menu>
+      <np-slider-menu
+        [isCollapsed]="isCollapsed"
+        (menuClick)="handleMenuClick($event)"
+        [menus]="menus"
+      ></np-slider-menu>
     </div>
   </nz-sider>
 
@@ -31,12 +35,10 @@
         <ng-container *ngTemplateOutlet="triggerTemplate"></ng-container>
       </span>
 
-      <div class="layout-header-left">
-        <np-header-app [appInfos]="appInfos"></np-header-app>
-      </div>
+      <div class="layout-header-left"></div>
 
       <div class="layout-header-action">
-        <np-header-menu-search [appInfos]="appInfos"></np-header-menu-search>
+        <np-header-menu-search [menus]="menus"></np-header-menu-search>
         <np-header-notify></np-header-notify>
         <np-header-username></np-header-username>
       </div>

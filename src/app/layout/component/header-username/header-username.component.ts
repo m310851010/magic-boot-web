@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 
+import { EnvService } from '@commons/service/env.service';
 import { UserInfo } from '@commons/service/user-info';
 import { UserService } from '@commons/service/user.service';
 
@@ -20,7 +21,8 @@ export class HeaderUsernameComponent implements OnInit, OnDestroy {
   constructor(
     private updatePasswordService: UpdatePasswordService,
     private notifyService: LogoutService,
-    private userService: UserService
+    private userService: UserService,
+    public env: EnvService
   ) {}
 
   ngOnInit(): void {

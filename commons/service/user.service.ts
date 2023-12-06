@@ -6,13 +6,13 @@ import { finalize } from 'rxjs/operators';
 import { NzxStorageService } from '@xmagic/nzx-antd/service';
 
 import { UserInfo } from './user-info';
+import { Constant } from '../constant';
 
-export const TOKEN_KEY = 'AUTH_TOKEN';
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private userInfoObservable?: Observable<UserInfo>;
+  private userInfo$?: Observable<UserInfo>;
 
   constructor(
     private http: HttpClient,
@@ -23,11 +23,11 @@ export class UserService {
    * 获取用户信息
    */
   getUserInfo(): Observable<UserInfo> {
-    if (this.userInfoObservable) {
-      return this.userInfoObservable;
+    if (this.userInfo$) {
+      return this.userInfo$;
     }
-    this.userInfoObservable = this.http.get<UserInfo>('/system/user').pipe(shareReplay(1));
-    return this.userInfoObservable;
+    this.userInfo$ = this.http.get<UserInfo>('/system/user/info').pipe(shareReplay(1));
+    return this.userInfo$;
   }
 
   /**
@@ -41,20 +41,27 @@ export class UserService {
    * 清空用户信息
    */
   clearUserInfo(): void {
-    this.userInfoObservable = undefined;
+    this.userInfo$ = undefined;
   }
 
   /**
    * 获取token
    */
   getToken(): string | null {
-    return this.storageService.getItem<string>(TOKEN_KEY);
+    return this.storageService.getItem<string>(Constant.AUTH_TOKEN_KEY);
+  }
+
+  /**
+   * 是否已登录
+   */
+  isLogin(): boolean {
+    return !!this.getToken();
   }
 
   /**
    * 删除token
    */
   removeToken(): void {
-    this.storageService.removeItem(TOKEN_KEY);
+    this.storageService.removeItem(Constant.AUTH_TOKEN_KEY);
   }
 }

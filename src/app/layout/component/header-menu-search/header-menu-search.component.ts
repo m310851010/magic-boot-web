@@ -1,12 +1,10 @@
 import { Component, HostListener, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzOptionSelectionChange } from 'ng-zorro-antd/auto-complete';
 
-import { AppInfo, Menu } from '@commons/service/user-info';
-
-import { LayoutService } from '../layout.service';
-import { MenuInfoService } from '../menu-info.service';
+import { Menu } from '@commons/service/user-info';
 
 @Component({
   selector: 'np-header-menu-search',
@@ -18,7 +16,7 @@ import { MenuInfoService } from '../menu-info.service';
   }
 })
 export class HeaderMenuSearchComponent implements OnInit, OnChanges {
-  @Input() appInfos?: AppInfo[];
+  @Input() menus!: Menu[];
   inputValue = '';
   /**
    * 隐藏搜索框
@@ -31,24 +29,18 @@ export class HeaderMenuSearchComponent implements OnInit, OnChanges {
   menuDataSource: Menu[] = [];
   autoOptions: Menu[] = [];
 
-  constructor(
-    protected menuService: MenuInfoService,
-    protected layoutService: LayoutService
-  ) {}
+  constructor(protected router: Router) {}
 
   ngOnInit(): void {
     this.getMenuList();
   }
 
-  getMenuList() {
-    this.appInfos?.forEach(v => {
-      NzxUtils.forEachTree(v.menus, item => {
-        if (!item.children || !item.children.length) {
-          item.appCode = v.appCode;
-          this.menuDataSource.push(item);
-        }
-        return true;
-      });
+  getMenuList(): void {
+    NzxUtils.forEachTree(this.menus, item => {
+      if (!item.children || !item.children.length) {
+        this.menuDataSource.push(item);
+      }
+      return true;
     });
 
     this.autoOptions = this.menuDataSource;
@@ -79,12 +71,12 @@ export class HeaderMenuSearchComponent implements OnInit, OnChanges {
 
   onSelectionChange(evt: NzOptionSelectionChange, menu: Menu): void {
     if (evt.isUserInput) {
-      this.layoutService.openTab(menu, menu.appCode!, true);
+      this.router.navigateByUrl(menu.url);
     }
   }
 
   ngOnChanges(changes: { [K in keyof this]?: SimpleChange } & SimpleChanges): void {
-    if (changes.appInfos && !changes.appInfos.isFirstChange()) {
+    if (changes.menus && !changes.menus.isFirstChange()) {
       this.getMenuList();
     }
   }

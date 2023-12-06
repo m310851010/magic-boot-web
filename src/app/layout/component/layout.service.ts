@@ -356,7 +356,7 @@ export class LayoutService {
     return document.getElementById(`${appCode}__${tabId}`) as HTMLIFrameElement;
   }
 
-  private findPath(tree: Menu[], id: string, path: Menu[] = []): Menu[] | undefined {
+  findPath(tree: Menu[], id: string, path: Menu[] = []): Menu[] | undefined {
     for (const item of tree) {
       const tempPath = [...path];
       item.selected = false;

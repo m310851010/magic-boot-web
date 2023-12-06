@@ -1,5 +1,10 @@
 <div nz-dropdown [nzDropdownMenu]="menu" class="avatar-box" nzTrigger="click">
-  <nz-avatar nzIcon="user" nzSize="default" class="avatar"></nz-avatar>
+  <nz-avatar
+    nzIcon="user"
+    nzSize="default"
+    class="avatar"
+    [nzSrc]="userInfo?.headPortrait ? env.basePath + userInfo?.headPortrait : undefined"
+  ></nz-avatar>
   <span>{{ userInfo?.username }}</span>
 </div>
 

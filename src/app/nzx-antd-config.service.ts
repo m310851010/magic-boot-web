@@ -1,6 +1,6 @@
 import { HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { throwError } from 'rxjs';
+import { map, Observable, throwError } from 'rxjs';
 
 import { DEFAULT_STATUS_MESSAGE_MAP, NzxAntdService, ResponseSetting, TableSetting } from '@xmagic/nzx-antd';
 import { HttpRequestOptions } from '@xmagic/nzx-antd/nzx-antd.service';
@@ -9,6 +9,7 @@ import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { Constant } from '@commons/constant';
+import { UserService } from '@commons/service/user.service';
 
 import { environment } from '../environments/environment';
 
@@ -41,13 +42,24 @@ export class NzxAntdConfigService extends NzxAntdService {
 
   constructor(
     private storageService: NzxStorageService,
-    private messageService: NzMessageService
+    private messageService: NzMessageService,
+    private userService: UserService
   ) {
     super();
   }
 
   override handleRequest = (req: HttpRequest<NzSafeAny>, url: string): null | HttpRequestOptions => {
-    const token = this.storageService.getItem<string>(Constant.AUTH_TOKEN_KEY);
-    return token ? { setHeaders: { token } } : null;
+    const Authorization = this.storageService.getItem<string>(Constant.AUTH_TOKEN_KEY);
+    return Authorization ? { setHeaders: { Authorization } } : null;
+  };
+
+  // @ts-ignore
+  override hasAuth = (authCode: string): Observable<boolean> => {
+    return this.userService.getUserInfo().pipe(
+      map(v => {
+        const authorities = v.authorities || [];
+        return authorities.indexOf(authCode) >= 0;
+      })
+    );
   };
 }

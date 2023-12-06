@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -16,6 +17,7 @@ export class SliderMenuComponent implements OnInit, OnDestroy {
    * 菜单是否展开
    */
   @Input() isCollapsed!: boolean;
+  @Input() menus!: Menu[];
   /**
    * 菜单点击事件
    */
@@ -29,21 +31,15 @@ export class SliderMenuComponent implements OnInit, OnDestroy {
    * @private
    */
   private destroy$ = new Subject<void>();
-  constructor(protected layoutService: LayoutService) {}
+  constructor(protected router: Router) {}
 
-  ngOnInit(): void {
-    this.layoutService.switchAppEvent.pipe(takeUntil(this.destroy$)).subscribe(v => (this.selected = v));
-  }
+  ngOnInit(): void {}
 
   /**
    * 菜单点击事件
    * @param menuItem 当前点击的菜单项
    */
   handleMenuClick(menuItem: Menu): void {
-    const prefix = this.selected?.pathPrefix;
-    if (prefix && menuItem.url && menuItem.url.indexOf(prefix) === -1) {
-      menuItem.url = `${prefix}#${menuItem.url}`;
-    }
     this.menuClick.emit(menuItem);
   }
 

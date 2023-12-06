@@ -1,8 +1,8 @@
 <!--递归生成菜单树-->
 <ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
-  <ng-container *ngTemplateOutlet="menuTpl; context: { $implicit: selected?.menus, level: 1 }"></ng-container>
-  <ng-template #menuTpl let-menus let-level="level">
-    <ng-container *ngFor="let menu of menus">
+  <ng-container *ngTemplateOutlet="menuTpl; context: { $implicit: menus, level: 1 }"></ng-container>
+  <ng-template #menuTpl let-children let-level="level">
+    <ng-container *ngFor="let menu of children">
       <li
         *ngIf="menu.children && menu.children.length; else menuItemTemplate"
         nz-submenu
