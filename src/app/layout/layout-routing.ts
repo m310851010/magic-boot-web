@@ -5,9 +5,10 @@ import { LayoutComponent } from './layout.component';
 
 const routes: Routes = [
   {
-    path: '**',
+    path: '',
     component: LayoutComponent,
-    title: '主页'
+    title: '主页',
+    loadChildren: () => import('../views/views-routing')
   }
 ];
 

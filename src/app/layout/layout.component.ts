@@ -30,7 +30,7 @@ export class LayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.router.navigate([`/main`], { queryParams: { x: 'yyyy' } });
+    // this.router.navigate([`/main`], { queryParams: { x: 'yyyy' } });
     this.layoutService.switchAppEvent.subscribe(app => (this.selected = app));
   }
 
