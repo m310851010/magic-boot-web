@@ -5,9 +5,8 @@ import { Subject } from 'rxjs';
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
 
 import { MenuInfoService } from '@commons/service/menu-info.service';
-import { AppInfo, Menu } from '@commons/service/user-info';
+import { Menu } from '@commons/service/user-info';
 
-import { LayoutService } from '../component/layout.service';
 import { UpdatePasswordService } from '../component/update-password/update-password.service';
 
 @Component({

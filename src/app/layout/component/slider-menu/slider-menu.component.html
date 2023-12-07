@@ -1,5 +1,5 @@
 <!--递归生成菜单树-->
-<ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+<ul nz-menu nzMode="inline" [nzInlineCollapsed]="isCollapsed" nzTheme="dark">
   <ng-container *ngTemplateOutlet="menuTpl; context: { $implicit: menus, level: 1 }"></ng-container>
   <ng-template #menuTpl let-children let-level="level">
     <ng-container *ngFor="let menu of children">
@@ -8,14 +8,12 @@
         nz-submenu
         [nzPaddingLeft]="level * 16"
         [nzOpen]="menu.open"
+        [nzIcon]="menu.icon"
+        [nzTitle]="menu.name"
         (nzOpenChange)="menu.open = $event"
+        [attr.yyyy]="menu.name"
       >
-        <span title>
-          <i *ngIf="menu.icon" class="ant-menu-item-icon" [fa-icon]="menu.icon"></i>
-          <span class="nav-text">{{ menu.name }}</span>
-        </span>
-
-        <ul *ngIf="menu.children && menu.children.length">
+        <ul>
           <ng-container
             *ngTemplateOutlet="menuTpl; context: { $implicit: menu.children, level: level + 1 }"
           ></ng-container>
@@ -23,11 +21,15 @@
       </li>
 
       <ng-template #menuItemTemplate>
-        <li nz-menu-item (click)="handleMenuClick(menu)" [nzPaddingLeft]="level * 16" [nzSelected]="menu.selected">
-          <span title>
-            <i *ngIf="menu.icon" class="ant-menu-item-icon" [fa-icon]="menu.icon"></i>
-            <span class="nav-text">{{ menu.name }}</span>
-          </span>
+        <li
+          nz-menu-item
+          (click)="handleMenuClick(menu)"
+          [nzPaddingLeft]="level * 16"
+          [nzSelected]="menu.selected"
+          [attr.xxxx]="menu.name"
+        >
+          <span nz-icon [nzType]="menu.icon" *ngIf="menu.icon"></span>
+          <span>{{ menu.name }}</span>
         </li>
       </ng-template>
     </ng-container>
