@@ -3,11 +3,11 @@
     <nz-breadcrumb class="nav-breadcrumb" *ngIf="routeData?.breadcrumb !== false && pathTraces.length">
       <nz-breadcrumb-item *ngFor="let item of pathTraces; last as last; first as first">
         <a *ngIf="item.url && (!last || first); else lastItemTemplate">
-          <i *ngIf="item.icon" class="ant-menu-item-icon" [fa-icon]="item.icon"></i>
+          <i *ngIf="item.icon" class="ant-menu-item-icon"  nz-icon [nzType]="item.icon"></i>
           {{ item.name }}
         </a>
         <ng-template #lastItemTemplate>
-          <i *ngIf="item.icon" class="ant-menu-item-icon" [fa-icon]="item.icon"></i>
+          <i *ngIf="item.icon" class="ant-menu-item-icon"  nz-icon [nzType]="item.icon"></i>
           {{ item.name }}
         </ng-template>
       </nz-breadcrumb-item>
