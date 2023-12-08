@@ -1,1 +1,15 @@
-<p>user works!</p>
+<nzx-page>
+    <nzx-header>
+        <form nz-form [formGroup]="searchForm" >
+            <formly-form [form]="searchForm" [fields]="searchFields" [model]="searchModal" [options]="{formState: gridOptions}"></formly-form>
+        </form>
+
+        <div buttons>
+            <nz-space>
+                <button *nzSpaceItem nz-button nzType="primary">查询</button>
+                <button *nzSpaceItem nz-button (click)="searchForm.reset()">重置</button>
+            </nz-space>
+
+        </div>
+    </nzx-header>
+</nzx-page>
