@@ -1,16 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzField, NzFormlyModule } from '@xmagic/nz-formly';
-import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
+import { FormlyNzButtonModule } from '@xmagic/nz-formly/button';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
-import { NzFormModule } from 'ng-zorro-antd/form';
+import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
+import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { FormlyNzButtonModule } from '@xmagic/nz-formly/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 @Component({
   selector: 'ma-user',
@@ -27,7 +31,11 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
     FormlyModule,
     NzFormModule,
     NzButtonModule,
-    NzSpaceModule
+    NzSpaceModule,
+    NzCardModule,
+    NzInputModule,
+    NzTreeModule,
+    FormsModule
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.less'
@@ -74,6 +82,33 @@ export default class UserComponent {
                 text: '重置'
               }
             }
+          ]
+        }
+      ]
+    }
+  ];
+
+  searchText = '';
+  nodes: NzTreeNodeOptions[] = [
+    {
+      title: 'parent 1',
+      key: '100',
+      children: [
+        {
+          title: 'parent 1-0',
+          key: '1001',
+          disabled: true,
+          children: [
+            { title: 'leaf 1-0-0', key: '10010', disableCheckbox: true, isLeaf: true },
+            { title: 'leaf 1-0-1', key: '10011', isLeaf: true }
+          ]
+        },
+        {
+          title: 'parent 1-1',
+          key: '1002',
+          children: [
+            { title: 'leaf 1-1-0', key: '10020', isLeaf: true },
+            { title: 'leaf 1-1-1', key: '10021', isLeaf: true }
           ]
         }
       ]

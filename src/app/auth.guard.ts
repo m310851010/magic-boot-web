@@ -1,12 +1,11 @@
 import { inject } from '@angular/core';
-import { CanActivateChildFn, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
-import { first, firstValueFrom, map, tap } from 'rxjs';
+import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
+import { first, map } from 'rxjs';
 
-import { NzxAntdService } from '@xmagic/nzx-antd';
-
-import { UserService } from '@commons/service/user.service';
-import { MenuInfoService } from '@commons/service/menu-info.service';
 import { NzxUtils } from '@xmagic/nzx-antd/util';
+
+import { MenuInfoService } from '@commons/service/menu-info.service';
+import { UserService } from '@commons/service/user.service';
 
 export const loginGuard: CanActivateFn = (route, state) => {
   const userService = inject(UserService);
@@ -44,7 +43,7 @@ export const authGuard: CanActivateChildFn = (childRoute, state) => {
 
         if (!isAuth) {
           const prefix = state.url.indexOf('/main/') === 0 ? '/main' : '';
-          router.navigate([prefix + '/error/403'], { skipLocationChange: true }).then();
+          router.navigate([`${prefix}/error/403`], { skipLocationChange: true }).then();
         }
         return isAuth;
       })

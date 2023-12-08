@@ -1,15 +1,41 @@
-<nzx-page>
-    <nzx-header>
-        <form nz-form [formGroup]="searchForm" >
-            <formly-form [form]="searchForm" [fields]="searchFields" [model]="searchModal" [options]="{formState: gridOptions}"></formly-form>
+<div nz-row class="full-height-less">
+  <div nz-col nzFlex="280px">
+    <nz-card nzTitle="组织机构" nzSize="small" class="flex-card card-body-less full-height">
+      <div class="flex-vertical flex-main">
+        <div class="search-box">
+          <nz-input-group nzSearch nzSuffixIcon="search">
+            <input nz-input placeholder="请输入关键字搜索" [(ngModel)]="searchText" />
+          </nz-input-group>
+        </div>
+
+        <div class="flex-main relative">
+          <nz-tree class="full-overflow" [nzData]="nodes" nzExpandAll nzShowLine nzCheckable nzBlockNode></nz-tree>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+
+  <div nz-col nzFlex="auto">
+    <nzx-page>
+      <nzx-header>
+        <form nz-form [formGroup]="searchForm">
+          <formly-form
+            [form]="searchForm"
+            [fields]="searchFields"
+            [model]="searchModal"
+            [options]="{ formState: gridOptions }"
+          ></formly-form>
         </form>
 
         <div buttons>
-            <nz-space>
-                <button *nzSpaceItem nz-button nzType="primary">查询</button>
-                <button *nzSpaceItem nz-button (click)="searchForm.reset()">重置</button>
-            </nz-space>
-
+          <nz-space>
+            <button *nzSpaceItem nz-button nzType="primary">查询</button>
+            <button *nzSpaceItem nz-button (click)="searchForm.reset()">重置</button>
+          </nz-space>
         </div>
-    </nzx-header>
-</nzx-page>
+      </nzx-header>
+
+      <nzx-content>5545455</nzx-content>
+    </nzx-page>
+  </div>
+</div>
