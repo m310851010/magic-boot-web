@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
       .login({ ...this.validateForm.value, ...this.captcha })
       .pipe(finalize(() => (this.loginLoading = false)))
       .subscribe({
-        next: () => this.router.navigate(['/']),
+        next: () => this.router.navigate(['/main']),
         error: (error: HttpError) => {
           if (!error.httpError) {
             this.changeCaptcha();

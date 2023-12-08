@@ -1,8 +1,8 @@
-<np-base-layout (menuClick)="handleMenuClick($event)">
+<np-base-layout [leftSlider]="routeData?.leftSlider !== false">
   <div class="nav-content-wrapper">
-    <nz-breadcrumb class="nav-breadcrumb" *ngIf="pathTraces.length">
+    <nz-breadcrumb class="nav-breadcrumb" *ngIf="routeData?.breadcrumb !== false && pathTraces.length">
       <nz-breadcrumb-item *ngFor="let item of pathTraces; last as last; first as first">
-        <a *ngIf="item.url && (!last || first); else lastItemTemplate" (click)="handleMenuClick(item)">
+        <a *ngIf="item.url && (!last || first); else lastItemTemplate">
           <i *ngIf="item.icon" class="ant-menu-item-icon" [fa-icon]="item.icon"></i>
           {{ item.name }}
         </a>
@@ -13,7 +13,7 @@
       </nz-breadcrumb-item>
     </nz-breadcrumb>
 
-    <div style="flex: 1; background: #fff">
+    <div style="flex: 1;">
       <router-outlet></router-outlet>
     </div>
   </div>

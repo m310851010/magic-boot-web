@@ -1,6 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
 
@@ -8,6 +6,7 @@ import { MenuInfoService } from '@commons/service/menu-info.service';
 import { Menu } from '@commons/service/user-info';
 
 import { UpdatePasswordService } from '../component/update-password/update-password.service';
+import { first } from 'rxjs';
 
 @Component({
   selector: 'np-base-layout',
@@ -15,7 +14,11 @@ import { UpdatePasswordService } from '../component/update-password/update-passw
   styleUrls: ['./base-layout.component.less', './../layout.component.less'],
   providers: [UpdatePasswordService]
 })
-export class BaseLayoutComponent implements OnInit, OnDestroy {
+export class BaseLayoutComponent implements OnInit {
+  /**
+   * 侧边菜单栏
+   */
+  @Input() leftSlider = true;
   sliderWidth = 220;
   /**
    * 是否展开
@@ -27,15 +30,14 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   menus: Menu[] = [];
 
   @Output() menuClick = new EventEmitter<Menu>();
-  private destroy$ = new Subject<void>();
 
-  constructor(
-    private menuService: MenuInfoService,
-    private router: Router
-  ) {}
+  constructor(private menuService: MenuInfoService) {}
 
   ngOnInit(): void {
-    this.menuService.getMenus().subscribe(menus => (this.menus = menus));
+    this.menuService
+      .getMenus()
+      .pipe(first())
+      .subscribe(menus => (this.menus = menus));
   }
 
   /**
@@ -48,11 +50,5 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
 
   onResize({ width, height }: NzResizeEvent): void {
     this.sliderWidth = width!;
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.menuService.clearCache();
   }
 }

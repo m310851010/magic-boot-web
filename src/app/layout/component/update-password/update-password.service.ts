@@ -29,7 +29,7 @@ export class UpdatePasswordService {
             .submitForm()
             .subscribe(val => {
               if (val) {
-                this.userService.removeToken();
+                this.userService.clearCache();
                 modalRef.close();
                 obs.next();
                 obs.complete();

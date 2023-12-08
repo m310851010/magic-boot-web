@@ -34,7 +34,7 @@ export class UserService {
    * 退出登录
    */
   logout(): Observable<void> {
-    return this.http.get<void>('/system/security/logout').pipe(finalize(() => this.removeToken()));
+    return this.http.get<void>('/system/security/logout').pipe(finalize(() => this.clearCache()));
   }
 
   /**
@@ -61,7 +61,8 @@ export class UserService {
   /**
    * 删除token
    */
-  removeToken(): void {
+  clearCache(): void {
     this.storageService.removeItem(Constant.AUTH_TOKEN_KEY);
+    this.clearUserInfo();
   }
 }

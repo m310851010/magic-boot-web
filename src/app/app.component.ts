@@ -7,6 +7,7 @@ import { loadingService } from '@xmagic/nzx-antd/service';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 
 import { UserService } from '@commons/service/user.service';
+import { MenuInfoService } from '@commons/service/menu-info.service';
 
 @Component({
   selector: 'ma-root',
@@ -22,6 +23,7 @@ export class AppComponent implements OnInit {
     private loading: HttpLoadingService,
     private notifyService: LogoutService,
     private userService: UserService,
+    private menuService: MenuInfoService,
     private router: Router
   ) {}
 
@@ -29,8 +31,10 @@ export class AppComponent implements OnInit {
     this.loading.subscribe(status => loadingService.loading(status));
 
     this.notifyService.onLogout(error => {
-      this.userService.removeToken();
+      this.userService.clearCache();
+      this.menuService.clearCache();
       this.modalService.closeAll();
+
       if (error.timeout) {
         this.modalService
           .info({ nzContent: error.message || '登录超时，请重新登录' })

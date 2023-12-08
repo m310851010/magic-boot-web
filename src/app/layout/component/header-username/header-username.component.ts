@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 
@@ -7,6 +7,7 @@ import { UserInfo } from '@commons/service/user-info';
 import { UserService } from '@commons/service/user.service';
 
 import { UpdatePasswordService } from '../update-password/update-password.service';
+import { first } from 'rxjs';
 
 @Component({
   selector: 'np-header-username',
@@ -16,7 +17,7 @@ import { UpdatePasswordService } from '../update-password/update-password.servic
     '[class.header-action-item]': 'true'
   }
 })
-export class HeaderUsernameComponent implements OnInit, OnDestroy {
+export class HeaderUsernameComponent implements OnInit {
   userInfo?: UserInfo;
   constructor(
     private updatePasswordService: UpdatePasswordService,
@@ -26,7 +27,10 @@ export class HeaderUsernameComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.userService.getUserInfo().subscribe(info => (this.userInfo = info));
+    this.userService
+      .getUserInfo()
+      .pipe(first())
+      .subscribe(info => (this.userInfo = info));
   }
 
   updateUserInfo(): void {}
@@ -37,9 +41,5 @@ export class HeaderUsernameComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.userService.logout().subscribe(() => this.notifyService.logout({ timeout: false }));
-  }
-
-  ngOnDestroy(): void {
-    this.userService.clearUserInfo();
   }
 }
