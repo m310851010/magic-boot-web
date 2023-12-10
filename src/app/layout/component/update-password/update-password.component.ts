@@ -6,7 +6,7 @@ import { Observable, of } from 'rxjs';
 import { NzxFormUtils } from '@xmagic/nzx-antd/util';
 
 @Component({
-  selector: 'np-update-password',
+  selector: 'ma-update-password',
   templateUrl: './update-password.component.html',
   styleUrls: ['./update-password.component.less']
 })

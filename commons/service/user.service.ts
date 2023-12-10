@@ -48,7 +48,8 @@ export class UserService {
    * 获取token
    */
   getToken(): string | null {
-    return this.storageService.getItem<string>(Constant.AUTH_TOKEN_KEY);
+    const token = this.storageService.getItem<string>(Constant.AUTH_TOKEN_KEY);
+    return token ? encodeURIComponent(token) : null;
   }
 
   /**

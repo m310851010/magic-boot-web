@@ -1,6 +1,6 @@
 <nz-layout class="app-layout">
   <nz-sider
-   *ngIf="leftSlider"
+    *ngIf="leftSlider"
     class="menu-sidebar"
     [nzCollapsible]="true"
     nzTheme="dark"
@@ -17,16 +17,16 @@
     <nz-resize-handles [nzDirections]="['right']"></nz-resize-handles>
 
     <div class="sidebar-logo">
-      <img src="./assets/xmagic-red.svg" alt="logo" />
+      <img src="favicon.svg" alt="logo" />
       <h1>X-Magic</h1>
     </div>
 
     <div class="scroll-container">
-      <np-slider-menu
+      <ma-slider-menu
         [isCollapsed]="isCollapsed"
         (menuClick)="handleMenuClick($event)"
         [menus]="menus"
-      ></np-slider-menu>
+      ></ma-slider-menu>
     </div>
   </nz-sider>
 
@@ -39,9 +39,9 @@
       <div class="layout-header-left"></div>
 
       <div class="layout-header-action">
-        <np-header-menu-search [menus]="menus"></np-header-menu-search>
-        <np-header-notify></np-header-notify>
-        <np-header-username></np-header-username>
+        <ma-header-menu-search [menus]="menus"></ma-header-menu-search>
+        <ma-header-notify></ma-header-notify>
+        <ma-header-username></ma-header-username>
       </div>
     </nz-header>
 

@@ -1,0 +1,28 @@
+<div class="flex-horizontal">
+  <div class="form-search-content flex-main">
+    <ng-content></ng-content>
+    <ng-content select="[search-more],.search-more" *ngIf="!collapsed"></ng-content>
+  </div>
+
+  <div class="form-actions">
+    <button
+      *ngIf="showSearch"
+      nz-button
+      nzType="primary"
+      type="button"
+      class="mr-sm"
+      (click)="table && table.refresh(); searchClick.emit($event)"
+    >
+      <span nz-icon nzType="search"></span>
+      搜索
+    </button>
+    <button *ngIf="showReset" nz-button type="button" (click)="form && form.reset(); resetClick.emit($event)">
+      <span nz-icon nzType="undo"></span>
+      重置
+    </button>
+    <button *ngIf="showArrow" nz-button nzType="link" (click)="onToggleCollapse()" nzSize="small">
+      <span>{{ collapsed ? '展开' : '收起' }}</span>
+      <i nz-icon nzType="down" class="form-arrow" [class.form-arrow-active]="!collapsed"></i>
+    </button>
+  </div>
+</div>

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { first } from 'rxjs';
 
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
 
@@ -6,10 +7,9 @@ import { MenuInfoService } from '@commons/service/menu-info.service';
 import { Menu } from '@commons/service/user-info';
 
 import { UpdatePasswordService } from '../component/update-password/update-password.service';
-import { first } from 'rxjs';
 
 @Component({
-  selector: 'np-base-layout',
+  selector: 'ma-base-layout',
   templateUrl: './base-layout.component.html',
   styleUrls: ['./base-layout.component.less', './../layout.component.less'],
   providers: [UpdatePasswordService]

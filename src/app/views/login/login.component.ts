@@ -17,7 +17,7 @@ import { InputPasswordComponent } from '@commons/component/input-password';
 import { LoginService, CaptchaInfo } from './login.service';
 
 @Component({
-  selector: 'np-login',
+  selector: 'ma-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.less'],
   standalone: true,

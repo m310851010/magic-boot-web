@@ -4,11 +4,9 @@ import { first, map, Observable, throwError } from 'rxjs';
 
 import { DEFAULT_STATUS_MESSAGE_MAP, NzxAntdService, ResponseSetting, TableSetting } from '@xmagic/nzx-antd';
 import { HttpRequestOptions } from '@xmagic/nzx-antd/nzx-antd.service';
-import { NzxStorageService } from '@xmagic/nzx-antd/service';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { Constant } from '@commons/constant';
 import { UserService } from '@commons/service/user.service';
 
 import { environment } from '../environments/environment';
@@ -21,7 +19,9 @@ export class NzxAntdConfigService extends NzxAntdService {
 
   override response: ResponseSetting = {
     data: 'data',
-    timeout: error => error.code === 402,
+    timeout: error => {
+      return error.code === 402;
+    },
     handleError: (req, error) => {
       if (error.httpError) {
         this.messageService.error(DEFAULT_STATUS_MESSAGE_MAP[error.code] || DEFAULT_STATUS_MESSAGE_MAP['other']);
@@ -39,7 +39,6 @@ export class NzxAntdConfigService extends NzxAntdService {
   };
 
   constructor(
-    private storageService: NzxStorageService,
     private messageService: NzMessageService,
     private userService: UserService
   ) {
@@ -47,7 +46,7 @@ export class NzxAntdConfigService extends NzxAntdService {
   }
 
   override handleRequest = (req: HttpRequest<NzSafeAny>, url: string): null | HttpRequestOptions => {
-    const Authorization = this.storageService.getItem<string>(Constant.AUTH_TOKEN_KEY);
+    const Authorization = this.userService.getToken();
     return Authorization ? { setHeaders: { Authorization } } : null;
   };
 

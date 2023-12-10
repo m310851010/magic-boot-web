@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { first } from 'rxjs';
 
 import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 
@@ -7,10 +8,9 @@ import { UserInfo } from '@commons/service/user-info';
 import { UserService } from '@commons/service/user.service';
 
 import { UpdatePasswordService } from '../update-password/update-password.service';
-import { first } from 'rxjs';
 
 @Component({
-  selector: 'np-header-username',
+  selector: 'ma-header-username',
   templateUrl: './header-username.component.html',
   styleUrls: ['./header-username.component.less'],
   host: {

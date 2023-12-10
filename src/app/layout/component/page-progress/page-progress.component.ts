@@ -3,7 +3,7 @@ import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'np-page-progress',
+  selector: 'ma-page-progress',
   exportAs: 'pageProgress',
   templateUrl: './page-progress.component.html',
   styleUrls: ['./page-progress.component.less']

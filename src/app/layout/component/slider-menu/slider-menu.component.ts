@@ -1,14 +1,11 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import { AppInfo, Menu } from '@commons/service/user-info';
 
-import { LayoutService } from '../layout.service';
-
 @Component({
-  selector: 'np-slider-menu',
+  selector: 'ma-slider-menu',
   templateUrl: './slider-menu.component.html',
   styleUrls: ['./slider-menu.component.less']
 })

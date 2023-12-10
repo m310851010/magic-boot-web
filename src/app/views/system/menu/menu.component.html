@@ -1,25 +1,19 @@
 <div nz-row class="full-height-less">
-    <div nz-col nzFlex="280px">
-        <nz-card nzTitle="组织机构" nzSize="small" class="flex-card card-body-less full-height">
-            <div class="flex-vertical flex-main">
-                <div class="search-box">
-                    <nz-input-group nzSearch nzSuffixIcon="search">
-                        <input nz-input placeholder="请输入关键字搜索" [(ngModel)]="searchText">
-                    </nz-input-group>
-                </div>
+  <div nz-col nzFlex="280px">
+    <nz-card nzTitle="组织机构" nzSize="small" class="flex-card card-body-less full-height">
+      <div class="flex-vertical flex-main">
+        <div class="search-box">
+          <nz-input-group nzSearch nzSuffixIcon="search">
+            <input nz-input placeholder="请输入关键字搜索" [(ngModel)]="searchText" />
+          </nz-input-group>
+        </div>
 
-                <div class="flex-main relative">
-                    <nz-tree
-                            class="full-overflow"
-                            [nzData]="nodes"
-                            nzCheckable
-                    ></nz-tree>
-                </div>
-            </div>
-        </nz-card>
-    </div>
+        <div class="flex-main relative">
+          <nz-tree class="full-overflow" [nzData]="nodes" nzCheckable nzBlockNode></nz-tree>
+        </div>
+      </div>
+    </nz-card>
+  </div>
 
-    <div nz-col nzFlex="auto">
-
-    </div>
+  <div nz-col nzFlex="auto"></div>
 </div>

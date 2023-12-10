@@ -7,7 +7,7 @@ import { NzOptionSelectionChange } from 'ng-zorro-antd/auto-complete';
 import { Menu } from '@commons/service/user-info';
 
 @Component({
-  selector: 'np-header-menu-search',
+  selector: 'ma-header-menu-search',
   templateUrl: './header-menu-search.component.html',
   styleUrls: ['./header-menu-search.component.less'],
   host: {

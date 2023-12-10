@@ -1,41 +1,85 @@
-<div nz-row class="full-height-less">
-  <div nz-col nzFlex="280px">
-    <nz-card nzTitle="组织机构" nzSize="small" class="flex-card card-body-less full-height">
+<div class="full-height-less flex-horizontal">
+  <div style="width: 280px">
+    <nz-card nzTitle="组织机构" nzSize="small" [nzExtra]="nzExtraTemplate" class="flex-card card-body-less full-height">
       <div class="flex-vertical flex-main">
         <div class="search-box">
           <nz-input-group nzSearch nzSuffixIcon="search">
-            <input nz-input placeholder="请输入关键字搜索" [(ngModel)]="searchText" />
+            <input
+              nz-input
+              placeholder="请输入关键字搜索"
+              [(ngModel)]="searchText"
+              (ngModelChange)="onSearchTextChange($event)"
+            />
           </nz-input-group>
         </div>
 
         <div class="flex-main relative">
-          <nz-tree class="full-overflow" [nzData]="nodes" nzExpandAll nzShowLine nzCheckable nzBlockNode></nz-tree>
+          <nz-tree
+            class="full-overflow"
+            style="padding-left: 10px"
+            [nzData]="nodes"
+            nzShowLine
+            nzCheckable
+            nzBlockNode
+            [nzShowExpand]="false"
+            [nzShowIcon]="false"
+          ></nz-tree>
         </div>
       </div>
+
+      <ng-template #nzExtraTemplate>
+        <span nz-icon nzType="ellipsis-vertical" class="cursor-pointer" nz-dropdown [nzDropdownMenu]="menu"></span>
+      </ng-template>
+
+      <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu>
+          <li nz-menu-item (click)="onExpandAll()">展开全部</li>
+          <li nz-menu-item (click)="onUnExpandAll()">折叠全部</li>
+        </ul>
+      </nz-dropdown-menu>
     </nz-card>
   </div>
 
-  <div nz-col nzFlex="auto">
+  <div class="flex-main">
     <nzx-page>
       <nzx-header>
-        <form nz-form [formGroup]="searchForm">
-          <formly-form
-            [form]="searchForm"
-            [fields]="searchFields"
-            [model]="searchModal"
-            [options]="{ formState: gridOptions }"
-          ></formly-form>
+        <form nz-form [formGroup]="searchForm" nzLayout="inline">
+          <ma-form-search [table]="table" [form]="searchForm">
+            <formly-form
+              [form]="searchForm"
+              [fields]="searchFields"
+              [model]="searchModal"
+              [options]="{ formState: gridOptions }"
+            ></formly-form>
+          </ma-form-search>
         </form>
-
-        <div buttons>
-          <nz-space>
-            <button *nzSpaceItem nz-button nzType="primary">查询</button>
-            <button *nzSpaceItem nz-button (click)="searchForm.reset()">重置</button>
-          </nz-space>
-        </div>
       </nzx-header>
 
-      <nzx-content>5545455</nzx-content>
+      <nzx-content>
+        <nzx-table #table [nzxColumns]="columns" api="/system/user/list" [params]="getParams">
+          <div title>
+            <button nz-button nzType="primary" class="mr-sm">
+              <span nz-icon nzType="plus"></span>
+              添加用户
+            </button>
+
+            <button nz-button class="mr-sm">
+              <span nz-icon nzType="export"></span>
+              批量导出
+            </button>
+
+            <button nz-button nzDanger>
+              <span nz-icon nzType="delete"></span>
+              批量删除
+            </button>
+          </div>
+          <ng-template named="buttons" let-row>
+            <a *auth="'user:save'" (click)="onEditClick(row)" class="mr-xs">修改</a>
+            <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs">删除</a>
+            <a *auth="'user:resetpwd'" (click)="onResetClick(row)">重置密码</a>
+          </ng-template>
+        </nzx-table>
+      </nzx-content>
     </nzx-page>
   </div>
 </div>
