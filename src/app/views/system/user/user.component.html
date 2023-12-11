@@ -21,8 +21,8 @@
             nzShowLine
             nzCheckable
             nzBlockNode
-            [nzShowExpand]="false"
             [nzShowIcon]="false"
+            (nzCheckBoxChange)="onCheckBoxChange($event, table)"
           ></nz-tree>
         </div>
       </div>
@@ -33,8 +33,8 @@
 
       <nz-dropdown-menu #menu="nzDropdownMenu">
         <ul nz-menu>
-          <li nz-menu-item (click)="onExpandAll()">展开全部</li>
-          <li nz-menu-item (click)="onUnExpandAll()">折叠全部</li>
+          <li nz-menu-item (click)="onToggleExpandAll(true)">展开全部</li>
+          <li nz-menu-item (click)="onToggleExpandAll(false)">折叠全部</li>
         </ul>
       </nz-dropdown-menu>
     </nz-card>
@@ -43,12 +43,12 @@
   <div class="flex-main">
     <nzx-page>
       <nzx-header>
-        <form nz-form [formGroup]="searchForm" nzLayout="inline">
+        <form nz-form [formGroup]="searchForm">
           <ma-form-search [table]="table" [form]="searchForm">
             <formly-form
               [form]="searchForm"
               [fields]="searchFields"
-              [model]="searchModal"
+              [model]="searchModel"
               [options]="{ formState: gridOptions }"
             ></formly-form>
           </ma-form-search>
@@ -58,28 +58,57 @@
       <nzx-content>
         <nzx-table #table [nzxColumns]="columns" api="/system/user/list" [params]="getParams">
           <div title>
-            <button nz-button nzType="primary" class="mr-sm">
-              <span nz-icon nzType="plus"></span>
-              添加用户
-            </button>
+            <nz-space>
+              <ng-container *auth="'user:save'">
+                <button *nzSpaceItem nz-button nzType="primary" (click)="openModal('新建用户', {}, modalTemplate)">
+                  <span nz-icon nzType="plus"></span>
+                  新建用户
+                </button>
+              </ng-container>
 
-            <button nz-button class="mr-sm">
-              <span nz-icon nzType="export"></span>
-              批量导出
-            </button>
+              <ng-container *auth="'user:delete'">
+                <button *nzSpaceItem nz-button nzDanger>
+                  <span nz-icon nzType="delete"></span>
+                  批量删除
+                </button>
+              </ng-container>
 
-            <button nz-button nzDanger>
-              <span nz-icon nzType="delete"></span>
-              批量删除
-            </button>
+              <ng-container *auth="'user:import'">
+                <button *nzSpaceItem nz-button>
+                  <span nz-icon nzType="import"></span>
+                  导入
+                </button>
+              </ng-container>
+
+              <ng-container *auth="'user:export'">
+                <button *nzSpaceItem nz-button>
+                  <span nz-icon nzType="export"></span>
+                  导出
+                </button>
+              </ng-container>
+            </nz-space>
           </div>
           <ng-template named="buttons" let-row>
-            <a *auth="'user:save'" (click)="onEditClick(row)" class="mr-xs">修改</a>
+            <a *auth="'user:save'" (click)="openModal('修改用户', row, modalTemplate)" class="mr-xs">修改</a>
             <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs">删除</a>
-            <a *auth="'user:resetpwd'" (click)="onResetClick(row)">重置密码</a>
+            <a *auth="'user:resetpwd'" (click)="onResetPasswordClick(row)">重置密码</a>
+          </ng-template>
+          <ng-template named="role" let-row>
+            <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
           </ng-template>
         </nzx-table>
       </nzx-content>
     </nzx-page>
   </div>
 </div>
+
+<ng-template #modalTemplate>
+  <form nz-form [formGroup]="modalForm">
+    <formly-form
+      [form]="modalForm"
+      [fields]="modalFields"
+      [model]="modalModel"
+      [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
+    ></formly-form>
+  </form>
+</ng-template>

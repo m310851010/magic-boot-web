@@ -16,7 +16,11 @@ module.exports = {
         createDefaultProgram: true
       },
       plugins: ['@typescript-eslint', 'jsdoc', 'import', 'deprecation'],
-      extends: ['plugin:@angular-eslint/recommended', 'plugin:@angular-eslint/template/process-inline-templates', 'plugin:prettier/recommended'],
+      extends: [
+        'plugin:@angular-eslint/recommended',
+        'plugin:@angular-eslint/template/process-inline-templates',
+        'plugin:prettier/recommended'
+      ],
       rules: {
         'prettier/prettier': ['error', prettierConfig],
         '@angular-eslint/no-empty-lifecycle-method': ['off'],
@@ -83,12 +87,7 @@ module.exports = {
         '@angular-eslint/prefer-output-readonly': 'error',
         '@angular-eslint/use-component-selector': 'off',
         '@angular-eslint/use-component-view-encapsulation': 'off',
-        '@typescript-eslint/array-type': [
-          'error',
-          {
-            default: 'array-simple'
-          }
-        ],
+        '@typescript-eslint/array-type': 'off',
         '@typescript-eslint/consistent-type-definitions': 'error',
         '@typescript-eslint/explicit-member-accessibility': [
           'off',
