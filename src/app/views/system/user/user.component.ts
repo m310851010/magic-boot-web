@@ -188,7 +188,6 @@ export default class UserComponent {
    * @param row
    */
   onResetPasswordClick(row: UserInfo): void {
-    console.log(row);
     this.modalService.confirm({
       nzContent: `确定重置用户【${row.name || ''}】的密码`,
       nzOnOk: () => {
