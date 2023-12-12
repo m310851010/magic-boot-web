@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, NgZone, TemplateRef } from '@angular/core';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
 import { first, map, share, shareReplay, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -19,7 +19,7 @@ import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
-import { NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzxFormUtils, NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormatEmitEvent } from 'ng-zorro-antd/core/tree';
@@ -34,6 +34,7 @@ import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { CommonService, normalTree } from '@commons/service/common.service';
+import { FetcherService } from '@xmagic/nzx-antd/service';
 
 @Component({
   selector: 'ma-user',
@@ -87,7 +88,7 @@ export default class UserComponent {
           type: 'input',
           key: 'username',
           props: {
-            label: '用户名'
+            label: '账号'
           }
         },
         {
@@ -115,7 +116,6 @@ export default class UserComponent {
   getParams: () => Partial<UserInfo> = () => this.searchModel;
   columns: NzxColumn<UserInfo>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
-    { isIndex: true },
     { name: 'username', thText: '登录名称' },
     { name: 'name', thText: '姓名' },
     { name: 'sex', thText: '性别' },
@@ -147,7 +147,8 @@ export default class UserComponent {
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
-    private modalService: NzxModalService
+    private modalService: NzxModalService,
+    private fetcherService: FetcherService
   ) {
     this.onSearchTextChange('');
   }
@@ -167,18 +168,13 @@ export default class UserComponent {
     });
   }
 
-  onEditClick(row: UserInfo, nzContent: TemplateRef<{}>): void {
-    // (click)="openModal('新建用户', {}, modalTemplate)"
-    // this.openModal();
-  }
+  onEditClick(row: UserInfo, nzContent: TemplateRef<{}>): void {}
 
   onDeleteClick(row: UserInfo, table: NzxTableComponent): void {
     this.commonService.handleDelete({ id: row.id, url: '/system/user/delete', table });
   }
 
-  onResetPasswordClick(row: UserInfo): void {
-    console.log('  ');
-  }
+  onResetPasswordClick(row: UserInfo): void {}
 
   /**
    * 展开/折叠树节点
@@ -198,6 +194,15 @@ export default class UserComponent {
     table.refresh(true);
   }
 
+  private userUniqueValidator(): ValidatorFn {
+    return this.fetcherService.remoteValidate({
+      url: '/system/user/unique',
+      method: 'post',
+      message: '该账号已存在',
+      data: (control: AbstractControl) => ({ username: control.value })
+    });
+  }
+
   openModal(nzTitle: string, model: Partial<UserInfo>, nzContent: TemplateRef<{}>): void {
     this.modalForm = new FormGroup({});
     this.modalModel = NzxUtils.clone(model);
@@ -209,8 +214,17 @@ export default class UserComponent {
             type: 'input',
             key: 'username',
             props: {
-              label: '用户名',
-              disabled: !!model.id
+              label: '账号',
+              disabled: !!model.id,
+              minLength: 3,
+              maxLength: 64,
+              required: true
+            },
+            validators: {
+              validation: model.id ? [] : [this.userUniqueValidator()]
+            },
+            modelOptions: {
+              updateOn: 'blur'
             }
           },
           model.id
@@ -229,35 +243,22 @@ export default class UserComponent {
             type: 'input',
             key: 'name',
             props: {
-              label: '姓名'
+              label: '姓名',
+              maxLength: 64
+            },
+            validators: {
+              // validation: ['eitherSpace']
             }
           },
           {
             type: 'input',
             key: 'phone',
             props: {
-              label: '手机号'
-            }
-          },
-          {
-            type: 'tree-select',
-            key: 'officeId',
-            props: {
-              label: '组织机构',
-              options: this.nodes$,
-              required: true
-            }
-          },
-          {
-            type: 'select',
-            key: 'roles',
-            props: {
-              label: '角色',
-              options: '/system/role/all' as any,
-              nzMode: 'multiple',
-              nzShowArrow: true,
-              nzAllowClear: true,
-              required: true
+              label: '手机号',
+              maxLength: 11
+            },
+            validators: {
+              validation: [NzxFormUtils.mobile()]
             }
           },
           {
@@ -273,6 +274,27 @@ export default class UserComponent {
             }
           }
         ]
+      },
+      {
+        type: 'tree-select',
+        key: 'officeId',
+        props: {
+          label: '组织机构',
+          options: this.nodes$,
+          required: true
+        }
+      },
+      {
+        type: 'select',
+        key: 'roles',
+        props: {
+          label: '角色',
+          options: '/system/role/all' as any,
+          nzMode: 'multiple',
+          nzShowArrow: true,
+          nzAllowClear: true,
+          required: true
+        }
       }
     ];
 
