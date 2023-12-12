@@ -1,23 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, NgZone, TemplateRef } from '@angular/core';
+import { Component, TemplateRef } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
-import { first, map, share, shareReplay, Subject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { first, map, shareReplay } from 'rxjs';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
 import { FormlyNzButtonModule } from '@xmagic/nz-formly/button';
+import { FormlyCommonModule } from '@xmagic/nz-formly/common';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzRadioModule } from '@xmagic/nz-formly/radio';
+import { FormlyRefTemplateModule } from '@xmagic/nz-formly/ref-template';
 import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
 import { FormlyNzTreeSelectModule } from '@xmagic/nz-formly/tree-select';
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
+import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
+import { FetcherService, LOADING_ENABLED, NzxServiceModule, SYNCED_ENABLED } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -28,13 +31,14 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+import { NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
+import { InputPasswordComponent } from '@commons/component/input-password';
 import { CommonService, normalTree } from '@commons/service/common.service';
-import { FetcherService } from '@xmagic/nzx-antd/service';
 
 @Component({
   selector: 'ma-user',
@@ -51,6 +55,7 @@ import { FetcherService } from '@xmagic/nzx-antd/service';
     FormlyNzSelectModule,
     FormlyNzTreeSelectModule,
     FormlyNzRadioModule,
+    FormlyRefTemplateModule,
     FormlyModule,
     NzFormModule,
     NzButtonModule,
@@ -66,7 +71,10 @@ import { FetcherService } from '@xmagic/nzx-antd/service';
     NzxPipeModule,
     NzIconModule,
     NzDropDownModule,
-    NzTagModule
+    NzTagModule,
+    NzxHttpInterceptorModule,
+    FormlyCommonModule,
+    InputPasswordComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.less'
@@ -116,17 +124,17 @@ export default class UserComponent {
   getParams: () => Partial<UserInfo> = () => this.searchModel;
   columns: NzxColumn<UserInfo>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
-    { name: 'username', thText: '登录名称' },
+    { name: 'username', thText: '账号' },
     { name: 'name', thText: '姓名' },
-    { name: 'sex', thText: '性别' },
     { name: 'officeName', thText: '所属部门' },
     { name: 'roleNames', thText: '角色', tdTemplate: 'role' },
     { name: 'phone', thText: '手机号' },
+    { name: 'isLogin', thText: '状态', tdTemplate: 'status' },
     {
       name: 'id',
       thText: '操作',
       tdTemplate: 'buttons',
-      nzWidth: '140px'
+      nzWidth: '175px'
     }
   ];
 
@@ -137,7 +145,7 @@ export default class UserComponent {
     map(v => v.list),
     map(list => {
       const newList = NzxUtils.clone(list);
-      normalTree(newList, node => {
+      normalTree(newList, 'id', node => {
         node['expanded'] = true;
       });
       return newList;
@@ -148,7 +156,8 @@ export default class UserComponent {
     private http: HttpClient,
     private commonService: CommonService,
     private modalService: NzxModalService,
-    private fetcherService: FetcherService
+    private fetcherService: FetcherService,
+    private messageService: NzMessageService
   ) {
     this.onSearchTextChange('');
   }
@@ -174,8 +183,22 @@ export default class UserComponent {
     this.commonService.handleDelete({ id: row.id, url: '/system/user/delete', table });
   }
 
-  onResetPasswordClick(row: UserInfo): void {}
-
+  /**
+   * 重置密码
+   * @param row
+   */
+  onResetPasswordClick(row: UserInfo): void {
+    console.log(row);
+    this.modalService.confirm({
+      nzContent: `确定重置用户【${row.name || ''}】的密码`,
+      nzOnOk: () => {
+        this.http
+          .get<string>('/system/user/reset-password', { params: { id: row.id } })
+          .subscribe(defaultPassword => this.messageService.success(`密码重置成功，默认密码是：${defaultPassword}`));
+      }
+    });
+  }
+  onToggleStatus(row: UserInfo): void {}
   /**
    * 展开/折叠树节点
    * @param expanded 是否展开
@@ -185,25 +208,22 @@ export default class UserComponent {
     this.nodes = [...this.nodes];
   }
 
-  onCheckBoxChange(evt: NzFormatEmitEvent, table: NzxTableComponent): void {
-    const officeIds: string[] = [];
-    NzxUtils.forEachTree(evt.checkedKeys!, n => {
-      officeIds.push(n.key);
-    });
-    this.searchModel.officeId = officeIds;
+  onSelectedChange(evt: NzFormatEmitEvent, table: NzxTableComponent): void {
+    this.searchModel.officeCode = evt.node!.origin['code'];
     table.refresh(true);
   }
 
-  private userUniqueValidator(): ValidatorFn {
-    return this.fetcherService.remoteValidate({
-      url: '/system/user/unique',
-      method: 'post',
-      message: '该账号已存在',
-      data: (control: AbstractControl) => ({ username: control.value })
-    });
-  }
-
   openModal(nzTitle: string, model: Partial<UserInfo>, nzContent: TemplateRef<{}>): void {
+    const uniqueValidator = model.id
+      ? []
+      : [
+          this.fetcherService.remoteValidate({
+            url: '/system/user/unique',
+            message: '该账号已存在 ',
+            data: (control: AbstractControl) => ({ username: control.value })
+          })
+        ];
+
     this.modalForm = new FormGroup({});
     this.modalModel = NzxUtils.clone(model);
     this.modalFields = [
@@ -221,7 +241,7 @@ export default class UserComponent {
               required: true
             },
             validators: {
-              validation: model.id ? [] : [this.userUniqueValidator()]
+              validation: uniqueValidator
             },
             modelOptions: {
               updateOn: 'blur'
@@ -230,14 +250,15 @@ export default class UserComponent {
           model.id
             ? {}
             : {
-                type: 'input',
+                type: 'ref-template',
                 key: 'password',
                 props: {
                   label: '密码',
-                  required: true,
                   type: 'password',
-                  attributes: { autocomplete: 'new-password' }
-                }
+                  refName: 'pwd',
+                  maxLength: 64
+                },
+                wrappers: ['field-wrapper']
               },
           {
             type: 'input',
@@ -258,7 +279,7 @@ export default class UserComponent {
               maxLength: 11
             },
             validators: {
-              validation: [NzxFormUtils.mobile()]
+              validation: ['mobile']
             }
           },
           {
@@ -269,7 +290,7 @@ export default class UserComponent {
               label: '状态',
               options: [
                 { label: '正常', value: 0 },
-                { label: '锁定', value: 1 }
+                { label: '停用', value: 1 }
               ]
             }
           }
@@ -321,12 +342,11 @@ interface UserInfo {
    */
   roles: string[];
   officeName: string;
+  officeId: string;
   phone?: string;
   username: string;
-  sex?: string;
-
   /**
    * 查询条件
    */
-  officeId: string[];
+  officeCode?: string;
 }

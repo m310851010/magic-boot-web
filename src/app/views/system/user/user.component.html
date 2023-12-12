@@ -18,11 +18,8 @@
             class="full-overflow"
             style="padding-left: 10px"
             [nzData]="nodes"
-            nzShowLine
-            nzCheckable
             nzBlockNode
-            [nzShowIcon]="false"
-            (nzCheckBoxChange)="onCheckBoxChange($event, table)"
+            (nzClick)="onSelectedChange($event, table)"
           ></nz-tree>
         </div>
       </div>
@@ -91,10 +88,14 @@
           <ng-template named="buttons" let-row>
             <a *auth="'user:save'" (click)="openModal('修改用户', row, modalTemplate)" class="mr-xs">修改</a>
             <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs">删除</a>
-            <a *auth="'user:resetpwd'" (click)="onResetPasswordClick(row)">重置密码</a>
+            <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
+            <a (click)="onToggleStatus(row)">{{ row.isLogin ? '停用' : '启用' }}</a>
           </ng-template>
           <ng-template named="role" let-row>
             <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
+          </ng-template>
+          <ng-template named="status" let-row>
+            <nz-tag [nzColor]="row.isLogin ? 'error' : 'success'">{{ row.isLogin ? '停用' : '正常' }}</nz-tag>
           </ng-template>
         </nzx-table>
       </nzx-content>
@@ -105,10 +106,15 @@
 <ng-template #modalTemplate>
   <form nz-form [formGroup]="modalForm">
     <formly-form
+      [formly-box]="[]"
       [form]="modalForm"
       [fields]="modalFields"
       [model]="modalModel"
       [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
-    ></formly-form>
+    >
+      <ng-template named="pwd">
+        <ma-input-password formControlName="password" placeholder="请输入密码"></ma-input-password>
+      </ng-template>
+    </formly-form>
   </form>
 </ng-template>

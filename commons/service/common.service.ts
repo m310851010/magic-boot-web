@@ -38,10 +38,12 @@ export class CommonService {
 /**
  * 规范树结构
  * @param list
+ * @param keyName key的属性名称
  * @param callback 回调函数
  */
 export function normalTree(
   list: TreeNode[],
+  keyName: string = 'id',
   callback?: (node: TreeNode, parentNode: TreeNode | undefined, level: number) => void
 ): NzTreeNodeOptions[] {
   callback ||= () => {};
@@ -56,7 +58,7 @@ export function normalTree(
     }
 
     if (!node['key']) {
-      node['key'] = node['id'];
+      node['key'] = node[keyName];
     }
 
     callback!(node, parentNode, level);
