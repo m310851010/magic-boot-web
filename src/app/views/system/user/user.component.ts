@@ -197,7 +197,22 @@ export default class UserComponent {
       }
     });
   }
-  onToggleStatus(row: UserInfo): void {}
+
+  /**
+   * 切换用户状态
+   * @param row
+   */
+  onToggleStatus(row: UserInfo): void {
+    const isLogin = row.isLogin === 0 ? 1 : 0;
+    this.http.get<number>('/system/user/change/status', { params: { isLogin, id: row.id } }).subscribe(count => {
+      if (count) {
+        this.messageService.success('修改成功!');
+      } else {
+        this.messageService.error('修改失败,用户不存在或已被删除!');
+      }
+      row.isLogin = isLogin;
+    });
+  }
   /**
    * 展开/折叠树节点
    * @param expanded 是否展开
