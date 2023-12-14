@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, TemplateRef } from '@angular/core';
-import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn } from '@angular/forms';
-import { first, map, shareReplay } from 'rxjs';
+import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { first, firstValueFrom, map, shareReplay } from 'rxjs';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -19,13 +19,15 @@ import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
+import { NzxModalOptions } from '@xmagic/nzx-antd/modal/nzx-modal.service';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { FetcherService, LOADING_ENABLED, NzxServiceModule, SYNCED_ENABLED } from '@xmagic/nzx-antd/service';
+import { FetcherService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
-import { NzxFormUtils, NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormatEmitEvent } from 'ng-zorro-antd/core/tree';
+import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -34,7 +36,9 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+// @ts-ignore
+import { sm3 } from 'sm-crypto';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
@@ -80,6 +84,7 @@ import { CommonService, normalTree } from '@commons/service/common.service';
   styleUrl: './user.component.less'
 })
 export default class UserComponent {
+  selectedKeys: string[] = [];
   gridOptions = { nzGutter: 15, colNzSpan: 8 };
 
   modalForm = new FormGroup({});
@@ -163,6 +168,10 @@ export default class UserComponent {
 
   onSearchTextChange(text: string): void {
     this.nodes$.pipe(first()).subscribe(nodes => {
+      if (!nodes || !nodes.length) {
+        return;
+      }
+      this.selectedKeys = [nodes[0].key];
       this.nodes = NzxUtils.filterTree(nodes, node => {
         if (node.children && node.children.length) {
           return true;
@@ -175,7 +184,20 @@ export default class UserComponent {
   onEditClick(row: UserInfo, nzContent: TemplateRef<{}>): void {}
 
   onDeleteClick(row: UserInfo, table: NzxTableComponent): void {
-    this.commonService.handleDelete({ id: row.id, url: '/system/user/delete', table });
+    return this.handleDelete(row.id, table);
+  }
+
+  onBatchDelete(table: NzxTableComponent): void {
+    const id = table.nzData.filter(v => v.checked).map(v => v.id);
+    if (!id.length) {
+      this.messageService.error('请选择至少一条用户信息');
+      return;
+    }
+    return this.handleDelete(id, table);
+  }
+
+  private handleDelete(id: string | string[], table: NzxTableComponent): void {
+    this.commonService.handleDelete({ id, url: '/system/user/delete', table });
   }
 
   /**
@@ -217,20 +239,72 @@ export default class UserComponent {
     this.nodes = [...this.nodes];
   }
 
-  onSelectedChange(evt: NzFormatEmitEvent, table: NzxTableComponent): void {
+  onSelectedChange(evt: NzFormatEmitEvent, nzTreeComponent: NzTreeComponent, table: NzxTableComponent): void {
+    const keys = nzTreeComponent.getSelectedNodeList().map(v => v.key);
+    if (!keys.length) {
+      this.selectedKeys = [evt.node!.key];
+      return;
+    }
+
     this.searchModel.officeCode = evt.node!.origin['code'];
     table.refresh(true);
   }
 
-  openModal(nzTitle: string, model: Partial<UserInfo>, nzContent: TemplateRef<{}>): void {
+  onNewOpenModal(nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+    this.openModal(
+      {},
+      {
+        nzTitle: '新建用户',
+        nzContent,
+        table,
+        nzOnOk: () => {
+          return firstValueFrom(
+            this.http.post('/system/user/save', {
+              ...this.modalModel,
+              password: this.modalModel.password ? sm3(this.modalModel.password) : null
+            })
+          );
+        }
+      }
+    );
+  }
+
+  onUpdateOpenModal(model: Partial<UserInfo>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+    this.openModal(model, {
+      nzTitle: '修改用户',
+      nzContent,
+      table,
+      nzOnOk: () => firstValueFrom(this.http.post('/system/user/center/update', this.modalModel))
+    });
+  }
+
+  openModal(
+    model: Partial<UserInfo>,
+    options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
+      nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
+      table: NzxTableComponent;
+    }
+  ): void {
+    const unique = this.fetcherService.remoteValidate({
+      url: '/system/user/unique',
+      message: '该账号已存在 ',
+      data: (control: AbstractControl) => ({ username: control.value })
+    });
+
     const uniqueValidator = model.id
       ? []
       : [
-          this.fetcherService.remoteValidate({
-            url: '/system/user/unique',
-            message: '该账号已存在 ',
-            data: (control: AbstractControl) => ({ username: control.value })
-          })
+          (control: AbstractControl) => {
+            const value = control.value;
+            if (!/^\w{3,64}$/.test(value)) {
+              return { username: { message: '账号必须是数字、字母的组合' } };
+            }
+            return this.fetcherService.remoteValidate({
+              url: '/system/user/unique',
+              message: '该账号已存在',
+              data: (control: AbstractControl) => ({ username: control.value })
+            });
+          }
         ];
 
     this.modalForm = new FormGroup({});
@@ -322,16 +396,25 @@ export default class UserComponent {
           options: '/system/role/all' as any,
           nzMode: 'multiple',
           nzShowArrow: true,
-          nzAllowClear: true,
-          required: true
+          nzAllowClear: true
         }
       }
     ];
 
     this.modalService.create({
-      nzTitle,
-      nzContent,
-      nzWidth: 650
+      nzWidth: 650,
+      ...options,
+      nzOnOk: instance => {
+        if (!NzxFormUtils.validate(this.modalForm)) {
+          return false;
+        }
+        return options.nzOnOk(instance).then(v => {
+          if (v !== false) {
+            options.table.refresh(false);
+          }
+          return v;
+        });
+      }
     });
   }
 }
@@ -354,6 +437,7 @@ interface UserInfo {
   officeId: string;
   phone?: string;
   username: string;
+  password?: string;
   /**
    * 查询条件
    */

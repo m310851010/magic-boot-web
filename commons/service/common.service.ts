@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxTableComponent } from '@xmagic/nzx-antd/table';
 import { NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 @Injectable({
@@ -12,24 +13,26 @@ import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 export class CommonService {
   constructor(
     private http: HttpClient,
-    private modalService: NzxModalService
+    private modalService: NzxModalService,
+    private messageService: NzMessageService
   ) {}
 
   /**
    * 删除
    * @param options
    */
-  handleDelete(options: { id: string; url: string; done?: () => {}; table?: NzxTableComponent }): void {
+  handleDelete(options: { id: string | string[]; url: string; table?: NzxTableComponent }): void {
     this.modalService.confirm({
-      nzContent: '是否确认删除该数据，删除后不可恢复?',
+      nzContent: '删除后不可恢复，确定删除?',
       nzOnOk: () => {
-        this.http.delete(options.url, { params: { id: options.id } }).subscribe(() => {
-          if (options.done) {
-            options.done();
-          } else if (options.table) {
-            options.table.refresh(false);
-          }
-        });
+        this.http
+          .delete(options.url, { params: { id: NzxUtils.isArray(options.id) ? options.id.join(',') : options.id } })
+          .subscribe(() => {
+            if (options.table) {
+              options.table.refresh(false);
+            }
+            this.messageService.success('删除成功');
+          });
       }
     });
   }

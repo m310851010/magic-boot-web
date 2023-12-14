@@ -15,11 +15,15 @@
 
         <div class="flex-main relative">
           <nz-tree
+            #nzTreeComponent
             class="full-overflow"
             style="padding-left: 10px"
-            [nzData]="nodes"
             nzBlockNode
-            (nzClick)="onSelectedChange($event, table)"
+            [nzData]="nodes"
+            [nzSelectMode]="true"
+            [nzMultiple]="false"
+            [(nzSelectedKeys)]="selectedKeys"
+            (nzClick)="onSelectedChange($event, nzTreeComponent, table)"
           ></nz-tree>
         </div>
       </div>
@@ -57,42 +61,31 @@
           <div title>
             <nz-space>
               <ng-container *auth="'user:save'">
-                <button *nzSpaceItem nz-button nzType="primary" (click)="openModal('新建用户', {}, modalTemplate)">
+                <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal(modalTemplate, table)">
                   <span nz-icon nzType="plus"></span>
                   新建用户
                 </button>
               </ng-container>
 
               <ng-container *auth="'user:delete'">
-                <button *nzSpaceItem nz-button nzDanger>
+                <button *nzSpaceItem nz-button nzDanger (click)="onBatchDelete(table)">
                   <span nz-icon nzType="delete"></span>
                   批量删除
-                </button>
-              </ng-container>
-
-              <ng-container *auth="'user:import'">
-                <button *nzSpaceItem nz-button>
-                  <span nz-icon nzType="import"></span>
-                  导入
-                </button>
-              </ng-container>
-
-              <ng-container *auth="'user:export'">
-                <button *nzSpaceItem nz-button>
-                  <span nz-icon nzType="export"></span>
-                  导出
                 </button>
               </ng-container>
             </nz-space>
           </div>
           <ng-template named="buttons" let-row>
-            <a *auth="'user:save'" (click)="openModal('修改用户', row, modalTemplate)" class="mr-xs">修改</a>
+            <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
             <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs">删除</a>
             <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
             <a (click)="onToggleStatus(row)">{{ row.isLogin ? '启用' : '停用' }}</a>
           </ng-template>
           <ng-template named="role" let-row>
-            <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
+            <ng-container *ngIf="row.roleNames?.length; else emptyTemplate">
+              <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
+            </ng-container>
+            <ng-template #emptyTemplate>--</ng-template>
           </ng-template>
           <ng-template named="status" let-row>
             <nz-tag [nzColor]="row.isLogin ? 'error' : 'success'">{{ row.isLogin ? '停用' : '正常' }}</nz-tag>
