@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, TemplateRef } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
-import { first, firstValueFrom, map, shareReplay } from 'rxjs';
+import { catchError, first, firstValueFrom, map, of, shareReplay } from 'rxjs';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -141,6 +141,7 @@ export default class UserComponent {
   searchText = '';
   nodes: NzTreeNodeOptions[] = [];
   nodes$ = this.http.get<{ list: NzTreeNodeOptions[] }>('/system/office/tree').pipe(
+    catchError(() => of({ list: [] })),
     shareReplay(1),
     map(v => v.list),
     map(list => {
@@ -365,18 +366,20 @@ export default class UserComponent {
               validation: ['mobile']
             }
           },
-          {
-            type: 'radio',
-            key: 'isLogin',
-            defaultValue: 0,
-            props: {
-              label: '状态',
-              options: [
-                { label: '正常', value: 0 },
-                { label: '停用', value: 1 }
-              ]
-            }
-          }
+          model.id === '1'
+            ? {}
+            : {
+                type: 'radio',
+                key: 'isLogin',
+                defaultValue: 0,
+                props: {
+                  label: '状态',
+                  options: [
+                    { label: '正常', value: 0 },
+                    { label: '停用', value: 1 }
+                  ]
+                }
+              }
         ]
       },
       {

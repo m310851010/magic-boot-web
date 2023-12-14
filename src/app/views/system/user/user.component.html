@@ -76,11 +76,14 @@
             </nz-space>
           </div>
           <ng-template named="buttons" let-row>
-            <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
-            <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs">删除</a>
-            <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
-            <a (click)="onToggleStatus(row)">{{ row.isLogin ? '启用' : '停用' }}</a>
+            <ng-container *ngIf="row.id !== '1'">
+              <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
+              <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs">删除</a>
+              <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
+              <a (click)="onToggleStatus(row)">{{ row.isLogin ? '启用' : '停用' }}</a>
+            </ng-container>
           </ng-template>
+
           <ng-template named="role" let-row>
             <ng-container *ngIf="row.roleNames?.length; else emptyTemplate">
               <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
