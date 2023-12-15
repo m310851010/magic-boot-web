@@ -4,8 +4,7 @@ import { filter, Observable, switchMap } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { LOADING_ENABLED, NzxStorageService } from '@xmagic/nzx-antd/service';
-// @ts-ignore
-import { sm3 } from 'sm-crypto';
+import { sm3 } from 'sm-crypto-v2';
 
 import { Constant } from '@commons/constant';
 
