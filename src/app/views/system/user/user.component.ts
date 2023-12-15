@@ -83,7 +83,6 @@ import { CommonService, normalTree } from '@commons/service/common.service';
   styleUrl: './user.component.less'
 })
 export default class UserComponent {
-  selectedKeys: string[] = [];
   gridOptions = { nzGutter: 15, colNzSpan: 8 };
 
   modalForm = new FormGroup({});
@@ -171,7 +170,6 @@ export default class UserComponent {
       if (!nodes || !nodes.length) {
         return;
       }
-      this.selectedKeys = [nodes[0].key];
       this.nodes = NzxUtils.filterTree(nodes, node => {
         if (node.children && node.children.length) {
           return true;
@@ -180,8 +178,6 @@ export default class UserComponent {
       });
     });
   }
-
-  onEditClick(row: UserInfo, nzContent: TemplateRef<{}>): void {}
 
   onDeleteClick(row: UserInfo, table: NzxTableComponent): void {
     return this.handleDelete(row.id, table);
@@ -230,6 +226,7 @@ export default class UserComponent {
       row.isLogin = isLogin;
     });
   }
+
   /**
    * 展开/折叠树节点
    * @param expanded 是否展开
@@ -240,13 +237,7 @@ export default class UserComponent {
   }
 
   onSelectedChange(evt: NzFormatEmitEvent, nzTreeComponent: NzTreeComponent, table: NzxTableComponent): void {
-    const keys = nzTreeComponent.getSelectedNodeList().map(v => v.key);
-    if (!keys.length) {
-      this.selectedKeys = [evt.node!.key];
-      return;
-    }
-
-    this.searchModel.officeCode = evt.node!.origin['code'];
+    this.searchModel.officeCode = evt.node!.isSelected ? evt.node!.origin['code'] : null;
     table.refresh(true);
   }
 
@@ -278,19 +269,13 @@ export default class UserComponent {
     });
   }
 
-  openModal(
+  private openModal(
     model: Partial<UserInfo>,
     options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
       nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
       table: NzxTableComponent;
     }
   ): void {
-    const unique = this.fetcherService.remoteValidate({
-      url: '/system/user/unique',
-      message: '该账号已存在 ',
-      data: (control: AbstractControl) => ({ username: control.value })
-    });
-
     const uniqueValidator = model.id
       ? []
       : [
@@ -349,9 +334,6 @@ export default class UserComponent {
             props: {
               label: '姓名',
               maxLength: 64
-            },
-            validators: {
-              // validation: ['eitherSpace']
             }
           },
           {
