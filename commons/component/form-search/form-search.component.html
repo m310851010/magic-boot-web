@@ -1,5 +1,5 @@
 <div class="flex-horizontal">
-  <div class="form-search-content flex-main">
+  <div class="form-search-content" [class.flex-main]="buttonAlignRight">
     <ng-content></ng-content>
     <ng-content select="[search-more],.search-more" *ngIf="!collapsed"></ng-content>
   </div>

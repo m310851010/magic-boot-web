@@ -20,7 +20,7 @@
     "@angular/router": "^17.0.0",
     "@ngx-formly/core": "^6.2.2",
     "@xmagic/nz-formly": "^17.0.0",
-    "@xmagic/nzx-antd": "^17.0.1",
+    "@xmagic/nzx-antd": "^17.0.4",
     "ng-zorro-antd": "^17.0.0",
     "rxjs": "~7.8.0",
     "sm-crypto-v2": "^1.7.0",

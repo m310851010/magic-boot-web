@@ -33,6 +33,7 @@ export class FormSearchComponent {
   @Input() form?: AbstractControl;
   @Input() table?: NzxTableComponent;
   @Input() collapsed = true;
+  @Input() buttonAlignRight = true;
   @Output() collapsedChange = new EventEmitter<boolean>();
   @Output() searchClick = new EventEmitter<MouseEvent>();
   @Output() resetClick = new EventEmitter<MouseEvent>();

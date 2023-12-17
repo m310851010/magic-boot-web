@@ -1,19 +1,52 @@
-<div nz-row class="full-height-less">
-  <div nz-col nzFlex="280px">
-    <nz-card nzTitle="组织机构" nzSize="small" class="flex-card card-body-less full-height">
-      <div class="flex-vertical flex-main">
-        <div class="search-box">
-          <nz-input-group nzSearch nzSuffixIcon="search">
-            <input nz-input placeholder="请输入关键字搜索" [(ngModel)]="searchText" />
-          </nz-input-group>
-        </div>
+<nzx-page>
+  <nzx-header>
+    <form nz-form [formGroup]="searchForm">
+      <ma-form-search [table]="table" [form]="searchForm" [buttonAlignRight]="false">
+        <formly-form [form]="searchForm" [fields]="searchFields" [model]="searchModel"></formly-form>
+      </ma-form-search>
+    </form>
+  </nzx-header>
 
-        <div class="flex-main relative">
-          <nz-tree class="full-overflow" [nzData]="nodes" nzCheckable nzBlockNode></nz-tree>
-        </div>
+  <nzx-content>
+    <nzx-table #table [api]="menus$" [nzxColumns]="columns" [nzShowPagination]="false" [nzxFit]="true">
+      <div title>
+        <nz-space>
+          <ng-container *auth="'menu:save'">
+            <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal({}, modalTemplate, table)">
+              <span nz-icon nzType="plus"></span>
+              新增
+            </button>
+          </ng-container>
+
+          <ng-container *auth="'menu:delete'">
+            <button *nzSpaceItem nz-button nzDanger (click)="onBatchDelete(table)">
+              <span nz-icon nzType="delete"></span>
+              批量删除
+            </button>
+          </ng-container>
+        </nz-space>
       </div>
-    </nz-card>
-  </div>
+      <ng-template named="buttons" let-row>
+        <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
+        <a *auth="'user:save'" (click)="onNewOpenModal(row, modalTemplate, table)" class="mr-xs">新增</a>
+        <a *auth="'user:delete'" (click)="onDeleteClick(row, table)">删除</a>
+      </ng-template>
+    </nzx-table>
+  </nzx-content>
+</nzx-page>
 
-  <div nz-col nzFlex="auto"></div>
-</div>
+<ng-template #modalTemplate>
+  <form nz-form [formGroup]="modalForm">
+    <formly-form
+      [formly-box]="[]"
+      [form]="modalForm"
+      [fields]="modalFields"
+      [model]="modalModel"
+      [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
+    >
+      <ng-template named="pwd">
+        <ma-input-password formControlName="password" placeholder="请输入密码"></ma-input-password>
+      </ng-template>
+    </formly-form>
+  </form>
+</ng-template>
