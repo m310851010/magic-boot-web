@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
@@ -21,7 +21,7 @@ import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxModalOptions } from '@xmagic/nzx-antd/modal/nzx-modal.service';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { FetcherService } from '@xmagic/nzx-antd/service';
+import { DicItem, DicService, FetcherService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -35,11 +35,12 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+import { NzTreeModule } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
 import { CommonService } from '@commons/service/common.service';
+import { dicMap } from '@commons/utils';
 
 @Component({
   selector: 'ma-menu',
@@ -81,6 +82,8 @@ import { CommonService } from '@commons/service/common.service';
   styleUrl: './menu.component.less'
 })
 export default class MenuComponent implements OnInit {
+  @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
+  @ViewChild('table') table!: NzxTableComponent;
   searchForm = new FormGroup({});
   searchModel: { searchValue?: string } = {};
   searchFields: FormlyFieldConfig[] = [
@@ -115,24 +118,60 @@ export default class MenuComponent implements OnInit {
     },
     {
       name: 'menuType',
-      thText: '类型'
+      thText: '类型',
+      tdTemplate: 'menuTypeTemplate'
     },
     {
       name: 'componentName',
       thText: '组件'
     },
-    { name: 'id', thText: '操作', tdTemplate: 'buttons', nzWidth: '175px' }
+    {
+      name: 'id',
+      thText: '操作',
+      buttons: [
+        {
+          text: '新增下级',
+          permission: 'menu:save',
+          visible: (row: Menu) => row.menuType === 'D' || row.menuType === 'M',
+          click: (row: Menu) => {
+            this.onUpdateOpenModal(row, this.modalTemplate, this.table);
+          }
+        },
+        {
+          text: '修改',
+          permission: 'menu:save',
+          click: (row: Menu) => {
+            this.onUpdateOpenModal(row, this.modalTemplate, this.table);
+          }
+        },
+        {
+          text: '修改',
+          permission: 'menu:delete',
+          click: (row: Menu) => {
+            this.onDeleteClick(row, this.table);
+          }
+        }
+      ],
+      nzWidth: '180px'
+    }
   ];
 
+  menuTypeMap: Record<string, DicItem & { color: string }> = {};
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
     private modalService: NzxModalService,
     private fetcherService: FetcherService,
-    private messageService: NzMessageService
+    private messageService: NzMessageService,
+    private dicService: DicService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.dicService
+      .getDic('MENU_TYPE')
+      .pipe(dicMap<DicItem & { color: string }>())
+      .subscribe(v => (this.menuTypeMap = v));
+  }
 
   onUpdateOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.openModal(model, {
@@ -279,6 +318,6 @@ interface Menu {
   pid?: string;
   sort: number;
   url?: string;
-  menuType: 'M' | 'D' | 'B' | 'O';
+  menuType: 'M' | 'D' | 'B' | 'O' | 'I';
   children: Menu[];
 }

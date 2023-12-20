@@ -26,10 +26,8 @@
           </ng-container>
         </nz-space>
       </div>
-      <ng-template named="buttons" let-row>
-        <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
-        <a *auth="'user:save'" (click)="onNewOpenModal(row, modalTemplate, table)" class="mr-xs">新增</a>
-        <a *auth="'user:delete'" (click)="onDeleteClick(row, table)">删除</a>
+      <ng-template named="menuTypeTemplate" let-row>
+        <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>
       </ng-template>
     </nzx-table>
   </nzx-content>

@@ -17,6 +17,23 @@ import { environment } from '../environments/environment';
 export class NzxAntdConfigService extends NzxAntdService {
   override basePath = environment.basePath;
 
+  // @ts-ignore
+  override dic = {
+    url: '/system/dict/children',
+    map: (list: { label: string; value: string | number; dataType: 0 | 1; extJson?: string }[]) => {
+      for (const item of list) {
+        if (item.extJson) {
+          Object.assign(item, JSON.parse(item.extJson));
+          delete item.extJson;
+        }
+        if (item.dataType === 1) {
+          item.value = +item.value;
+        }
+      }
+      return list;
+    }
+  };
+
   override response: ResponseSetting = {
     data: 'data',
     timeout: error => {
