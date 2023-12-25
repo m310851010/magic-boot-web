@@ -38,7 +38,7 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
-import { CommonService } from '@commons/service/common.service';
+import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { dicMap } from '@commons/utils';
 
 @Component({
@@ -134,9 +134,8 @@ export default class MenuComponent implements OnInit {
           click: (row: Menu) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
         },
         {
-          text: '删除',
+          ...DeleteButton,
           permission: 'menu:delete',
-          ngClass: ['ant-btn-dangerous', 'ant-btn-link'],
           click: (row: Menu) => {
             this.onDeleteClick(row, this.table);
           }

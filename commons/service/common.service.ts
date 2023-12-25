@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxTableComponent } from '@xmagic/nzx-antd/table';
+import { NzxColumnButton } from '@xmagic/nzx-antd/table/table.type';
 import { NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
@@ -77,3 +78,11 @@ export function normalTree(
   });
   return list as NzTreeNodeOptions[];
 }
+
+/**
+ * 删除按钮
+ */
+export const DeleteButton: Partial<NzxColumnButton> = {
+  text: '删除',
+  ngClass: ['ant-btn-dangerous', 'ant-btn-link']
+};
