@@ -7,7 +7,6 @@ import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
-import { FormlyNzButtonModule } from '@xmagic/nz-formly/button';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
@@ -21,7 +20,7 @@ import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService, NzxModalOptions } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { DicItem, DicService, FetcherService } from '@xmagic/nzx-antd/service';
+import { DicItem, DicService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -38,9 +37,9 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
+import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService } from '@commons/service/common.service';
 import { dicMap } from '@commons/utils';
-import { IconPickerComponent } from '@commons/component/icon-picker/icon-picker.component';
 
 @Component({
   selector: 'ma-menu',
@@ -53,7 +52,6 @@ import { IconPickerComponent } from '@commons/component/icon-picker/icon-picker.
     FormlyNzInputModule,
     FormlyNzFormFieldModule,
     FormlyNzGridModule,
-    FormlyNzButtonModule,
     FormlyNzSelectModule,
     FormlyNzTreeSelectModule,
     FormlyNzRadioModule,
@@ -84,7 +82,6 @@ import { IconPickerComponent } from '@commons/component/icon-picker/icon-picker.
 export default class MenuComponent implements OnInit {
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
   @ViewChild('table') table!: NzxTableComponent;
-  isDisabled = true;
   searchForm = new FormGroup({});
   searchModel: { searchValue?: string } = {};
   searchFields: FormlyFieldConfig[] = [
@@ -109,7 +106,7 @@ export default class MenuComponent implements OnInit {
   columns: NzxColumn<Menu>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'name', thText: '菜单名称', showExpand: true },
-    { name: 'icon', thText: '图标', tdTemplate: 'tdIconTemplate' },
+    { name: 'icon', thText: '图标', tdTemplate: 'tdIconTemplate', nzWidth: '50px' },
     { name: 'url', thText: '路径' },
     { name: 'permission', thText: '权限标识', nzWidth: '150px' },
     { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate' },
@@ -139,6 +136,7 @@ export default class MenuComponent implements OnInit {
         {
           text: '删除',
           permission: 'menu:delete',
+          ngClass: ['ant-btn-dangerous', 'ant-btn-link'],
           click: (row: Menu) => {
             this.onDeleteClick(row, this.table);
           }
@@ -170,7 +168,7 @@ export default class MenuComponent implements OnInit {
     this.loadMenus();
   }
 
-  onSearchClick() {
+  onSearchClick(): void {
     if (!this.menus.length) {
       return;
     }
@@ -209,13 +207,9 @@ export default class MenuComponent implements OnInit {
   }
 
   onBatchDelete(table: NzxTableComponent): void {
-    const ids: string[] = [];
-    // @ts-ignore
-    NzxUtils.forEachTree(table.nzData, node => {
-      if (node.checked) {
-        ids.push(node.id);
-      }
-    });
+    const ids = NzxUtils.flatTree(table.nzData)
+      .filter(node => node.checked)
+      .map(node => node.id);
     if (!ids.length) {
       this.messageService.error('请选择至少一条菜单');
       return;
@@ -240,7 +234,7 @@ export default class MenuComponent implements OnInit {
     });
   }
 
-  private loadMenus() {
+  private loadMenus(): void {
     this.menus$.subscribe(menus => {
       this.menus = menus;
       this.menusSnapshot = menus;

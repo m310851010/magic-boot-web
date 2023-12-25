@@ -29,10 +29,8 @@
 
       <ng-template named="tdIconTemplate" let-row>
         @if (row.icon){
-          <span nz-icon [nzType]="row.icon"></span>
-        } @else {
-          --
-        }
+        <span nz-icon [nzType]="row.icon"></span>
+        } @else { -- }
       </ng-template>
       <ng-template named="menuTypeTemplate" let-row>
         <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>

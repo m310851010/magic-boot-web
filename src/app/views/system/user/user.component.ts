@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, TemplateRef } from '@angular/core';
-import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, first, firstValueFrom, map, of, shareReplay } from 'rxjs';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
-import { FormlyNzButtonModule } from '@xmagic/nz-formly/button';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
@@ -54,7 +53,6 @@ import { CommonService, normalTree } from '@commons/service/common.service';
     FormlyNzInputModule,
     FormlyNzFormFieldModule,
     FormlyNzGridModule,
-    FormlyNzButtonModule,
     FormlyNzSelectModule,
     FormlyNzTreeSelectModule,
     FormlyNzRadioModule,
