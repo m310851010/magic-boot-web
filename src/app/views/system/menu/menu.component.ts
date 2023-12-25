@@ -40,6 +40,7 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { CommonService } from '@commons/service/common.service';
 import { dicMap } from '@commons/utils';
+import { IconPickerComponent } from '@commons/component/icon-picker/icon-picker.component';
 
 @Component({
   selector: 'ma-menu',
@@ -56,6 +57,7 @@ import { dicMap } from '@commons/utils';
     FormlyNzSelectModule,
     FormlyNzTreeSelectModule,
     FormlyNzRadioModule,
+    FormlyRefTemplateModule,
     FormlyModule,
     NzFormModule,
     NzButtonModule,
@@ -73,7 +75,8 @@ import { dicMap } from '@commons/utils';
     NzDropDownModule,
     NzTagModule,
     NzxHttpInterceptorModule,
-    FormlyCommonModule
+    FormlyCommonModule,
+    IconPickerComponent
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.less'
@@ -81,6 +84,7 @@ import { dicMap } from '@commons/utils';
 export default class MenuComponent implements OnInit {
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
   @ViewChild('table') table!: NzxTableComponent;
+  isDisabled = true;
   searchForm = new FormGroup({});
   searchModel: { searchValue?: string } = {};
   searchFields: FormlyFieldConfig[] = [
@@ -105,6 +109,7 @@ export default class MenuComponent implements OnInit {
   columns: NzxColumn<Menu>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'name', thText: '菜单名称', showExpand: true },
+    { name: 'icon', thText: '图标', tdTemplate: 'tdIconTemplate' },
     { name: 'url', thText: '路径' },
     { name: 'permission', thText: '权限标识', nzWidth: '150px' },
     { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate' },
@@ -349,14 +354,16 @@ export default class MenuComponent implements OnInit {
             }
           },
           {
-            type: 'input',
+            type: 'ref-template',
             key: 'icon',
             props: {
-              label: '图标'
+              label: '图标',
+              refName: 'iconTemplate'
             },
             expressions: {
               hide: `model.menuType==='B'`
-            }
+            },
+            wrappers: ['field-wrapper']
           },
           {
             type: 'input',

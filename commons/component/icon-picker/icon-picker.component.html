@@ -1,0 +1,55 @@
+<nz-input-group [nzSuffix]="suffixTemplate" [nzAddOnAfter]="addOnAfterTemplate">
+  <input nz-input (focus)="onTouched()" [(ngModel)]="value" readonly [placeholder]="placeholder || ''" [disabled]="isDisabled">
+</nz-input-group>
+
+<ng-template #suffixTemplate>
+  <span *ngIf="value && !isDisabled" nz-icon nzType="close-circle-fill" class="ant-input-clear-icon" (click)="onInputClear()"></span>
+</ng-template>
+<ng-template #addOnAfterTemplate>
+  <ng-container *ngIf="isDisabled; else popoverTemplate">
+    <div  class="icon-picker-icon disabled">
+      <span nz-icon nzType="appstore"></span>
+    </div>
+  </ng-container>
+</ng-template>
+
+<ng-template #popoverTemplate>
+  <div
+    nz-popover
+    [nzPopoverContent]="popoverContentTemplate"
+    nzPopoverTrigger="click"
+    (nzPopoverVisibleChange)="onVisibleChange($event)"
+    nzPopoverPlacement="bottom"
+    class="icon-picker-icon"
+  >
+    <span nz-icon nzType="appstore"></span>
+  </div>
+</ng-template>
+
+<ng-template #popoverContentTemplate>
+  <div class="icon-picker-viewer">
+    <input nz-input placeholder="搜索图标名称" class="icon-search" [(ngModel)]="searchText" (ngModelChange)="onSearchTextChange($event)">
+
+    <ng-container *ngIf="_iconNames && _iconNames.length; else emptyTemplate">
+      <div class="icon-view-container">
+        <ul class="icon-view">
+          <li class="icon-view-item" *ngFor="let item of iconPageData" [class.active]="item === value" (click)="onIconItemClick(item)">
+            <span nz-icon [nzType]="item" class="icon-view-icon"></span>
+          </li>
+        </ul>
+      </div>
+      <nz-pagination
+        [(nzPageIndex)]="pageIndex"
+        (nzPageIndexChange)="onPageIndexChange()"
+        [nzTotal]="nzTotal"
+        [nzPageSize]="pageSize"
+        nzHideOnSinglePage
+        nzSize="small"
+      ></nz-pagination>
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #emptyTemplate>
+  <nz-empty class="icon-picker-empty"></nz-empty>
+</ng-template>

@@ -26,6 +26,14 @@
           </ng-container>
         </nz-space>
       </div>
+
+      <ng-template named="tdIconTemplate" let-row>
+        @if (row.icon){
+          <span nz-icon [nzType]="row.icon"></span>
+        } @else {
+          --
+        }
+      </ng-template>
       <ng-template named="menuTypeTemplate" let-row>
         <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>
       </ng-template>
@@ -41,6 +49,10 @@
       [fields]="modalFields"
       [model]="modalModel"
       [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
-    ></formly-form>
+    >
+      <ng-template named="iconTemplate">
+        <ma-icon-picker formControlName="icon"></ma-icon-picker>
+      </ng-template>
+    </formly-form>
   </form>
 </ng-template>
