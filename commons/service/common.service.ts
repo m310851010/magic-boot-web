@@ -21,19 +21,28 @@ export class CommonService {
    * 删除
    * @param options
    */
-  handleDelete(options: { id: string | string[]; url: string; table?: NzxTableComponent }): void {
-    this.modalService.confirm({
-      nzContent: '删除后不可恢复，确定删除?',
-      nzOnOk: () => {
-        this.http
-          .delete(options.url, { params: { id: NzxUtils.isArray(options.id) ? options.id.join(',') : options.id } })
-          .subscribe(() => {
-            if (options.table) {
-              options.table.refresh(false);
-            }
-            this.messageService.success('删除成功');
-          });
-      }
+  handleDelete<T = boolean>(options: { id: string | string[]; url: string; table?: NzxTableComponent }): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.modalService.confirm({
+        nzContent: '删除后不可恢复，确定删除?',
+        nzOnOk: () => {
+          this.http
+            .delete<T>(options.url, {
+              params: { id: NzxUtils.isArray(options.id) ? options.id.join(',') : options.id }
+            })
+            .subscribe(result => {
+              if (result) {
+                if (options.table) {
+                  options.table.refresh(false);
+                }
+                this.messageService.success('删除成功');
+              } else {
+                this.messageService.warning('该信息不存在或已被删除');
+              }
+              resolve(result);
+            });
+        }
+      });
     });
   }
 }

@@ -88,7 +88,9 @@ export default class MenuComponent implements OnInit {
       type: 'input',
       key: 'searchValue',
       props: {
-        label: '关键字'
+        label: '关键字',
+        placeholder: '菜单名称、路径、权限码、组件',
+        attributes: { style: 'width: 300px' }
       }
     }
   ];
@@ -97,41 +99,18 @@ export default class MenuComponent implements OnInit {
   modalModel: Partial<Menu> = {};
   modalFields: FormlyFieldConfig[] = [];
 
-  menus$ = this.http.get<Menu[]>('/system/menu/tree');
-  columns: NzxColumn[] = [
-    {
-      name: 'name',
-      thText: '菜单名称',
-      showExpand: true
-    },
-    {
-      name: 'url',
-      thText: '路径'
-    },
-    {
-      name: 'permission',
-      thText: '权限标识',
-      nzWidth: '150px'
-    },
-    {
-      name: 'menuType',
-      thText: '菜单类型',
-      tdTemplate: 'menuTypeTemplate'
-    },
-    {
-      name: 'componentName',
-      thText: '组件'
-    },
-    {
-      name: 'openMode',
-      thText: '打开方式',
-      format: data => (data == null ? '--' : data ? '新标签页' : 'iframe')
-    },
-    {
-      name: 'isShow',
-      thText: '是否显示',
-      format: isShow => (isShow ? '是' : '否')
-    },
+  private menus: Menu[] = [];
+  menusSnapshot: Menu[] = [];
+  private menus$ = this.http.get<Menu[]>('/system/menu/tree');
+  columns: NzxColumn<Menu>[] = [
+    { nzShowCheckAll: true, nzShowCheckbox: true },
+    { name: 'name', thText: '菜单名称', showExpand: true },
+    { name: 'url', thText: '路径' },
+    { name: 'permission', thText: '权限标识', nzWidth: '150px' },
+    { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate' },
+    { name: 'componentName', thText: '组件' },
+    { name: 'sort', thText: '排序号' },
+    { name: 'isShow', thText: '是否显示', format: isShow => (isShow ? '是' : '否') },
     {
       name: 'id',
       thText: '操作',
@@ -140,16 +119,17 @@ export default class MenuComponent implements OnInit {
           text: '新增下级',
           permission: 'menu:save',
           visible: (row: Menu) => row.menuType === 'D' || row.menuType === 'M',
-          click: (row: Menu) => {
-            this.onUpdateOpenModal(row, this.modalTemplate, this.table);
-          }
+          click: (row: Menu) =>
+            this.onNewOpenModal(
+              { pid: row.id, menuType: row.menuType === 'D' ? 'M' : 'B' },
+              this.modalTemplate,
+              this.table
+            )
         },
         {
           text: '修改',
           permission: 'menu:save',
-          click: (row: Menu) => {
-            this.onUpdateOpenModal(row, this.modalTemplate, this.table);
-          }
+          click: (row: Menu) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
         },
         {
           text: '删除',
@@ -169,7 +149,6 @@ export default class MenuComponent implements OnInit {
     private http: HttpClient,
     private commonService: CommonService,
     private modalService: NzxModalService,
-    private fetcherService: FetcherService,
     private messageService: NzMessageService,
     private dicService: DicService
   ) {}
@@ -182,6 +161,33 @@ export default class MenuComponent implements OnInit {
         dicMap<DicItem & { color: string }>()
       )
       .subscribe(v => (this.menuTypeMap = v));
+
+    this.loadMenus();
+  }
+
+  onSearchClick() {
+    if (!this.menus.length) {
+      return;
+    }
+
+    if (!this.searchModel.searchValue) {
+      this.menusSnapshot = this.menus;
+      return;
+    }
+
+    const keyword = this.searchModel.searchValue.toLowerCase();
+    this.menusSnapshot = NzxUtils.filterTree(this.menus, node => {
+      if (node.children && node.children.length) {
+        node['expand'] = true;
+        return true;
+      }
+      for (const key of ['name', 'url', 'permission', 'componentName']) {
+        if (node[key] && node[key].toLowerCase().includes(keyword)) {
+          return true;
+        }
+      }
+      return false;
+    });
   }
 
   onUpdateOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
@@ -189,30 +195,50 @@ export default class MenuComponent implements OnInit {
       nzTitle: '修改菜单',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/user/center/update', this.modalModel))
+      nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
     });
   }
 
   onDeleteClick(row: Menu, table: NzxTableComponent): void {
-    return this.handleDelete(row.id, table);
+    return this.handleDelete(row.id);
   }
 
-  onBatchDelete(table: NzxTableComponent<Record<string, any>>): void {}
-
-  private handleDelete(id: string | string[], table: NzxTableComponent): void {
-    this.commonService.handleDelete({ id, url: '/system/menu/delete', table });
+  onBatchDelete(table: NzxTableComponent): void {
+    const ids: string[] = [];
+    // @ts-ignore
+    NzxUtils.forEachTree(table.nzData, node => {
+      if (node.checked) {
+        ids.push(node.id);
+      }
+    });
+    if (!ids.length) {
+      this.messageService.error('请选择至少一条菜单');
+      return;
+    }
+    return this.handleDelete(ids);
   }
 
-  onNewOpenModal(
-    model: Partial<Menu>,
-    nzContent: TemplateRef<{}>,
-    table: NzxTableComponent<Record<string, any>>
-  ): void {
+  private handleDelete(id: string | string[]): void {
+    this.commonService.handleDelete({ id, url: '/system/menu/delete' }).then(row => {
+      if (row) {
+        this.loadMenus();
+      }
+    });
+  }
+
+  onNewOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.openModal(model, {
       nzTitle: '新增',
       nzContent,
       table,
       nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+    });
+  }
+
+  private loadMenus() {
+    this.menus$.subscribe(menus => {
+      this.menus = menus;
+      this.menusSnapshot = menus;
     });
   }
 
@@ -292,6 +318,9 @@ export default class MenuComponent implements OnInit {
                   return nodes;
                 })
               )
+            },
+            expressions: {
+              'props.required': `model.menuType === 'B'`
             }
           },
           {
@@ -311,7 +340,7 @@ export default class MenuComponent implements OnInit {
                   if (/^(https?:\/\/|\/).+/i.test(control.value)) {
                     return null;
                   }
-                  return { menuUrl: { message: '路径只能以"http://" "https://"或"/"开头' } };
+                  return { menuUrl: { message: '路径以"http://" "https://"或"/"开头' } };
                 }
               ]
             },
@@ -371,6 +400,7 @@ export default class MenuComponent implements OnInit {
             defaultValue: 1,
             props: {
               label: '是否显示',
+              required: true,
               options: [
                 { value: 1, label: '是' },
                 { value: 0, label: '否' }
@@ -389,10 +419,7 @@ export default class MenuComponent implements OnInit {
               nzMin: 0,
               nzPrecision: 0,
               nzStep: 0,
-              required: true
-            },
-            expressions: {
-              hide: `model.menuType==='B'`
+              description: '按数字从小到大排列'
             }
           }
         ]
@@ -408,7 +435,7 @@ export default class MenuComponent implements OnInit {
         }
         return options.nzOnOk(instance).then(v => {
           if (v !== false) {
-            options.table.refresh(false);
+            this.loadMenus();
           }
           return v;
         });

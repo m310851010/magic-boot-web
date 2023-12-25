@@ -202,7 +202,7 @@ export default class UserComponent {
    */
   onResetPasswordClick(row: UserInfo): void {
     this.modalService.confirm({
-      nzContent: `确定重置用户【${row.name || ''}】的密码`,
+      nzContent: `确定重置用户【${row.name || row.username}】的密码`,
       nzOnOk: () => {
         this.http
           .get<string>('/system/user/reset-password', { params: { id: row.id } })

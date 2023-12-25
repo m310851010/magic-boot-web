@@ -1,14 +1,14 @@
 <nzx-page>
   <nzx-header>
     <form nz-form [formGroup]="searchForm">
-      <ma-form-search [table]="table" [form]="searchForm" [buttonAlignRight]="false">
+      <ma-form-search [form]="searchForm" [buttonAlignRight]="false" (searchClick)="onSearchClick()">
         <formly-form [form]="searchForm" [fields]="searchFields" [model]="searchModel"></formly-form>
       </ma-form-search>
     </form>
   </nzx-header>
 
   <nzx-content>
-    <nzx-table #table [api]="menus$" [nzxColumns]="columns" [nzShowPagination]="false" [nzxFit]="true">
+    <nzx-table #table [nzData]="menusSnapshot" [nzxColumns]="columns" [nzShowPagination]="false" [nzxFit]="true">
       <div title>
         <nz-space>
           <ng-container *auth="'menu:save'">
