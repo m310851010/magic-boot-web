@@ -8,7 +8,14 @@
   </nzx-header>
 
   <nzx-content>
-    <nzx-table #table [nzData]="menusSnapshot" [nzxColumns]="columns" [nzShowPagination]="false" [nzFrontPagination]="true" [nzxFit]="true">
+    <nzx-table
+      #table
+      [nzData]="menusSnapshot"
+      [nzxColumns]="columns"
+      [nzShowPagination]="false"
+      [nzFrontPagination]="true"
+      [nzxFit]="true"
+    >
       <div title>
         <nz-space>
           <ng-container *auth="'menu:save'">

@@ -1,45 +1,48 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormSearchComponent } from '@commons/component/form-search';
-import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
-import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
-import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
+import { HttpClient } from '@angular/common/http';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { first, firstValueFrom, forkJoin, map, Observable, shareReplay } from 'rxjs';
+
+import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
-import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
+import { FormlyCommonModule } from '@xmagic/nz-formly/common';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
-import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
-import { FormlyNzTreeSelectModule } from '@xmagic/nz-formly/tree-select';
+import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzRadioModule } from '@xmagic/nz-formly/radio';
 import { FormlyRefTemplateModule } from '@xmagic/nz-formly/ref-template';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzTreeModule } from 'ng-zorro-antd/tree';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
-import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
-import { FormlyCommonModule } from '@xmagic/nz-formly/common';
-import { CommonService, DeleteButton, normalTree } from '@commons/service/common.service';
-import { DicService } from '@xmagic/nzx-antd/service';
-import { HttpClient } from '@angular/common/http';
-import { NzxModalOptions, NzxModalService } from '@xmagic/nzx-antd/modal';
-import { NzMessageService } from 'ng-zorro-antd/message';
-
-import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
-import { firstValueFrom, map } from 'rxjs';
-import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
 import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
 import { FormlyNzTreeModule } from '@xmagic/nz-formly/tree';
+import { FormlyNzTreeSelectModule } from '@xmagic/nz-formly/tree-select';
+import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
+import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
+import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
+import { NzxModalOptions, NzxModalService } from '@xmagic/nzx-antd/modal';
+import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
+import { DicService } from '@xmagic/nzx-antd/service';
+import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
+import { NzxFormUtils, NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzTreeNodeKey } from 'ng-zorro-antd/core/tree';
+import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
+
+import { FormSearchComponent } from '@commons/component/form-search';
+import { CommonService, DeleteButton, normalTree } from '@commons/service/common.service';
+import { listToMap } from '@commons/utils';
 
 @Component({
   selector: 'ma-role',
@@ -86,6 +89,8 @@ export default class RoleComponent {
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
   @ViewChild('permissionModalTemplate') permissionModalTemplate!: TemplateRef<{}>;
   @ViewChild('table') table!: NzxTableComponent;
+  @ViewChild('menuTree') menuTreeComponent!: NzTreeComponent;
+  @ViewChild('officeTree') officeTreeComponent!: NzTreeComponent;
   searchForm = new FormGroup({});
   searchModel: { name?: string } = {};
   searchFields: FormlyFieldConfig[] = [
@@ -132,7 +137,7 @@ export default class RoleComponent {
         {
           text: '权限',
           permission: 'role:permission',
-          click: (row: Role) => this.openPermissionModal(row, this.permissionModalTemplate)
+          click: (row: Role) => this.openPermissionModal(row, this.permissionModalTemplate, this.table)
         },
         {
           text: '用户列表',
@@ -151,30 +156,26 @@ export default class RoleComponent {
     }
   ];
 
-  menuExpand = true;
+  menuExpand = false;
   menuCheckAll = false;
   menuIndeterminate = false;
   menuCheckStrictly = true;
-  menuCheckedKeys: string[] = [];
+  menuCheckedKeys: NzTreeNodeKey[] = [];
 
-  officeExpand = true;
+  officeExpand = false;
   officeCheckAll = false;
   officeIndeterminate = false;
   officeCheckStrictly = true;
-  officeCheckedKeys: string[] = [];
+  officeCheckedKeys: NzTreeNodeKey[] = [];
+  customOfficeLoad = false;
 
-  treeMap = (tree: any) => {
-    normalTree(tree, '', node => {
-      node['expanded'] = true;
-    });
-    return tree;
-  };
+  menu$!: Observable<NzTreeNodeOptions[]>;
+  office$!: Observable<NzTreeNodeOptions[]>;
 
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
     private modalService: NzxModalService,
-    private messageService: NzMessageService,
     private dicService: DicService
   ) {}
 
@@ -202,50 +203,159 @@ export default class RoleComponent {
     });
   }
 
-  private openPermissionModal(model: Partial<Role>, nzContent: TemplateRef<{}>) {
-    this.modalFields = [
-      {
-        type: 'tree',
-        key: 'menus',
-        props: {
-          nzData: '/system/menu/tree',
-          nzCheckable: true,
-          labelName: 'menuLabelTemplate'
-        }
-      },
+  private openPermissionModal(model: Role, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+    this.menuExpand = false;
+    this.menuCheckAll = false;
+    this.menuIndeterminate = false;
+    this.menuCheckStrictly = true;
 
-      {
-        type: 'select',
-        key: 'permission',
-        props: {
-          label: '权限范围',
-          nzShowArrow: true,
-          nzAllowClear: true,
-          options: this.permission$
-        }
-      },
+    this.officeExpand = false;
+    this.officeCheckAll = false;
+    this.officeIndeterminate = false;
+    this.officeCheckStrictly = true;
+    this.customOfficeLoad = model.permission === 1;
 
-      {
-        type: 'tree',
-        key: 'offices',
-        props: {
-          label: '权限范围',
-          nzCheckable: true,
-          nzData: '/system/office/tree'
+    this.permission = model.permission;
+
+    let menuChecked: Record<string, boolean> = {};
+    let officeChecked: Record<string, boolean> = {};
+
+    this.menu$ = this.http.get<TreeNode[]>('/system/menu/tree').pipe(
+      map(tree => {
+        const checkedKeys: string[] = [];
+        let hasChecked = false;
+        let hasUnChecked = false;
+
+        const nodes = normalTree(tree, '', node => {
+          if (menuChecked[node['key']]) {
+            hasChecked = true;
+            checkedKeys.push(node['key']);
+          } else {
+            hasUnChecked = true;
+          }
+        });
+
+        this.checkboxStatus(hasChecked, hasUnChecked, 'menuCheckAll', 'menuIndeterminate');
+        this.menuCheckedKeys = checkedKeys;
+        return nodes;
+      })
+    );
+    this.office$ = this.http.get<TreeNode[]>('/system/office/tree').pipe(
+      map(tree => {
+        const checkedKeys: string[] = [];
+        let hasChecked = false;
+        let hasUnChecked = false;
+        const nodes = normalTree(tree, '', node => {
+          if (officeChecked[node['key']]) {
+            hasChecked = true;
+            checkedKeys.push(node['key']);
+          } else {
+            hasUnChecked = true;
+          }
+        });
+        this.checkboxStatus(hasChecked, hasUnChecked, 'officeCheckAll', 'officeIndeterminate');
+        this.officeCheckedKeys = checkedKeys;
+        console.log(nodes);
+        return nodes;
+      }),
+      first(),
+      shareReplay(1)
+    );
+
+    const params = { params: { roleId: model.id } };
+    const reqs: Observable<string[]>[] = [this.http.get<string[]>('/system/menu/by/role', params)];
+    if (model.permission === 1) {
+      reqs.push(this.http.get<string[]>('/system/office/by/role', params));
+    }
+    forkJoin(reqs).subscribe(([menuKeys, officeKeys]) => {
+      menuChecked = listToMap(menuKeys, null, () => true);
+      officeChecked = listToMap(officeKeys, null, () => true);
+
+      this.openModal(model, {
+        nzTitle: '分配权限',
+        nzContent,
+        nzWidth: '850px',
+        table,
+        nzBodyStyle: { 'padding-top': '0', 'padding-bottom': '0' },
+        nzOnOk: () => {
+          const menus = this.getTreeCheckedKeys(this.menuTreeComponent);
+          const offices = this.permission === 1 ? this.getTreeCheckedKeys(this.officeTreeComponent) : [];
+
+          return firstValueFrom(
+            this.http.post('/system/role/permission', { id: model.id, permission: this.permission, menus, offices })
+          );
         }
-      }
-    ];
-    this.openModal(model, {
-      nzTitle: '分配权限',
-      nzContent,
-      nzWidth: '850px',
-      nzBodyStyle: { 'padding-top': '0', 'padding-bottom': '0' },
-      nzOnOk: () => firstValueFrom(this.http.post('/system/role/permission', this.modalModel))
+      });
     });
   }
 
-  menuCheckAllChange(checkAll: boolean): void {}
-  officeCheckAllChange(checkAll: boolean): void {}
+  onPermissionChange(value: number): void {
+    this.permission = value;
+    if (value === 1) {
+      this.customOfficeLoad = true;
+    }
+  }
+
+  onToggleExpandAll(expanded: boolean, tree: NzTreeComponent): void {
+    NzxUtils.forEachTree(tree.getTreeNodes(), node => {
+      if (!node.isLeaf) {
+        node.isExpanded = expanded;
+      }
+    });
+  }
+
+  treeCheckAllChange(
+    checkAll: boolean,
+    tree: NzTreeComponent,
+    indeterminateName: 'menuIndeterminate' | 'officeIndeterminate'
+  ): void {
+    const nodeKeys: string[] = [];
+    if (checkAll) {
+      NzxUtils.forEachTree(tree.getTreeNodes(), node => {
+        nodeKeys.push(node.key);
+      });
+    }
+    tree.handleCheckedKeys(nodeKeys);
+    this[indeterminateName] = false;
+  }
+
+  treeCheckBoxChange(
+    tree: NzTreeComponent,
+    checkAllName: 'menuCheckAll' | 'officeCheckAll',
+    indeterminateName: 'menuIndeterminate' | 'officeIndeterminate'
+  ): void {
+    let hasChecked = false;
+    let hasUnChecked = false;
+    NzxUtils.forEachTree(tree.getTreeNodes(), node => {
+      if (node.isChecked) {
+        hasChecked = true;
+      } else {
+        hasUnChecked = true;
+      }
+    });
+
+    this.checkboxStatus(hasChecked, hasUnChecked, checkAllName, indeterminateName);
+  }
+
+  private checkboxStatus(
+    hasChecked: boolean,
+    hasUnChecked: boolean,
+    checkAllName: 'menuCheckAll' | 'officeCheckAll',
+    indeterminateName: 'menuIndeterminate' | 'officeIndeterminate'
+  ): void {
+    if (hasChecked && !hasUnChecked) {
+      this[checkAllName] = true;
+      this[indeterminateName] = false;
+      return;
+    }
+    if (hasChecked && hasUnChecked) {
+      this[checkAllName] = false;
+      this[indeterminateName] = true;
+      return;
+    }
+    this[checkAllName] = false;
+    this[indeterminateName] = false;
+  }
 
   private openRoleModal(
     model: Partial<Role>,
@@ -284,10 +394,10 @@ export default class RoleComponent {
       nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
       table?: NzxTableComponent;
     }
-  ): void {
+  ): NzModalRef {
     this.modalForm = new FormGroup({});
     this.modalModel = NzxUtils.clone(model);
-    this.modalService.create({
+    return this.modalService.create({
       nzWidth: 650,
       ...options,
       nzOnOk: instance => {
@@ -302,6 +412,16 @@ export default class RoleComponent {
         });
       }
     });
+  }
+
+  private getTreeCheckedKeys(tree: NzTreeComponent): string[] {
+    const keys: string[] = [];
+    NzxUtils.forEachTree(tree.getTreeNodes(), node => {
+      if (node.isChecked) {
+        keys.push(node.key);
+      }
+    });
+    return keys;
   }
 }
 

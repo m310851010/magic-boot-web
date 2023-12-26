@@ -227,15 +227,14 @@ export default class UserComponent {
   /**
    * 展开/折叠树节点
    * @param expanded 是否展开
-   * @param nzTreeComponent 树组件
+   * @param tree 树组件
    */
-  onToggleExpandAll(expanded: boolean, nzTreeComponent: NzTreeComponent): void {
-    NzxUtils.forEachTree(this.nodes, node => (node.expanded = expanded));
-    const keys = nzTreeComponent.getSelectedNodeList().map(v => v.key);
-    this.nodes = [...this.nodes];
-    if (keys.length) {
-      setTimeout(() => nzTreeComponent.handleSelectedKeys(keys, false));
-    }
+  onToggleExpandAll(expanded: boolean, tree: NzTreeComponent): void {
+    NzxUtils.forEachTree(tree.getTreeNodes(), node => {
+      if (!node.isLeaf) {
+        node.isExpanded = expanded;
+      }
+    });
   }
 
   onSelectedChange(evt: NzFormatEmitEvent, nzTreeComponent: NzTreeComponent, table: NzxTableComponent): void {
