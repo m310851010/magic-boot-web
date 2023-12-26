@@ -2,18 +2,15 @@ import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
-import { IconPickerComponent } from '@commons/component/icon-picker';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzTransitionPatchModule } from 'ng-zorro-antd/core/transition-patch/transition-patch.module';
-import { NzWaveModule } from 'ng-zorro-antd/core/wave';
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
-import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzFormlyModule } from '@xmagic/nz-formly';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
@@ -30,17 +27,19 @@ import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
-import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { DicItem, DicService } from '@xmagic/nzx-antd/service';
+import { CommonService, DeleteButton, normalTree } from '@commons/service/common.service';
+import { DicService } from '@xmagic/nzx-antd/service';
 import { HttpClient } from '@angular/common/http';
 import { NzxModalOptions, NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { tap } from 'rxjs/operators';
-import { dicMap } from '@commons/utils';
+
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { firstValueFrom, map } from 'rxjs';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
+import { FormlyNzTreeModule } from '@xmagic/nz-formly/tree';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'ma-role',
@@ -58,6 +57,7 @@ import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
     FormlyNzRadioModule,
     FormlyRefTemplateModule,
     FormlyNzTextareaModule,
+    FormlyNzTreeModule,
     FormlyModule,
     NzFormModule,
     NzButtonModule,
@@ -76,13 +76,15 @@ import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    IconPickerComponent
+    NzCheckboxModule,
+    NzSelectModule
   ],
   templateUrl: './role.component.html',
   styleUrl: './role.component.less'
 })
 export default class RoleComponent {
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
+  @ViewChild('permissionModalTemplate') permissionModalTemplate!: TemplateRef<{}>;
   @ViewChild('table') table!: NzxTableComponent;
   searchForm = new FormGroup({});
   searchModel: { name?: string } = {};
@@ -101,9 +103,11 @@ export default class RoleComponent {
   modalModel: Partial<Role> = {};
   modalFields: FormlyFieldConfig[] = [];
 
-  private permission$ = this.dicService.getDic('PERMISSION');
+  permission?: number;
+  permission$ = this.dicService.getDic('PERMISSION');
   getParams: () => Partial<Role> = () => this.searchModel;
   columns: NzxColumn<Role>[] = [
+    { isIndex: true },
     { name: 'name', thText: '角色名称' },
     {
       name: 'permission',
@@ -114,6 +118,7 @@ export default class RoleComponent {
           map(dic => dic[value])
         )
     },
+    { name: 'createDate', thText: '创建时间' },
     { name: 'desc', thText: '角色描述' },
     {
       name: 'id',
@@ -127,7 +132,7 @@ export default class RoleComponent {
         {
           text: '权限',
           permission: 'role:permission',
-          click: (row: Role) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
+          click: (row: Role) => this.openPermissionModal(row, this.permissionModalTemplate)
         },
         {
           text: '用户列表',
@@ -146,8 +151,25 @@ export default class RoleComponent {
     }
   ];
 
-  menuTypeMap: Record<string, DicItem & { color: string }> = {};
-  menuTypes: DicItem[] = [];
+  menuExpand = true;
+  menuCheckAll = false;
+  menuIndeterminate = false;
+  menuCheckStrictly = true;
+  menuCheckedKeys: string[] = [];
+
+  officeExpand = true;
+  officeCheckAll = false;
+  officeIndeterminate = false;
+  officeCheckStrictly = true;
+  officeCheckedKeys: string[] = [];
+
+  treeMap = (tree: any) => {
+    normalTree(tree, '', node => {
+      node['expanded'] = true;
+    });
+    return tree;
+  };
+
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
@@ -156,51 +178,82 @@ export default class RoleComponent {
     private dicService: DicService
   ) {}
 
-  ngOnInit(): void {
-    this.dicService
-      .getDic('MENU_TYPE')
-      .pipe(
-        tap(list => (this.menuTypes = list)),
-        dicMap<DicItem & { color: string }>()
-      )
-      .subscribe(v => (this.menuTypeMap = v));
-  }
+  ngOnInit(): void {}
 
   onUpdateOpenModal(model: Partial<Role>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    this.openModal(model, {
-      nzTitle: '修改菜单',
+    this.openRoleModal(model, {
+      nzTitle: '修改角色',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+      nzOnOk: () => firstValueFrom(this.http.post('/system/role/save', this.modalModel))
     });
   }
 
   onDeleteClick(row: Role, table: NzxTableComponent): void {
-    return this.handleDelete(row.id);
-  }
-
-  private handleDelete(id: string | string[]): void {
-    this.commonService.handleDelete({ id, url: '/system/menu/delete', table: this.table });
+    this.commonService.handleDelete({ id: row.id, url: '/system/role/delete', table: this.table });
   }
 
   onNewOpenModal(model: Partial<Role>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    this.openModal(model, {
-      nzTitle: '新增',
+    this.openRoleModal(model, {
+      nzTitle: '新增角色',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+      nzOnOk: () => firstValueFrom(this.http.post('/system/role/save', this.modalModel))
     });
   }
 
-  private openModal(
+  private openPermissionModal(model: Partial<Role>, nzContent: TemplateRef<{}>) {
+    this.modalFields = [
+      {
+        type: 'tree',
+        key: 'menus',
+        props: {
+          nzData: '/system/menu/tree',
+          nzCheckable: true,
+          labelName: 'menuLabelTemplate'
+        }
+      },
+
+      {
+        type: 'select',
+        key: 'permission',
+        props: {
+          label: '权限范围',
+          nzShowArrow: true,
+          nzAllowClear: true,
+          options: this.permission$
+        }
+      },
+
+      {
+        type: 'tree',
+        key: 'offices',
+        props: {
+          label: '权限范围',
+          nzCheckable: true,
+          nzData: '/system/office/tree'
+        }
+      }
+    ];
+    this.openModal(model, {
+      nzTitle: '分配权限',
+      nzContent,
+      nzWidth: '850px',
+      nzBodyStyle: { 'padding-top': '0', 'padding-bottom': '0' },
+      nzOnOk: () => firstValueFrom(this.http.post('/system/role/permission', this.modalModel))
+    });
+  }
+
+  menuCheckAllChange(checkAll: boolean): void {}
+  officeCheckAllChange(checkAll: boolean): void {}
+
+  private openRoleModal(
     model: Partial<Role>,
     options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
       nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
       table: NzxTableComponent;
     }
   ): void {
-    this.modalForm = new FormGroup({});
-    this.modalModel = NzxUtils.clone(model);
     this.modalFields = [
       {
         type: 'input',
@@ -212,31 +265,6 @@ export default class RoleComponent {
         }
       },
       {
-        type: 'number',
-        key: 'sort',
-        props: {
-          label: '排序号',
-          nzMax: 9999,
-          nzMin: 0,
-          nzPrecision: 0,
-          nzStep: 0,
-          description: '按数字从小到大排列'
-        }
-      },
-
-      {
-        type: 'select',
-        key: 'permission',
-        props: {
-          label: '权限范围',
-          nzShowArrow: true,
-          nzAllowClear: true,
-          required: true,
-          options: this.permission$
-        }
-      },
-
-      {
         type: 'textarea',
         key: 'desc',
         props: {
@@ -247,7 +275,18 @@ export default class RoleComponent {
         }
       }
     ];
+    this.openModal(model, options);
+  }
 
+  private openModal(
+    model: Partial<Role>,
+    options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
+      nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
+      table?: NzxTableComponent;
+    }
+  ): void {
+    this.modalForm = new FormGroup({});
+    this.modalModel = NzxUtils.clone(model);
     this.modalService.create({
       nzWidth: 650,
       ...options,
@@ -256,7 +295,7 @@ export default class RoleComponent {
           return false;
         }
         return options.nzOnOk(instance).then(v => {
-          if (v !== false) {
+          if (v && options.table) {
             options.table.refresh(false);
           }
           return v;
@@ -272,19 +311,16 @@ interface Role {
    * 角色名称
    */
   name: string /**
-   * 状态
-   */;
-  status: 0 | 1;
   /**
    * 排序
-   */
+   */;
   sort?: number;
   /**
    * 描述
    */
   desc?: string;
   /**
-   * 权限范围
+   * 权限范围 0：全部数据，1：自定义数据，2：本部门及以下数据，3：本部门数据, 4仅个人数据
    */
-  permission: string;
+  permission?: 0 | 1 | 2 | 3 | 4;
 }

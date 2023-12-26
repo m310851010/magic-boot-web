@@ -136,10 +136,9 @@ export default class UserComponent {
 
   searchText = '';
   nodes: NzTreeNodeOptions[] = [];
-  nodes$ = this.http.get<{ list: NzTreeNodeOptions[] }>('/system/office/tree').pipe(
-    catchError(() => of({ list: [] })),
+  nodes$ = this.http.get<NzTreeNodeOptions[]>('/system/office/tree').pipe(
+    catchError(() => of([])),
     shareReplay(1),
-    map(v => v.list),
     map(list => {
       const newList = NzxUtils.clone(list);
       normalTree(newList, 'id', node => {
@@ -228,10 +227,15 @@ export default class UserComponent {
   /**
    * 展开/折叠树节点
    * @param expanded 是否展开
+   * @param nzTreeComponent 树组件
    */
-  onToggleExpandAll(expanded: boolean): void {
+  onToggleExpandAll(expanded: boolean, nzTreeComponent: NzTreeComponent): void {
     NzxUtils.forEachTree(this.nodes, node => (node.expanded = expanded));
+    const keys = nzTreeComponent.getSelectedNodeList().map(v => v.key);
     this.nodes = [...this.nodes];
+    if (keys.length) {
+      setTimeout(() => nzTreeComponent.handleSelectedKeys(keys, false));
+    }
   }
 
   onSelectedChange(evt: NzFormatEmitEvent, nzTreeComponent: NzTreeComponent, table: NzxTableComponent): void {
@@ -243,7 +247,7 @@ export default class UserComponent {
     this.openModal(
       {},
       {
-        nzTitle: '新建用户',
+        nzTitle: '新增用户',
         nzContent,
         table,
         nzOnOk: () => {
@@ -391,7 +395,7 @@ export default class UserComponent {
           return false;
         }
         return options.nzOnOk(instance).then(v => {
-          if (v !== false) {
+          if (v && options.table) {
             options.table.refresh(false);
           }
           return v;

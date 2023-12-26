@@ -33,8 +33,8 @@
 
       <nz-dropdown-menu #menu="nzDropdownMenu">
         <ul nz-menu>
-          <li nz-menu-item (click)="onToggleExpandAll(true)">展开全部</li>
-          <li nz-menu-item (click)="onToggleExpandAll(false)">折叠全部</li>
+          <li nz-menu-item (click)="onToggleExpandAll(true, nzTreeComponent)">展开全部</li>
+          <li nz-menu-item (click)="onToggleExpandAll(false, nzTreeComponent)">折叠全部</li>
         </ul>
       </nz-dropdown-menu>
     </nz-card>

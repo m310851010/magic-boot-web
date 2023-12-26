@@ -226,7 +226,7 @@ export default class MenuComponent implements OnInit {
 
   onNewOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.openModal(model, {
-      nzTitle: '新增',
+      nzTitle: '新增菜单',
       nzContent,
       table,
       nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
@@ -434,7 +434,7 @@ export default class MenuComponent implements OnInit {
           return false;
         }
         return options.nzOnOk(instance).then(v => {
-          if (v !== false) {
+          if (v) {
             this.loadMenus();
           }
           return v;

@@ -17,15 +17,6 @@
           </button>
         </ng-container>
       </div>
-
-      <ng-template named="tdIconTemplate" let-row>
-        @if (row.icon){
-          <span nz-icon [nzType]="row.icon"></span>
-        } @else { -- }
-      </ng-template>
-      <ng-template named="menuTypeTemplate" let-row>
-        <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>
-      </ng-template>
     </nzx-table>
   </nzx-content>
 </nzx-page>
@@ -39,9 +30,73 @@
       [model]="modalModel"
       [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
     >
-      <ng-template named="iconTemplate">
-        <ma-icon-picker formControlName="icon"></ma-icon-picker>
-      </ng-template>
     </formly-form>
   </form>
+</ng-template>
+
+
+<ng-template #permissionModalTemplate>
+  <div nz-row [nzGutter]="20" class="clear-form-item-bottom">
+    <div nz-col class="mt-sm flex-main">
+      <nz-form-item >
+        <nz-form-label>菜单权限</nz-form-label>
+        <nz-form-control>
+          <label nz-checkbox [(ngModel)]="menuExpand">展开/折叠</label>
+          <label nz-checkbox
+                 [(ngModel)]="menuCheckAll"
+                 [nzIndeterminate]="menuIndeterminate"
+                 (ngModelChange)="menuCheckAllChange($event)">全选/全不选</label>
+          <label nz-checkbox [(ngModel)]="menuCheckStrictly">层级联动</label>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-divider class="mb-l mt-m"></nz-divider>
+      <div style="height: 437px; overflow: auto">
+        <nz-tree #menuTree
+                 [nzData]="$any('/system/menu/tree' | toAsync: { map: treeMap } | async)"
+                 [nzCheckedKeys]="menuCheckedKeys"
+                 [nzCheckStrictly]="!menuCheckStrictly"
+                 nzCheckable
+                 nzBlockNode
+        ></nz-tree>
+      </div>
+    </div>
+    <div style="border-left: 1px solid rgba(0, 0, 0, 0.06);"></div>
+    <div nz-col class="mt-m flex-main">
+      <nz-form-item >
+        <nz-form-label>权限范围</nz-form-label>
+        <nz-form-control>
+          <nz-select class="full-width" [(ngModel)]="permission" [nzOptions]="$any(permission$ | async)" nzPlaceHolder="请选择权限范围" nzAllowClear nzShowSearch></nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      @if (permission === 1) {
+        <nz-form-item >
+          <nz-form-label>数据权限</nz-form-label>
+          <nz-form-control>
+            <label nz-checkbox [(ngModel)]="officeExpand">展开/折叠</label>
+            <label nz-checkbox
+                   [(ngModel)]="officeCheckAll"
+                   [nzIndeterminate]="officeIndeterminate"
+                   (ngModelChange)="officeCheckAllChange($event)">全选/全不选</label>
+            <label nz-checkbox [(ngModel)]="officeCheckStrictly">层级联动</label>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-divider class="mb-l mt-m"></nz-divider>
+
+        <div style="height: 400px; overflow: auto">
+          <nz-tree
+               #officeTree
+               [nzData]="$any('/system/office/tree' | toAsync: { map: treeMap } | async)"
+               [nzCheckedKeys]="officeCheckedKeys"
+               [nzCheckStrictly]="!officeCheckStrictly"
+               nzCheckable
+               nzBlockNode
+          ></nz-tree>
+        </div>
+      }
+    </div>
+  </div>
+
 </ng-template>
