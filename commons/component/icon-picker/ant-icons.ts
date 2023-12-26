@@ -1,5 +1,6 @@
 /**
  *  在开始和结束之间的内容是自动生成的,请不要往里面添加代码,需要添加的图标名称,请在<ICON> ... </ICON>之外添加
+ *  @see icon- extra.js
  */
 export const antIcons: string[] = [
   /*<ICON>*/
