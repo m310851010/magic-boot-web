@@ -130,7 +130,7 @@ export default class UserComponent {
     { name: 'officeName', thText: '所属部门' },
     { name: 'roleNames', thText: '角色', tdTemplate: 'role' },
     { name: 'phone', thText: '手机号' },
-    { name: 'isLogin', thText: '状态', tdTemplate: 'status' },
+    { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '60px' },
     { name: 'id', thText: '操作', tdTemplate: 'buttons', nzWidth: '180px' }
   ];
 

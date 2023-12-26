@@ -56,13 +56,13 @@
       </nzx-header>
 
       <nzx-content>
-        <nzx-table #table [nzxColumns]="columns" api="/system/user/list" [params]="getParams" style="width: 100%">
+        <nzx-table #table [nzxColumns]="columns" api="/system/user/list" [params]="getParams">
           <div title>
             <nz-space>
               <ng-container *auth="'user:save'">
                 <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal(modalTemplate, table)">
                   <span nz-icon nzType="plus"></span>
-                  新建用户
+                  新增用户
                 </button>
               </ng-container>
 
@@ -77,11 +77,11 @@
           <ng-template named="buttons" let-row>
             <ng-container *ngIf="row.id !== '1'">
               <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
-              <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="mr-xs ant-btn-dangerous ant-btn-link">
+              <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
+              <a (click)="onToggleStatus(row)" class="mr-xs">{{ row.isLogin ? '启用' : '停用' }}</a>
+              <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="ant-btn-dangerous ant-btn-link">
                 删除
               </a>
-              <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
-              <a (click)="onToggleStatus(row)">{{ row.isLogin ? '启用' : '停用' }}</a>
             </ng-container>
           </ng-template>
 
