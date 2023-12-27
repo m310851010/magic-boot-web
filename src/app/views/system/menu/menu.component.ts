@@ -112,7 +112,7 @@ export default class MenuComponent implements OnInit {
     { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate' },
     { name: 'componentName', thText: '组件' },
     { name: 'sort', thText: '排序号' },
-    { name: 'isShow', thText: '是否显示', format: isShow => (isShow ? '是' : '否') },
+    { name: 'isShow', thText: '显示状态', format: isShow => (isShow ? '显示' : '隐藏') },
     {
       name: 'id',
       thText: '操作',
@@ -399,11 +399,11 @@ export default class MenuComponent implements OnInit {
             key: 'isShow',
             defaultValue: 1,
             props: {
-              label: '是否显示',
+              label: '显示状态',
               required: true,
               options: [
-                { value: 1, label: '是' },
-                { value: 0, label: '否' }
+                { value: 1, label: '显示' },
+                { value: 0, label: '隐藏' }
               ]
             },
             expressions: {
