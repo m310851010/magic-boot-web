@@ -14,6 +14,7 @@ import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzRadioModule } from '@xmagic/nz-formly/radio';
 import { FormlyRefTemplateModule } from '@xmagic/nz-formly/ref-template';
 import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
+import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
 import { FormlyNzTreeSelectModule } from '@xmagic/nz-formly/tree-select';
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
@@ -56,6 +57,7 @@ import { dicMap } from '@commons/utils';
     FormlyNzTreeSelectModule,
     FormlyNzRadioModule,
     FormlyRefTemplateModule,
+    FormlyNzTextareaModule,
     FormlyModule,
     NzFormModule,
     NzButtonModule,
@@ -90,7 +92,7 @@ export default class MenuComponent implements OnInit {
       key: 'searchValue',
       props: {
         label: '关键字',
-        placeholder: '菜单名称、路径、权限码、组件',
+        placeholder: '菜单名称、路由地址、权限码、组件',
         attributes: { style: 'width: 300px' }
       }
     }
@@ -107,7 +109,7 @@ export default class MenuComponent implements OnInit {
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'name', thText: '菜单名称', showExpand: true },
     { name: 'icon', thText: '图标', tdTemplate: 'tdIconTemplate', nzWidth: '50px' },
-    { name: 'url', thText: '路径' },
+    { name: 'url', thText: '路由地址' },
     { name: 'permission', thText: '权限标识', nzWidth: '150px' },
     { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate' },
     { name: 'componentName', thText: '组件' },
@@ -281,6 +283,7 @@ export default class MenuComponent implements OnInit {
               nzAllowClear: true,
               nzShowSearch: true,
               nzHideUnMatched: true,
+              nzShowIcon: true,
               options: this.menus$.pipe(
                 map(list => {
                   const nodes = [...list];
@@ -299,9 +302,6 @@ export default class MenuComponent implements OnInit {
                     if (node.id === model.id) {
                       node['disabled'] = true;
                     }
-
-                    node['title'] = node.name;
-                    node['key'] = node.id;
                     if (node.menuType === 'D') {
                       return true;
                     }
@@ -325,7 +325,7 @@ export default class MenuComponent implements OnInit {
             type: 'input',
             key: 'url',
             props: {
-              label: '路径',
+              label: '路由地址',
               maxLength: 256,
               required: true
             },
@@ -338,25 +338,13 @@ export default class MenuComponent implements OnInit {
                   if (/^(https?:\/\/|\/).+/i.test(control.value)) {
                     return null;
                   }
-                  return { menuUrl: { message: '路径以"http://" "https://"或"/"开头' } };
+                  return { menuUrl: { message: '路由地址以"http://" "https://"或"/"开头' } };
                 }
               ]
             },
             expressions: {
               hide: `model.menuType==='D' || model.menuType=='B'`
             }
-          },
-          {
-            type: 'ref-template',
-            key: 'icon',
-            props: {
-              label: '图标',
-              refName: 'iconTemplate'
-            },
-            expressions: {
-              hide: `model.menuType==='B'`
-            },
-            wrappers: ['field-wrapper']
           },
           {
             type: 'input',
@@ -375,7 +363,60 @@ export default class MenuComponent implements OnInit {
               label: '权限码'
             },
             expressions: {
-              hide: `model.menuType!=='B'`
+              hide: `model.menuType==='D'`
+            }
+          },
+          {
+            type: 'ref-template',
+            key: 'icon',
+            props: {
+              label: '图标',
+              refName: 'iconTemplate'
+            },
+            expressions: {
+              hide: `model.menuType==='B'`
+            },
+            wrappers: ['field-wrapper']
+          },
+
+          {
+            type: 'number',
+            key: 'sort',
+            props: {
+              label: '排序号',
+              nzMax: 9999,
+              nzMin: 0,
+              nzPrecision: 0,
+              nzStep: 0
+            }
+          },
+          {
+            type: 'radio',
+            key: 'frame',
+            defaultValue: 1,
+            props: {
+              label: '外链',
+              required: true,
+              options: [
+                { value: 0, label: '是' },
+                { value: 1, label: '否' }
+              ]
+            },
+            expressions: {
+              hide: `model.menuType!=='M'`
+            }
+          },
+          {
+            type: 'radio',
+            key: 'isShow',
+            defaultValue: 1,
+            props: {
+              label: '显示状态',
+              required: true,
+              options: [
+                { value: 1, label: '显示' },
+                { value: 0, label: '隐藏' }
+              ]
             }
           },
           {
@@ -391,38 +432,20 @@ export default class MenuComponent implements OnInit {
               ]
             },
             expressions: {
-              hide: `!(model.menuType==='I' || model.menuType==='O')`
-            }
-          },
-          {
-            type: 'radio',
-            key: 'isShow',
-            defaultValue: 1,
-            props: {
-              label: '显示状态',
-              required: true,
-              options: [
-                { value: 1, label: '显示' },
-                { value: 0, label: '隐藏' }
-              ]
-            },
-            expressions: {
-              hide: `model.menuType==='B'`
-            }
-          },
-          {
-            type: 'number',
-            key: 'sort',
-            props: {
-              label: '排序号',
-              nzMax: 9999,
-              nzMin: 0,
-              nzPrecision: 0,
-              nzStep: 0,
-              description: '按数字从小到大排列'
+              hide: `model.frame !== 0`
             }
           }
         ]
+      },
+      {
+        type: 'textarea',
+        key: 'desc',
+        props: {
+          label: '备注',
+          rows: 4,
+          maxLength: 200,
+          nzMaxCharacterCount: 200
+        }
       }
     ];
 
@@ -456,7 +479,7 @@ interface Menu {
   pid?: string;
   sort: number;
   url?: string;
-  menuType: 'M' | 'D' | 'B' | 'O' | 'I';
+  menuType: 'M' | 'D' | 'B';
   children: Menu[];
 
   [key: string]: NzSafeAny;
