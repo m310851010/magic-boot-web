@@ -70,8 +70,10 @@
           [(nzCheckedKeys)]="menuCheckedKeys"
           [nzCheckStrictly]="!menuCheckStrictly"
           (nzCheckBoxChange)="treeCheckBoxChange(menuTree, 'menuCheckAll', 'menuIndeterminate')"
+          nzVirtualHeight="437px"
           nzCheckable
           nzBlockNode
+          nzShowIcon
         ></nz-tree>
       </div>
     </div>
@@ -120,6 +122,7 @@
             [(nzCheckedKeys)]="officeCheckedKeys"
             [nzCheckStrictly]="!officeCheckStrictly"
             (nzCheckBoxChange)="treeCheckBoxChange(officeTree, 'officeCheckAll', 'officeIndeterminate')"
+            nzVirtualHeight="400px"
             nzCheckable
             nzBlockNode
           ></nz-tree>

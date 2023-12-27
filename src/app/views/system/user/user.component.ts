@@ -81,7 +81,13 @@ import { CommonService, normalTree } from '@commons/service/common.service';
   styleUrl: './user.component.less'
 })
 export default class UserComponent {
-  gridOptions = { nzGutter: 15, colNzSpan: 8 };
+  gridOptions = { nzGutter: 15, colNzSpan: 8, labelNzFlex: '60px' };
+  collapsed = true;
+
+  private isLoginOptions = [
+    { label: '正常', value: 0 },
+    { label: '停用', value: 1 }
+  ];
 
   modalForm = new FormGroup({});
   modalModel: Partial<UserInfo> = {};
@@ -116,6 +122,28 @@ export default class UserComponent {
             nzMode: 'multiple',
             nzShowArrow: true,
             nzAllowClear: true
+          }
+        },
+        {
+          type: 'input',
+          key: 'phone',
+          props: {
+            label: '手机号'
+          },
+          expressions: {
+            hide: () => this.collapsed
+          }
+        },
+        {
+          type: 'select',
+          key: 'isLogin',
+          props: {
+            label: '状态',
+            options: this.isLoginOptions,
+            nzAllowClear: true
+          },
+          expressions: {
+            hide: () => this.collapsed
           }
         }
       ]
@@ -356,10 +384,7 @@ export default class UserComponent {
                 defaultValue: 0,
                 props: {
                   label: '状态',
-                  options: [
-                    { label: '正常', value: 0 },
-                    { label: '停用', value: 1 }
-                  ]
+                  options: this.isLoginOptions
                 }
               }
         ]
