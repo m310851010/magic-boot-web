@@ -19,11 +19,11 @@ export class HeaderMenuSearchComponent implements OnInit, OnChanges {
   @Input() menus!: Menu[];
   inputValue = '';
   /**
-   * 隐藏搜索框
+   * 隐藏查询框
    */
   hiddenSearch = true;
   /**
-   * 是否清除搜索图标的hover样式
+   * 是否清除查询图标的hover样式
    */
   clearHoverSearch = false;
   menuDataSource: Menu[] = [];

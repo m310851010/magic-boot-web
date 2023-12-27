@@ -22,14 +22,23 @@ export class CommonService {
    * 删除
    * @param options
    */
-  handleDelete<T = boolean>(options: { id: string | string[]; url: string; table?: NzxTableComponent }): Promise<T> {
+  handleDelete<T = boolean>(options: {
+    id: string | string[];
+    url: string;
+    params?: Record<string, any>;
+    table?: NzxTableComponent;
+    message?: string;
+  }): Promise<T> {
     return new Promise((resolve, reject) => {
       this.modalService.confirm({
-        nzContent: '删除后不可恢复，确定删除?',
+        nzContent: options.message || '删除后不可恢复，确定删除?',
         nzOnOk: () => {
           this.http
             .delete<T>(options.url, {
-              params: { id: NzxUtils.isArray(options.id) ? options.id.join(',') : options.id }
+              params: {
+                id: NzxUtils.isArray(options.id) ? options.id.join(',') : options.id,
+                ...(options.params || {})
+              }
             })
             .subscribe(result => {
               if (result) {

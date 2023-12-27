@@ -20,7 +20,7 @@ import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxModalOptions } from '@xmagic/nzx-antd/modal/nzx-modal.service';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { FetcherService } from '@xmagic/nzx-antd/service';
+import { FetcherService, NzxServiceModule } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -40,6 +40,7 @@ import { sm3 } from 'sm-crypto-v2';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
+import { Constant } from '@commons/constant';
 import { CommonService, normalTree } from '@commons/service/common.service';
 
 @Component({
@@ -83,11 +84,6 @@ import { CommonService, normalTree } from '@commons/service/common.service';
 export default class UserComponent {
   gridOptions = { nzGutter: 15, colNzSpan: 8, labelNzFlex: '60px' };
   collapsed = true;
-
-  private isLoginOptions = [
-    { label: '正常', value: 0 },
-    { label: '停用', value: 1 }
-  ];
 
   modalForm = new FormGroup({});
   modalModel: Partial<UserInfo> = {};
@@ -139,7 +135,7 @@ export default class UserComponent {
           key: 'isLogin',
           props: {
             label: '状态',
-            options: this.isLoginOptions,
+            options: Constant.STATUS_OPTIONS,
             nzAllowClear: true
           },
           expressions: {
@@ -158,7 +154,8 @@ export default class UserComponent {
     { name: 'officeName', thText: '所属部门' },
     { name: 'roleNames', thText: '角色', tdTemplate: 'role' },
     { name: 'phone', thText: '手机号' },
-    { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '60px' },
+    { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
+    { name: 'createDate', thText: '创建时间', nzWidth: '150px' },
     { name: 'id', thText: '操作', tdTemplate: 'buttons', nzWidth: '180px' }
   ];
 
@@ -205,7 +202,7 @@ export default class UserComponent {
   }
 
   onDeleteClick(row: UserInfo, table: NzxTableComponent): void {
-    return this.handleDelete(row.id, table);
+    this.handleDelete(row.id, table);
   }
 
   onBatchDelete(table: NzxTableComponent): void {
@@ -214,7 +211,7 @@ export default class UserComponent {
       this.messageService.error('请选择至少一条用户信息');
       return;
     }
-    return this.handleDelete(id, table);
+    this.handleDelete(id, table);
   }
 
   private handleDelete(id: string | string[], table: NzxTableComponent): void {
@@ -310,14 +307,14 @@ export default class UserComponent {
       : [
           (control: AbstractControl) => {
             const value = control.value;
-            if (!/^\w{3,64}$/.test(value)) {
-              return { username: { message: '账号必须是数字、字母的组合' } };
+            if (value == null || !/^\w{3,64}$/.test(value)) {
+              return null;
             }
             return this.fetcherService.remoteValidate({
               url: '/system/user/unique',
               message: '该账号已存在',
               data: (control: AbstractControl) => ({ username: control.value })
-            });
+            })(control);
           }
         ];
 
@@ -384,7 +381,7 @@ export default class UserComponent {
                 defaultValue: 0,
                 props: {
                   label: '状态',
-                  options: this.isLoginOptions
+                  options: Constant.STATUS_OPTIONS
                 }
               }
         ]

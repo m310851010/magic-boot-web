@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { Component, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { first, firstValueFrom, forkJoin, map, Observable, shareReplay } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -34,6 +35,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
@@ -42,6 +44,7 @@ import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { CommonService, DeleteButton, normalTree } from '@commons/service/common.service';
+import { UserInfo } from '@commons/service/user-info';
 import { listToMap } from '@commons/utils';
 
 @Component({
@@ -87,10 +90,13 @@ import { listToMap } from '@commons/utils';
 })
 export default class RoleComponent {
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
+  @ViewChild('userModalTemplate') userModalTemplate!: TemplateRef<{}>;
   @ViewChild('permissionModalTemplate') permissionModalTemplate!: TemplateRef<{}>;
   @ViewChild('table') table!: NzxTableComponent;
+  @ViewChildren('userTable') userTable!: QueryList<NzxTableComponent<UserInfo & { checked: boolean }>>;
   @ViewChild('menuTree') menuTreeComponent!: NzTreeComponent;
   @ViewChild('officeTree') officeTreeComponent!: NzTreeComponent;
+
   searchForm = new FormGroup({});
   searchModel: { name?: string } = {};
   searchFields: FormlyFieldConfig[] = [
@@ -111,6 +117,7 @@ export default class RoleComponent {
   permission?: number;
   permission$ = this.dicService.getDic('PERMISSION');
   getParams: () => Partial<Role> = () => this.searchModel;
+
   columns: NzxColumn<Role>[] = [
     { isIndex: true },
     { name: 'name', thText: '角色名称' },
@@ -142,14 +149,12 @@ export default class RoleComponent {
         {
           text: '用户列表',
           permission: 'role:user:list',
-          click: (row: Role) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
+          click: (row: Role) => this.openUserModal(row)
         },
         {
           ...DeleteButton,
           permission: 'role:delete',
-          click: (row: Role) => {
-            this.onDeleteClick(row, this.table);
-          }
+          click: (row: Role) => this.onDeleteClick(row, this.table)
         }
       ],
       nzWidth: '240px'
@@ -172,11 +177,19 @@ export default class RoleComponent {
   menu$!: Observable<NzTreeNodeOptions[]>;
   office$!: Observable<NzTreeNodeOptions[]>;
 
+  // 分配用户对话框
+  userSearchForm = new FormGroup({});
+  userSearchModel: { name?: string } = {};
+  userFields: FormlyFieldConfig[] = [];
+  rowRole!: Role;
+  userColumns: NzxColumn<UserInfo>[] = [];
+
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
     private modalService: NzxModalService,
-    private dicService: DicService
+    private dicService: DicService,
+    private messageService: NzMessageService
   ) {}
 
   ngOnInit(): void {}
@@ -191,7 +204,7 @@ export default class RoleComponent {
   }
 
   onDeleteClick(row: Role, table: NzxTableComponent): void {
-    this.commonService.handleDelete({ id: row.id, url: '/system/role/delete', table: this.table });
+    this.commonService.handleDelete({ id: row.id, url: '/system/role/delete', table });
   }
 
   onNewOpenModal(model: Partial<Role>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
@@ -201,6 +214,163 @@ export default class RoleComponent {
       table,
       nzOnOk: () => firstValueFrom(this.http.post('/system/role/save', this.modalModel))
     });
+  }
+
+  onBatchCancel(table: NzxTableComponent): void {
+    console.log('v ssn   s  ');
+  }
+
+  onUnallocatedUserModal(nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+    const model: Record<string, any> = { roleId: this.rowRole.id };
+    const url = '/system/role/unallocated/users';
+    this.modalService.create({
+      nzTitle: '选择用户',
+      nzWidth: 1200,
+      nzContent,
+      nzData: {
+        allocate: false,
+        url,
+        columns: this.getUserColumns(),
+        getParams: () => model,
+        model,
+        form: new FormGroup({}),
+        fields: this.getUserSearchFields()
+      },
+      nzBodyStyle: {
+        'padding-top': '0',
+        'padding-bottom': '0'
+      },
+      nzOnOk: () => {
+        const selectionTable = this.userTable.filter(v => v.api === url)[0]!;
+        const nzData = selectionTable.nzData || [];
+        if (!nzData.length) {
+          this.messageService.error('没有可以分配的用户，请点击"查询"重试');
+          return false;
+        }
+
+        const users = nzData.filter(v => v.checked).map(v => v.id);
+        if (!users.length) {
+          this.messageService.error('请选择要分配的用户');
+          return false;
+        }
+        return firstValueFrom(
+          this.http
+            .post('/system/role/allocate/users', { id: this.rowRole.id, users })
+            .pipe(tap(() => table.refresh(true)))
+        );
+      }
+    });
+  }
+
+  private openUserModal(row: Role): void {
+    this.rowRole = row;
+    const model: Record<string, any> = { roleId: this.rowRole.id };
+    this.modalService.create({
+      nzTitle: '分配用户',
+      nzWidth: 1200,
+      nzContent: this.userModalTemplate,
+      nzData: {
+        allocate: true,
+        url: '/system/role/list/users',
+        columns: this.getUserColumns().concat([
+          {
+            name: 'id',
+            thText: '操作',
+            nzWidth: '80px',
+            tdTemplate: 'buttons'
+          }
+        ]),
+        getParams: () => model,
+        model,
+        form: new FormGroup({}),
+        fields: this.getUserSearchFields()
+      },
+      nzCancelText: '关闭',
+      nzOkText: null,
+      nzBodyStyle: {
+        'padding-top': '0',
+        'padding-bottom': '0'
+      }
+    });
+  }
+
+  onCancelUsers(row: UserInfo, table: NzxTableComponent<UserInfo & { checked: boolean }>): void {
+    this.handleCancelUsers(row.id, table, `确认要取消该用户"${row.name || row.username}"角色吗？`);
+  }
+
+  onBatchCancelUsers(table: NzxTableComponent): void {
+    const id = table.nzData.filter(v => v.checked).map(v => v.id);
+    if (!id.length) {
+      this.messageService.error('请选择至少一条用户信息');
+      return;
+    }
+    this.handleCancelUsers(id, table, '是否取消选中用户授权数据项？');
+  }
+
+  private handleCancelUsers(userId: string | string[], table: NzxTableComponent, message: string): void {
+    this.modalService.confirm({
+      nzContent: message,
+      nzOnOk: () => {
+        this.http
+          .delete('/system/role/cancel/users', {
+            params: {
+              id: this.rowRole.id,
+              users: NzxUtils.isArray(userId) ? userId.join(',') : userId
+            }
+          })
+          .subscribe(result => {
+            if (result) {
+              table.refresh(false);
+              this.messageService.success('取消成功');
+            } else {
+              this.messageService.warning('用户信息不存在或已被删除');
+            }
+          });
+      }
+    });
+  }
+
+  private getUserColumns(): NzxColumn<UserInfo>[] {
+    return [
+      { nzShowCheckAll: true, nzShowCheckbox: true },
+      { name: 'username', thText: '账号' },
+      { name: 'name', thText: '姓名' },
+      { name: 'officeName', thText: '所属部门' },
+      { name: 'phone', thText: '手机号' },
+      { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '60px' },
+      { name: 'createDate', thText: '创建时间', nzWidth: '150px' }
+    ];
+  }
+
+  private getUserSearchFields(): FormlyFieldConfig[] {
+    return [
+      {
+        type: 'row',
+        fieldGroup: [
+          {
+            type: 'input',
+            key: 'username',
+            props: {
+              label: '账号'
+            }
+          },
+          {
+            type: 'input',
+            key: 'name',
+            props: {
+              label: '姓名'
+            }
+          },
+          {
+            type: 'input',
+            key: 'phone',
+            props: {
+              label: '手机号'
+            }
+          }
+        ]
+      }
+    ];
   }
 
   private openPermissionModal(model: Role, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
@@ -405,6 +575,9 @@ export default class RoleComponent {
           return false;
         }
         return options.nzOnOk(instance).then(v => {
+          if (v) {
+            this.messageService.success('保存成功');
+          }
           if (v && options.table) {
             options.table.refresh(false);
           }

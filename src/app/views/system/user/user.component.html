@@ -6,7 +6,7 @@
           <nz-input-group nzSearch nzSuffixIcon="search">
             <input
               nz-input
-              placeholder="请输入关键字搜索"
+              placeholder="请输入关键字查询"
               [(ngModel)]="searchText"
               (ngModelChange)="onSearchTextChange($event)"
             />
@@ -50,7 +50,13 @@
     <nzx-page class="full-overflow">
       <nzx-header>
         <form nz-form [formGroup]="searchForm">
-          <ma-form-search [table]="table" [form]="searchForm" [showArrow]="true" [(collapsed)]="collapsed" (collapsedChange)="onCollapsedChange()">
+          <ma-form-search
+            [table]="table"
+            [form]="searchForm"
+            [showArrow]="true"
+            [(collapsed)]="collapsed"
+            (collapsedChange)="onCollapsedChange()"
+          >
             <formly-form
               [form]="searchForm"
               [fields]="searchFields"

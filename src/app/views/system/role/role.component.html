@@ -13,7 +13,6 @@
       api="/system/role/list"
       [nzxColumns]="columns"
       [nzShowPagination]="false"
-      [nzFrontPagination]="true"
       [params]="getParams"
       [nzxFit]="true"
     >
@@ -131,4 +130,56 @@
       }
     </div>
   </div>
+</ng-template>
+
+<!--授权用户-->
+<ng-template #userModalTemplate let-data>
+  <nzx-page style="height: 600px">
+    <nzx-header>
+      <form nz-form [formGroup]="data.form">
+        <ma-form-search [form]="data.form" [buttonAlignRight]="true" [table]="userTable">
+          <formly-form
+            [form]="data.form"
+            [fields]="data.fields"
+            [model]="data.model"
+            [options]="{ formState: { nzGutter: 0, colNzSpan: 8, labelNzFlex: '60px' } }"
+          ></formly-form>
+        </ma-form-search>
+      </form>
+    </nzx-header>
+
+    <nzx-content>
+      <nzx-table #userTable [api]="data.url" [nzxColumns]="data.columns" [params]="data.getParams" scrollY="395px">
+        <div title>
+          <nz-space *ngIf="data.allocate">
+            <ng-container *auth="'role:user:unallocated'">
+              <button
+                *nzSpaceItem
+                nz-button
+                nzType="primary"
+                (click)="onUnallocatedUserModal(userModalTemplate, userTable)"
+              >
+                <span nz-icon nzType="plus"></span>
+                添加用户
+              </button>
+            </ng-container>
+
+            <ng-container *auth="'user:delete'">
+              <button *nzSpaceItem nz-button nzDanger (click)="onBatchCancelUsers(userTable)">
+                <span nz-icon nzType="delete"></span>
+                批量取消授权
+              </button>
+            </ng-container>
+          </nz-space>
+        </div>
+        <ng-template named="status" let-row>
+          <nz-tag [nzColor]="row.isLogin ? 'error' : 'success'">{{ row.isLogin ? '停用' : '正常' }}</nz-tag>
+        </ng-template>
+
+        <ng-template named="buttons" let-row>
+          <a *auth="'role:user:cancel'" (click)="onCancelUsers(row, userTable)">取消授权</a>
+        </ng-template>
+      </nzx-table>
+    </nzx-content>
+  </nzx-page>
 </ng-template>
