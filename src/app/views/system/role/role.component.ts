@@ -147,7 +147,7 @@ export default class RoleComponent {
           click: (row: Role) => this.openPermissionModal(row, this.permissionModalTemplate, this.table)
         },
         {
-          text: '用户列表',
+          text: '分配用户',
           permission: 'role:user:list',
           click: (row: Role) => this.openUserModal(row)
         },

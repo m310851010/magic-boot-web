@@ -417,6 +417,9 @@ export default class MenuComponent implements OnInit {
                 { value: 1, label: '显示' },
                 { value: 0, label: '隐藏' }
               ]
+            },
+            expressions: {
+              hide: `model.menuType === 'B'`
             }
           },
           {
