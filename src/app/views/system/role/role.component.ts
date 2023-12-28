@@ -130,8 +130,8 @@ export default class RoleComponent {
           map(dic => dic[value])
         )
     },
-    { name: 'createDate', thText: '创建时间' },
     { name: 'desc', thText: '角色描述' },
+    { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
     {
       name: 'id',
       thText: '操作',
@@ -178,11 +178,7 @@ export default class RoleComponent {
   office$!: Observable<NzTreeNodeOptions[]>;
 
   // 分配用户对话框
-  userSearchForm = new FormGroup({});
-  userSearchModel: { name?: string } = {};
-  userFields: FormlyFieldConfig[] = [];
-  rowRole!: Role;
-  userColumns: NzxColumn<UserInfo>[] = [];
+  private selectedRole!: Role;
 
   constructor(
     private http: HttpClient,
@@ -221,7 +217,7 @@ export default class RoleComponent {
   }
 
   onUnallocatedUserModal(nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    const model: Record<string, any> = { roleId: this.rowRole.id };
+    const model: Record<string, any> = { roleId: this.selectedRole.id };
     const url = '/system/role/unallocated/users';
     this.modalService.create({
       nzTitle: '选择用户',
@@ -255,7 +251,7 @@ export default class RoleComponent {
         }
         return firstValueFrom(
           this.http
-            .post('/system/role/allocate/users', { id: this.rowRole.id, users })
+            .post('/system/role/allocate/users', { id: this.selectedRole.id, users })
             .pipe(tap(() => table.refresh(true)))
         );
       }
@@ -263,8 +259,8 @@ export default class RoleComponent {
   }
 
   private openUserModal(row: Role): void {
-    this.rowRole = row;
-    const model: Record<string, any> = { roleId: this.rowRole.id };
+    this.selectedRole = row;
+    const model: Record<string, any> = { roleId: this.selectedRole.id };
     this.modalService.create({
       nzTitle: '分配用户',
       nzWidth: 1200,
@@ -314,7 +310,7 @@ export default class RoleComponent {
         this.http
           .delete('/system/role/cancel/users', {
             params: {
-              id: this.rowRole.id,
+              id: this.selectedRole.id,
               users: NzxUtils.isArray(userId) ? userId.join(',') : userId
             }
           })
@@ -338,7 +334,7 @@ export default class RoleComponent {
       { name: 'officeName', thText: '所属部门' },
       { name: 'phone', thText: '手机号' },
       { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '60px' },
-      { name: 'createDate', thText: '创建时间', nzWidth: '150px' }
+      { name: 'createDate', thText: '创建时间', nzWidth: '170px' }
     ];
   }
 

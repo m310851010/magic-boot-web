@@ -182,11 +182,11 @@ export default class MenuComponent implements OnInit {
     const keyword = this.searchModel.searchValue.toLowerCase();
     this.menusSnapshot = NzxUtils.filterTree(this.menus, node => {
       if (node.children && node.children.length) {
-        node['expand'] = true;
+        node.expand = true;
         return true;
       }
-      for (const key of ['name', 'url', 'permission', 'componentName']) {
-        if (node[key] && node[key].toLowerCase().includes(keyword)) {
+      for (const key of ['name', 'url', 'permission', 'componentName'] as (keyof Menu)[]) {
+        if (node[key] && (node[key]! as string).toLowerCase().includes(keyword)) {
           return true;
         }
       }
@@ -290,7 +290,7 @@ export default class MenuComponent implements OnInit {
                   if (model.menuType === 'D') {
                     const dNode = nodes.find(v => v.id === model.id);
                     if (dNode) {
-                      dNode['isLeaf'] = true;
+                      dNode.isLeaf = true;
                       dNode.children = [];
                     }
                   }
@@ -300,13 +300,13 @@ export default class MenuComponent implements OnInit {
                     }
 
                     if (node.id === model.id) {
-                      node['disabled'] = true;
+                      node.disabled = true;
                     }
                     if (node.menuType === 'D') {
                       return true;
                     }
                     if (node.menuType === 'M') {
-                      node['isLeaf'] = true;
+                      node.isLeaf = true;
                       node.children = [];
                       return true;
                     }
@@ -485,5 +485,8 @@ interface Menu {
   menuType: 'M' | 'D' | 'B';
   children: Menu[];
 
-  [key: string]: NzSafeAny;
+  // 树结构需要的属性
+  isLeaf: boolean;
+  expand: boolean;
+  disabled: boolean;
 }
