@@ -429,9 +429,9 @@ export default class RoleComponent {
     );
 
     const params = { params: { roleId: model.id } };
-    const reqs: Observable<string[]>[] = [this.http.get<string[]>('/system/menu/by/role', params)];
+    const reqs: Observable<string[]>[] = [this.http.get<string[]>('/system/role/menu/list', params)];
     if (model.permission === 1) {
-      reqs.push(this.http.get<string[]>('/system/office/by/role', params));
+      reqs.push(this.http.get<string[]>('/system/role/offices/list', params));
     }
     forkJoin(reqs).subscribe(([menuKeys, officeKeys]) => {
       menuChecked = listToMap(menuKeys, null, () => true);
