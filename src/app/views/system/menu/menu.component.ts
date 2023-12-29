@@ -104,7 +104,7 @@ export default class MenuComponent implements OnInit {
 
   private menus: Menu[] = [];
   menusSnapshot: Menu[] = [];
-  private menus$ = this.http.get<Menu[]>('/system/menu/tree');
+  private menus$ = this.http.get<Menu[]>('/system/menu/tree').pipe(map(v => v || []));
   columns: NzxColumn<Menu>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'name', thText: '菜单名称', showExpand: true },
@@ -125,7 +125,7 @@ export default class MenuComponent implements OnInit {
           visible: (row: Menu) => row.menuType === 'D' || row.menuType === 'M',
           click: (row: Menu) =>
             this.onNewOpenModal(
-              { pid: row.id, menuType: row.menuType === 'D' ? 'M' : 'B' },
+              { pid: row.id, menuType: row.menuType === 'D' ? 'M' : 'B', sort: this.getMaxSort(row.children) },
               this.modalTemplate,
               this.table
             )
@@ -227,12 +227,28 @@ export default class MenuComponent implements OnInit {
   }
 
   onNewOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    this.openModal(model, {
-      nzTitle: '新增菜单',
-      nzContent,
-      table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
-    });
+    const sort = model.sort || this.getMaxSort(this.menus);
+    this.openModal(
+      { ...model, sort },
+      {
+        nzTitle: '新增菜单',
+        nzContent,
+        table,
+        nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+      }
+    );
+  }
+
+  private getMaxSort(list: Menu[]) {
+    let maxSort = 0;
+    if (list) {
+      list.forEach(v => {
+        if (v.sort > maxSort) {
+          maxSort = v.sort;
+        }
+      });
+    }
+    return maxSort + 10;
   }
 
   private loadMenus(): void {
@@ -386,7 +402,8 @@ export default class MenuComponent implements OnInit {
               nzMax: 9999,
               nzMin: 0,
               nzPrecision: 0,
-              nzStep: 0
+              nzStep: 0,
+              required: true
             }
           },
           {
@@ -491,4 +508,5 @@ interface Menu {
   isLeaf: boolean;
   expand: boolean;
   disabled: boolean;
+  parent?: Menu;
 }

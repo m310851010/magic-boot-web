@@ -24,7 +24,7 @@ import { NzxModalOptions, NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
-import { NzxFormUtils, NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
@@ -43,9 +43,9 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
-import { CommonService, DeleteButton, normalTree } from '@commons/service/common.service';
+import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { UserInfo } from '@commons/service/user-info';
-import { listToMap } from '@commons/utils';
+import { listToMap, normalTree } from '@commons/utils';
 
 @Component({
   selector: 'ma-role',
@@ -188,8 +188,6 @@ export default class RoleComponent {
     private messageService: NzMessageService
   ) {}
 
-  ngOnInit(): void {}
-
   onUpdateOpenModal(model: Partial<Role>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.openRoleModal(model, {
       nzTitle: '修改角色',
@@ -200,7 +198,7 @@ export default class RoleComponent {
   }
 
   onDeleteClick(row: Role, table: NzxTableComponent): void {
-    this.commonService.handleDelete({ id: row.id, url: '/system/role/delete', table });
+    this.commonService.handleDelete({ id: row.id, url: '/system/role/delete', table }).then();
   }
 
   onNewOpenModal(model: Partial<Role>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
@@ -210,10 +208,6 @@ export default class RoleComponent {
       table,
       nzOnOk: () => firstValueFrom(this.http.post('/system/role/save', this.modalModel))
     });
-  }
-
-  onBatchCancel(table: NzxTableComponent): void {
-    console.log('v ssn   s  ');
   }
 
   onUnallocatedUserModal(nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
@@ -386,42 +380,41 @@ export default class RoleComponent {
     let menuChecked: Record<string, boolean> = {};
     let officeChecked: Record<string, boolean> = {};
 
-    this.menu$ = this.http.get<TreeNode[]>('/system/menu/tree').pipe(
+    this.menu$ = this.http.get<NzTreeNodeOptions[]>('/system/menu/tree').pipe(
       map(tree => {
         const checkedKeys: string[] = [];
         let hasChecked = false;
         let hasUnChecked = false;
 
-        const nodes = normalTree(tree, '', node => {
-          if (menuChecked[node['key']]) {
+        normalTree(tree, node => {
+          if (menuChecked[node.key!]) {
             hasChecked = true;
-            checkedKeys.push(node['key']);
+            checkedKeys.push(node.key!);
           } else {
             hasUnChecked = true;
           }
         });
-
         this.checkboxStatus(hasChecked, hasUnChecked, 'menuCheckAll', 'menuIndeterminate');
         this.menuCheckedKeys = checkedKeys;
-        return nodes;
+        return tree;
       })
     );
-    this.office$ = this.http.get<TreeNode[]>('/system/office/tree').pipe(
-      map(tree => {
+    this.office$ = this.http.get<NzTreeNodeOptions[]>('/system/role/office/tree').pipe(
+      map(nodes => {
         const checkedKeys: string[] = [];
         let hasChecked = false;
         let hasUnChecked = false;
-        const nodes = normalTree(tree, '', node => {
-          if (officeChecked[node['key']]) {
+
+        normalTree(nodes, node => {
+          if (officeChecked[node.key!]) {
             hasChecked = true;
-            checkedKeys.push(node['key']);
+            checkedKeys.push(node.key!);
           } else {
             hasUnChecked = true;
           }
         });
         this.checkboxStatus(hasChecked, hasUnChecked, 'officeCheckAll', 'officeIndeterminate');
         this.officeCheckedKeys = checkedKeys;
-        console.log(nodes);
         return nodes;
       }),
       first(),
@@ -431,7 +424,7 @@ export default class RoleComponent {
     const params = { params: { roleId: model.id } };
     const reqs: Observable<string[]>[] = [this.http.get<string[]>('/system/role/menu/list', params)];
     if (model.permission === 1) {
-      reqs.push(this.http.get<string[]>('/system/role/offices/list', params));
+      reqs.push(this.http.get<string[]>('/system/role/office/list', params));
     }
     forkJoin(reqs).subscribe(([menuKeys, officeKeys]) => {
       menuChecked = listToMap(menuKeys, null, () => true);

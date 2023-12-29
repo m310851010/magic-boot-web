@@ -1,6 +1,8 @@
 import { map, OperatorFunction } from 'rxjs';
 
 import { DicItem } from '@xmagic/nzx-antd/service';
+import { NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 /**
  * 把字典转换为Map结构
@@ -43,3 +45,24 @@ export function listToMap<T, V>(
 
   return record;
 }
+
+/**
+ * 规范树结构, 增加isLeaf属性
+ * @param list 原始树结构
+ * @param callback 回调函数
+ */
+export function normalTree(
+  list: NewNode[],
+  callback?: (node: NewNode, parentNode: NewNode | undefined, level: number) => void
+): NzTreeNodeOptions[] {
+  callback ||= () => {};
+  NzxUtils.forEachTree(list, (node, parentNode, level: number) => {
+    if (!node.children || !node.children.length) {
+      node.isLeaf = true;
+    }
+    callback!(node, parentNode, level);
+  });
+  return list as NzTreeNodeOptions[];
+}
+
+export type NewNode = Partial<NzTreeNodeOptions>;

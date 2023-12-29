@@ -88,9 +88,11 @@
           </div>
           <ng-template named="buttons" let-row>
             <ng-container *ngIf="row.id !== '1'">
-              <a *auth="'user:save'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
-              <a (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
-              <a (click)="onToggleStatus(row)" class="mr-xs">{{ row.isLogin ? '启用' : '停用' }}</a>
+              <a *auth="'user:update'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
+              <a *auth="'user:resetPassword'" (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
+              <a *auth="'user:change:status'" (click)="onToggleStatus(row)" class="mr-xs">
+                {{ row.isLogin ? '启用' : '停用' }}
+              </a>
               <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="ant-btn-dangerous ant-btn-link">
                 删除
               </a>

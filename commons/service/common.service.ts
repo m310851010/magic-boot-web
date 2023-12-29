@@ -4,9 +4,8 @@ import { Injectable } from '@angular/core';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxTableComponent } from '@xmagic/nzx-antd/table';
 import { NzxColumnButton } from '@xmagic/nzx-antd/table/table.type';
-import { NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 @Injectable({
   providedIn: 'root'
@@ -55,37 +54,6 @@ export class CommonService {
       });
     });
   }
-}
-
-/**
- * 规范树结构
- * @param list
- * @param keyName key的属性名称
- * @param callback 回调函数
- */
-export function normalTree(
-  list: TreeNode[],
-  keyName: string = 'id',
-  callback?: (node: TreeNode, parentNode: TreeNode | undefined, level: number) => void
-): NzTreeNodeOptions[] {
-  callback ||= () => {};
-  NzxUtils.forEachTree(list, (node, parentNode, level: number) => {
-    if (node.children && !node.children.length) {
-      delete node.children;
-      node['isLeaf'] = true;
-    }
-
-    if (!node['title']) {
-      node['title'] = node['name'];
-    }
-
-    if (!node['key']) {
-      node['key'] = node[keyName];
-    }
-
-    callback!(node, parentNode, level);
-  });
-  return list as NzTreeNodeOptions[];
 }
 
 /**

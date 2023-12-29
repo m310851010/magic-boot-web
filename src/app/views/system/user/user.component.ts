@@ -20,7 +20,7 @@ import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxModalOptions } from '@xmagic/nzx-antd/modal/nzx-modal.service';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { FetcherService, NzxServiceModule } from '@xmagic/nzx-antd/service';
+import { FetcherService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -41,7 +41,8 @@ import { sm3 } from 'sm-crypto-v2';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
 import { Constant } from '@commons/constant';
-import { CommonService, normalTree } from '@commons/service/common.service';
+import { CommonService } from '@commons/service/common.service';
+import { normalTree } from '@commons/utils';
 
 @Component({
   selector: 'ma-user',
@@ -114,7 +115,7 @@ export default class UserComponent {
           key: 'roles',
           props: {
             label: '角色',
-            options: '/system/role/all' as any,
+            options: '/system/user/role/list' as any,
             nzMode: 'multiple',
             nzShowArrow: true,
             nzAllowClear: true
@@ -161,13 +162,13 @@ export default class UserComponent {
 
   searchText = '';
   nodes: NzTreeNodeOptions[] = [];
-  nodes$ = this.http.get<NzTreeNodeOptions[]>('/system/office/tree').pipe(
+  nodes$ = this.http.get<NzTreeNodeOptions[]>('/system/user/office/tree').pipe(
     catchError(() => of([])),
     shareReplay(1),
     map(list => {
       const newList = NzxUtils.clone(list);
-      normalTree(newList, 'id', node => {
-        node['expanded'] = true;
+      normalTree(newList, node => {
+        node.expanded = true;
       });
       return newList;
     })
@@ -291,7 +292,7 @@ export default class UserComponent {
       nzTitle: '修改用户',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/user/center/update', this.modalModel))
+      nzOnOk: () => firstValueFrom(this.http.post('/system/user/update', this.modalModel))
     });
   }
 
