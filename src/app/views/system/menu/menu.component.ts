@@ -111,10 +111,10 @@ export default class MenuComponent implements OnInit {
     { name: 'icon', thText: '图标', tdTemplate: 'tdIconTemplate', nzWidth: '50px' },
     { name: 'url', thText: '路由地址' },
     { name: 'permission', thText: '权限标识', nzWidth: '150px' },
-    { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate' },
+    { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate', nzWidth: '80px' },
     { name: 'componentName', thText: '组件' },
-    { name: 'sort', thText: '排序号' },
-    { name: 'isShow', thText: '显示状态', format: isShow => (isShow ? '显示' : '隐藏') },
+    { name: 'sort', thText: '排序号', nzWidth: '70px' },
+    { name: 'isShow', thText: '显示状态', format: isShow => (isShow ? '显示' : '隐藏'), nzWidth: '80px' },
     {
       name: 'id',
       thText: '操作',
@@ -259,8 +259,7 @@ export default class MenuComponent implements OnInit {
         props: {
           label: '菜单类型',
           options: this.menuTypes
-        },
-        wrappers: ['field-wrapper']
+        }
       },
       {
         type: 'row',
@@ -374,7 +373,7 @@ export default class MenuComponent implements OnInit {
               refName: 'iconTemplate'
             },
             expressions: {
-              hide: `model.menuType==='B'`
+              hide: f => f.model.menuType === 'B'
             },
             wrappers: ['field-wrapper']
           },
@@ -419,7 +418,7 @@ export default class MenuComponent implements OnInit {
               ]
             },
             expressions: {
-              hide: `model.menuType === 'B'`
+              hide: f => f.model.menuType === 'B'
             }
           },
           {
@@ -475,6 +474,9 @@ interface Menu {
   desc?: string;
   icon?: string;
   id: string;
+  /**
+   * 0 隐藏 1 显示
+   */
   isShow: 0 | 1;
   keepAlive: 0 | 1;
   name: string;
