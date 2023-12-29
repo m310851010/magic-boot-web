@@ -391,7 +391,7 @@ export default class UserComponent {
         type: 'tree-select',
         key: 'officeId',
         props: {
-          label: '组织机构',
+          label: '所属部门',
           options: this.nodes$,
           required: true
         }
