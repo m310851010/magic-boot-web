@@ -41,6 +41,8 @@ import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { dicMap } from '@commons/utils';
+import { getMaxSort } from '../menu/menu-utils';
+import { Constant } from '@commons/constant';
 
 @Component({
   selector: 'ma-office',
@@ -98,46 +100,45 @@ export default class OfficeComponent implements OnInit {
   ];
 
   modalForm = new FormGroup({});
-  modalModel: Partial<Menu> = {};
+  modalModel: Partial<Office> = {};
   modalFields: FormlyFieldConfig[] = [];
 
-  private menus: Menu[] = [];
-  menusSnapshot: Menu[] = [];
-  private menus$ = this.http.get<Menu[]>('/system/office/tree');
-  columns: NzxColumn<Menu>[] = [
+  private officeType$ = this.dicService.getDic('OFFICE_TYPE');
+  private menus: Office[] = [];
+  menusSnapshot: Office[] = [];
+  private menus$ = this.http.get<Office[]>('/system/office/tree');
+  columns: NzxColumn<Office>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
-    { name: 'name', thText: '菜单名称', showExpand: true },
-    { name: 'icon', thText: '图标', tdTemplate: 'tdIconTemplate', nzWidth: '50px' },
-    { name: 'url', thText: '路由地址' },
-    { name: 'permission', thText: '权限标识', nzWidth: '150px' },
-    { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate', nzWidth: '80px' },
-    { name: 'componentName', thText: '组件' },
+    { name: 'name', thText: '部门名称', showExpand: true },
+    {
+      name: 'type',
+      thText: '分类',
+      nzWidth: '100px',
+      format: type => this.officeType$.pipe(map(list => this.dicService.listToMap(list)[type]))
+    },
+    { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
+    { name: 'leader', thText: '主管' },
     { name: 'sort', thText: '排序号', nzWidth: '70px' },
-    { name: 'isShow', thText: '显示状态', format: isShow => (isShow ? '显示' : '隐藏'), nzWidth: '80px' },
+    { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
     {
       name: 'id',
       thText: '操作',
       buttons: [
         {
           text: '新增下级',
-          permission: 'menu:save',
-          visible: (row: Menu) => row.menuType === 'D' || row.menuType === 'M',
-          click: (row: Menu) =>
-            this.onNewOpenModal(
-              { pid: row.id, menuType: row.menuType === 'D' ? 'M' : 'B' },
-              this.modalTemplate,
-              this.table
-            )
+          permission: 'office:save',
+          click: (row: Office) =>
+            this.onNewOpenModal({ pid: row.id, sort: getMaxSort(row.children) }, this.modalTemplate, this.table)
         },
         {
           text: '修改',
-          permission: 'menu:save',
-          click: (row: Menu) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
+          permission: 'office:save',
+          click: (row: Office) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
         },
         {
           ...DeleteButton,
-          permission: 'menu:delete',
-          click: (row: Menu) => {
+          permission: 'office:delete',
+          click: (row: Office) => {
             this.onDeleteClick(row, this.table);
           }
         }
@@ -146,8 +147,6 @@ export default class OfficeComponent implements OnInit {
     }
   ];
 
-  menuTypeMap: Record<string, DicItem & { color: string }> = {};
-  menuTypes: DicItem[] = [];
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
@@ -157,14 +156,6 @@ export default class OfficeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.dicService
-      .getDic('MENU_TYPE')
-      .pipe(
-        tap(list => (this.menuTypes = list)),
-        dicMap<DicItem & { color: string }>()
-      )
-      .subscribe(v => (this.menuTypeMap = v));
-
     this.loadMenus();
   }
 
@@ -184,7 +175,7 @@ export default class OfficeComponent implements OnInit {
         node.expand = true;
         return true;
       }
-      for (const key of ['name', 'url', 'permission', 'componentName'] as (keyof Menu)[]) {
+      for (const key of ['name', 'url', 'permission', 'componentName'] as (keyof Office)[]) {
         if (node[key] && (node[key]! as string).toLowerCase().includes(keyword)) {
           return true;
         }
@@ -193,16 +184,16 @@ export default class OfficeComponent implements OnInit {
     });
   }
 
-  onUpdateOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+  onUpdateOpenModal(model: Partial<Office>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.openModal(model, {
-      nzTitle: '修改菜单',
+      nzTitle: '修改部门',
       nzContent,
       table,
       nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
     });
   }
 
-  onDeleteClick(row: Menu, table: NzxTableComponent): void {
+  onDeleteClick(row: Office, table: NzxTableComponent): void {
     return this.handleDelete(row.id);
   }
 
@@ -225,13 +216,17 @@ export default class OfficeComponent implements OnInit {
     });
   }
 
-  onNewOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    this.openModal(model, {
-      nzTitle: '新增菜单',
-      nzContent,
-      table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
-    });
+  onNewOpenModal(model: Partial<Office>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+    const sort = model.sort || getMaxSort(this.menus);
+    this.openModal(
+      { ...model, sort },
+      {
+        nzTitle: '新增部门',
+        nzContent,
+        table,
+        nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+      }
+    );
   }
 
   private loadMenus(): void {
@@ -242,7 +237,7 @@ export default class OfficeComponent implements OnInit {
   }
 
   private openModal(
-    model: Partial<Menu>,
+    model: Partial<Office>,
     options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
       nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
       table: NzxTableComponent;
@@ -252,22 +247,13 @@ export default class OfficeComponent implements OnInit {
     this.modalModel = NzxUtils.clone(model);
     this.modalFields = [
       {
-        type: 'radio',
-        key: 'menuType',
-        defaultValue: 'M',
-        props: {
-          label: '菜单类型',
-          options: this.menuTypes
-        }
-      },
-      {
         type: 'row',
         fieldGroup: [
           {
             type: 'input',
             key: 'name',
             props: {
-              label: '菜单名称',
+              label: '部门名称',
               maxLength: 64,
               required: true
             }
@@ -276,7 +262,7 @@ export default class OfficeComponent implements OnInit {
             type: 'tree-select',
             key: 'pid',
             props: {
-              label: '上级菜单',
+              label: '上级部门',
               nzDefaultExpandAll: true,
               nzAllowClear: true,
               nzShowSearch: true,
@@ -285,13 +271,6 @@ export default class OfficeComponent implements OnInit {
               options: this.menus$.pipe(
                 map(list => {
                   const nodes = [...list];
-                  if (model.menuType === 'D') {
-                    const dNode = nodes.find(v => v.id === model.id);
-                    if (dNode) {
-                      dNode.isLeaf = true;
-                      dNode.children = [];
-                    }
-                  }
                   NzxUtils.forEachTree(nodes, node => {
                     if (node.children) {
                       node.children = [...node.children];
@@ -299,59 +278,53 @@ export default class OfficeComponent implements OnInit {
 
                     if (node.id === model.id) {
                       node.disabled = true;
-                    }
-                    if (node.menuType === 'D') {
-                      return true;
-                    }
-                    if (node.menuType === 'M') {
                       node.isLeaf = true;
                       node.children = [];
-                      return true;
+                      return false;
                     }
-                    return false;
+                    return true;
                   });
 
                   return nodes;
                 })
               )
-            },
-            expressions: {
-              'props.required': `model.menuType === 'B'`
+            }
+          },
+          {
+            type: 'select',
+            key: 'type',
+            props: {
+              label: '分类',
+              nzAllowClear: true,
+              required: true,
+              options: this.officeType$
+            }
+          },
+          {
+            type: 'radio',
+            key: 'status',
+            defaultValue: 0,
+            props: {
+              label: '状态',
+              options: Constant.STATUS_OPTIONS
             }
           },
           {
             type: 'input',
-            key: 'url',
+            key: 'leader',
             props: {
-              label: '路由地址',
-              maxLength: 256,
-              required: true
+              label: '负责人',
+              maxLength: 256
+            }
+          },
+          {
+            type: 'input',
+            key: 'phone',
+            props: {
+              label: '联系电话'
             },
             validators: {
-              validation: [
-                (control: AbstractControl) => {
-                  if (!control.value) {
-                    return null;
-                  }
-                  if (/^(https?:\/\/|\/).+/i.test(control.value)) {
-                    return null;
-                  }
-                  return { menuUrl: { message: '路由地址以"http://" "https://"或"/"开头' } };
-                }
-              ]
-            },
-            expressions: {
-              hide: `model.menuType==='D' || model.menuType=='B'`
-            }
-          },
-          {
-            type: 'input',
-            key: 'componentName',
-            props: {
-              label: '关联组件'
-            },
-            expressions: {
-              hide: `model.menuType!=='M'`
+              validation: ['phone']
             }
           },
           {
@@ -363,18 +336,6 @@ export default class OfficeComponent implements OnInit {
             expressions: {
               hide: `model.menuType==='D'`
             }
-          },
-          {
-            type: 'ref-template',
-            key: 'icon',
-            props: {
-              label: '图标',
-              refName: 'iconTemplate'
-            },
-            expressions: {
-              hide: f => f.model.menuType === 'B'
-            },
-            wrappers: ['field-wrapper']
           },
 
           {
@@ -468,26 +429,55 @@ export default class OfficeComponent implements OnInit {
   }
 }
 
-interface Menu {
-  componentName?: string;
-  desc?: string;
-  icon?: string;
+interface Office {
   id: string;
   /**
-   * 0 隐藏 1 显示
+   * 名称
    */
-  isShow: 0 | 1;
-  keepAlive: 0 | 1;
   name: string;
-  permission?: string;
-  pid?: string;
+  /**
+   * 类型 1部门 2公司
+   */
+  type: string;
+  /**
+   * 组织机构编码
+   */
+  code: string;
+  pid: string;
+  /**
+   * 部门状态（0正常 1停用）
+   */
+  status: number;
+  /**
+   * 负责人
+   */
+  leader: string;
+  /**
+   * 联系电话
+   */
+  phone: string;
+  /**
+   * 邮箱
+   */
+  email: string;
+  /**
+   * 排序
+   */
   sort: number;
-  url?: string;
-  menuType: 'M' | 'D' | 'B';
-  children: Menu[];
+  /**
+   * 扩展信息
+   */
+  extJson: string;
+  /**
+   * 删除标识
+   */
+  isDel: number;
+  createDate: string;
+
+  children: Office[];
 
   // 树结构需要的属性
-  isLeaf: boolean;
   expand: boolean;
+  isLeaf: boolean;
   disabled: boolean;
 }

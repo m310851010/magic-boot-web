@@ -14,7 +14,7 @@
           <ng-container *auth="'menu:save'">
             <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal({}, modalTemplate, table)">
               <span nz-icon nzType="plus"></span>
-              新增菜单
+              新增机构
             </button>
           </ng-container>
 
@@ -27,13 +27,8 @@
         </nz-space>
       </div>
 
-      <ng-template named="tdIconTemplate" let-row>
-        @if (row.icon){
-        <span nz-icon [nzType]="row.icon"></span>
-        } @else { -- }
-      </ng-template>
-      <ng-template named="menuTypeTemplate" let-row>
-        <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>
+      <ng-template named="status" let-row>
+        <nz-tag [nzColor]="row.status ? 'error' : 'success'">{{ row.status ? '停用' : '正常' }}</nz-tag>
       </ng-template>
     </nzx-table>
   </nzx-content>

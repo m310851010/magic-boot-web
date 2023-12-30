@@ -41,6 +41,7 @@ import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { dicMap } from '@commons/utils';
+import { getMaxSort } from './menu-utils';
 
 @Component({
   selector: 'ma-menu',
@@ -125,7 +126,7 @@ export default class MenuComponent implements OnInit {
           visible: (row: Menu) => row.menuType === 'D' || row.menuType === 'M',
           click: (row: Menu) =>
             this.onNewOpenModal(
-              { pid: row.id, menuType: row.menuType === 'D' ? 'M' : 'B', sort: this.getMaxSort(row.children) },
+              { pid: row.id, menuType: row.menuType === 'D' ? 'M' : 'B', sort: getMaxSort(row.children) },
               this.modalTemplate,
               this.table
             )
@@ -227,7 +228,7 @@ export default class MenuComponent implements OnInit {
   }
 
   onNewOpenModal(model: Partial<Menu>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    const sort = model.sort || this.getMaxSort(this.menus);
+    const sort = model.sort || getMaxSort(this.menus);
     this.openModal(
       { ...model, sort },
       {
@@ -237,18 +238,6 @@ export default class MenuComponent implements OnInit {
         nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
       }
     );
-  }
-
-  private getMaxSort(list: Menu[]) {
-    let maxSort = 0;
-    if (list) {
-      list.forEach(v => {
-        if (v.sort > maxSort) {
-          maxSort = v.sort;
-        }
-      });
-    }
-    return maxSort + 10;
   }
 
   private loadMenus(): void {
