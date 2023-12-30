@@ -1,1 +1,56 @@
-<p>office works!</p>
+<nzx-page>
+  <nzx-header>
+    <form nz-form [formGroup]="searchForm">
+      <ma-form-search [form]="searchForm" [buttonAlignRight]="false" (searchClick)="onSearchClick()">
+        <formly-form [form]="searchForm" [fields]="searchFields" [model]="searchModel"></formly-form>
+      </ma-form-search>
+    </form>
+  </nzx-header>
+
+  <nzx-content>
+    <nzx-table #table [nzData]="menusSnapshot" [nzxColumns]="columns" [nzShowPagination]="false" [nzxFit]="true">
+      <div title>
+        <nz-space>
+          <ng-container *auth="'menu:save'">
+            <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal({}, modalTemplate, table)">
+              <span nz-icon nzType="plus"></span>
+              新增菜单
+            </button>
+          </ng-container>
+
+          <ng-container *auth="'menu:delete'">
+            <button *nzSpaceItem nz-button nzDanger (click)="onBatchDelete(table)">
+              <span nz-icon nzType="delete"></span>
+              批量删除
+            </button>
+          </ng-container>
+        </nz-space>
+      </div>
+
+      <ng-template named="tdIconTemplate" let-row>
+        @if (row.icon){
+        <span nz-icon [nzType]="row.icon"></span>
+        } @else { -- }
+      </ng-template>
+      <ng-template named="menuTypeTemplate" let-row>
+        <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>
+      </ng-template>
+    </nzx-table>
+  </nzx-content>
+</nzx-page>
+
+<ng-template #modalTemplate>
+  <form nz-form [formGroup]="modalForm">
+    <formly-form
+      [formly-box]="[]"
+      [form]="modalForm"
+      [fields]="modalFields"
+      [model]="modalModel"
+      [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
+    >
+      <ng-template named="iconTemplate">
+        <ma-icon-picker formControlName="icon"></ma-icon-picker>
+      </ng-template>
+    </formly-form>
+  </form>
+</ng-template>
