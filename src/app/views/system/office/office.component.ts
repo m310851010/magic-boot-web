@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom, map, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
@@ -39,10 +39,10 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
-import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicMap } from '@commons/utils';
-import { getMaxSort } from '../menu/menu-utils';
 import { Constant } from '@commons/constant';
+import { CommonService, DeleteButton } from '@commons/service/common.service';
+
+import { getMaxSort } from '../menu/menu-utils';
 
 @Component({
   selector: 'ma-office',
@@ -93,7 +93,8 @@ export default class OfficeComponent implements OnInit {
       type: 'input',
       key: 'searchValue',
       props: {
-        label: '部门名称',
+        label: '关键字',
+        placeholder: '部门名称、主管',
         attributes: { style: 'width: 300px' }
       }
     }
@@ -104,9 +105,9 @@ export default class OfficeComponent implements OnInit {
   modalFields: FormlyFieldConfig[] = [];
 
   private officeType$ = this.dicService.getDic('OFFICE_TYPE');
-  private menus: Office[] = [];
-  menusSnapshot: Office[] = [];
-  private menus$ = this.http.get<Office[]>('/system/office/tree');
+  private offices: Office[] = [];
+  officesSnapshot: Office[] = [];
+  private offices$ = this.http.get<Office[]>('/system/office/tree');
   columns: NzxColumn<Office>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'name', thText: '部门名称', showExpand: true },
@@ -132,15 +133,13 @@ export default class OfficeComponent implements OnInit {
         },
         {
           text: '修改',
-          permission: 'office:save',
-          click: (row: Office) => this.onUpdateOpenModal(row, this.modalTemplate, this.table)
+          permission: 'office:update',
+          click: (row: Office) => this.onUpdateOpenModal({ ...row, children: [] }, this.modalTemplate, this.table)
         },
         {
           ...DeleteButton,
           permission: 'office:delete',
-          click: (row: Office) => {
-            this.onDeleteClick(row, this.table);
-          }
+          click: (row: Office) => this.onDeleteClick(row)
         }
       ],
       nzWidth: '180px'
@@ -156,26 +155,26 @@ export default class OfficeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadMenus();
+    this.loadData();
   }
 
   onSearchClick(): void {
-    if (!this.menus.length) {
+    if (!this.offices.length) {
       return;
     }
 
     if (!this.searchModel.searchValue) {
-      this.menusSnapshot = this.menus;
+      this.officesSnapshot = this.offices;
       return;
     }
 
     const keyword = this.searchModel.searchValue.toLowerCase();
-    this.menusSnapshot = NzxUtils.filterTree(this.menus, node => {
+    this.officesSnapshot = NzxUtils.filterTree(this.offices, node => {
       if (node.children && node.children.length) {
         node.expand = true;
         return true;
       }
-      for (const key of ['name', 'url', 'permission', 'componentName'] as (keyof Office)[]) {
+      for (const key of ['name', 'leader'] as (keyof Office)[]) {
         if (node[key] && (node[key]! as string).toLowerCase().includes(keyword)) {
           return true;
         }
@@ -189,11 +188,11 @@ export default class OfficeComponent implements OnInit {
       nzTitle: '修改部门',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+      nzOnOk: () => firstValueFrom(this.http.post('/system/office/update', this.modalModel))
     });
   }
 
-  onDeleteClick(row: Office, table: NzxTableComponent): void {
+  onDeleteClick(row: Office): void {
     return this.handleDelete(row.id);
   }
 
@@ -209,30 +208,34 @@ export default class OfficeComponent implements OnInit {
   }
 
   private handleDelete(id: string | string[]): void {
-    this.commonService.handleDelete({ id, url: '/system/menu/delete' }).then(row => {
+    this.commonService.handleDelete({ id, url: '/system/office/delete' }).then(row => {
       if (row) {
-        this.loadMenus();
+        this.loadData();
       }
     });
   }
 
   onNewOpenModal(model: Partial<Office>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
-    const sort = model.sort || getMaxSort(this.menus);
+    const sort = model.sort || getMaxSort(this.offices);
     this.openModal(
       { ...model, sort },
       {
         nzTitle: '新增部门',
         nzContent,
         table,
-        nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
+        nzOnOk: () => firstValueFrom(this.http.post('/system/office/save', this.modalModel))
       }
     );
   }
 
-  private loadMenus(): void {
-    this.menus$.subscribe(menus => {
-      this.menus = menus;
-      this.menusSnapshot = menus;
+  onRefreshClick(): void {
+    this.loadData();
+  }
+
+  private loadData(): void {
+    this.offices$.subscribe(menus => {
+      this.offices = menus;
+      this.officesSnapshot = menus;
     });
   }
 
@@ -245,6 +248,20 @@ export default class OfficeComponent implements OnInit {
   ): void {
     this.modalForm = new FormGroup({});
     this.modalModel = NzxUtils.clone(model);
+    const nodes = NzxUtils.clone(this.offices);
+    NzxUtils.forEachTree(nodes, node => {
+      if (!node.children || !node.children.length) {
+        node.isLeaf = true;
+      }
+
+      if (node.id === model.id) {
+        node.isLeaf = true;
+        node.disabled = true;
+        node.children = [];
+      }
+      return true;
+    });
+
     this.modalFields = [
       {
         type: 'row',
@@ -268,31 +285,13 @@ export default class OfficeComponent implements OnInit {
               nzShowSearch: true,
               nzHideUnMatched: true,
               nzShowIcon: true,
-              options: this.menus$.pipe(
-                map(list => {
-                  const nodes = [...list];
-                  NzxUtils.forEachTree(nodes, node => {
-                    if (node.children) {
-                      node.children = [...node.children];
-                    }
-
-                    if (node.id === model.id) {
-                      node.disabled = true;
-                      node.isLeaf = true;
-                      node.children = [];
-                      return false;
-                    }
-                    return true;
-                  });
-
-                  return nodes;
-                })
-              )
+              options: nodes
             }
           },
           {
             type: 'select',
             key: 'type',
+            defaultValue: 2,
             props: {
               label: '分类',
               nzAllowClear: true,
@@ -306,6 +305,7 @@ export default class OfficeComponent implements OnInit {
             defaultValue: 0,
             props: {
               label: '状态',
+              required: true,
               options: Constant.STATUS_OPTIONS
             }
           },
@@ -314,7 +314,7 @@ export default class OfficeComponent implements OnInit {
             key: 'leader',
             props: {
               label: '负责人',
-              maxLength: 256
+              maxLength: 64
             }
           },
           {
@@ -324,20 +324,20 @@ export default class OfficeComponent implements OnInit {
               label: '联系电话'
             },
             validators: {
-              validation: ['phone']
+              validation: ['mobile']
             }
           },
           {
             type: 'input',
-            key: 'permission',
+            key: 'email',
             props: {
-              label: '权限码'
+              label: '邮箱',
+              maxLength: 128
             },
-            expressions: {
-              hide: `model.menuType==='D'`
+            validators: {
+              validation: ['email']
             }
           },
-
           {
             type: 'number',
             key: 'sort',
@@ -346,68 +346,11 @@ export default class OfficeComponent implements OnInit {
               nzMax: 9999,
               nzMin: 0,
               nzPrecision: 0,
-              nzStep: 0
-            }
-          },
-          {
-            type: 'radio',
-            key: 'frame',
-            defaultValue: 1,
-            props: {
-              label: '外链',
-              required: true,
-              options: [
-                { value: 0, label: '是' },
-                { value: 1, label: '否' }
-              ]
-            },
-            expressions: {
-              hide: `model.menuType!=='M'`
-            }
-          },
-          {
-            type: 'radio',
-            key: 'isShow',
-            defaultValue: 1,
-            props: {
-              label: '显示状态',
-              required: true,
-              options: [
-                { value: 1, label: '显示' },
-                { value: 0, label: '隐藏' }
-              ]
-            },
-            expressions: {
-              hide: f => f.model.menuType === 'B'
-            }
-          },
-          {
-            type: 'radio',
-            key: 'openMode',
-            defaultValue: 0,
-            props: {
-              label: '打开方式',
-              required: true,
-              options: [
-                { value: 0, label: 'iframe' },
-                { value: 1, label: '新标签页' }
-              ]
-            },
-            expressions: {
-              hide: `model.frame !== 0`
+              nzStep: 0,
+              required: true
             }
           }
         ]
-      },
-      {
-        type: 'textarea',
-        key: 'desc',
-        props: {
-          label: '备注',
-          rows: 4,
-          maxLength: 200,
-          nzMaxCharacterCount: 200
-        }
       }
     ];
 
@@ -420,7 +363,7 @@ export default class OfficeComponent implements OnInit {
         }
         return options.nzOnOk(instance).then(v => {
           if (v) {
-            this.loadMenus();
+            this.loadData();
           }
           return v;
         });

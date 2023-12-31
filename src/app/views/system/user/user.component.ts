@@ -382,7 +382,8 @@ export default class UserComponent {
                 defaultValue: 0,
                 props: {
                   label: '状态',
-                  options: Constant.STATUS_OPTIONS
+                  options: Constant.STATUS_OPTIONS,
+                  required: true
                 }
               }
         ]

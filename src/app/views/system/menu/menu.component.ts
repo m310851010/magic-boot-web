@@ -41,6 +41,7 @@ import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { dicMap } from '@commons/utils';
+
 import { getMaxSort } from './menu-utils';
 
 @Component({
@@ -139,9 +140,7 @@ export default class MenuComponent implements OnInit {
         {
           ...DeleteButton,
           permission: 'menu:delete',
-          click: (row: Menu) => {
-            this.onDeleteClick(row, this.table);
-          }
+          click: (row: Menu) => this.onDeleteClick(row)
         }
       ],
       nzWidth: '180px'
@@ -204,7 +203,7 @@ export default class MenuComponent implements OnInit {
     });
   }
 
-  onDeleteClick(row: Menu, table: NzxTableComponent): void {
+  onDeleteClick(row: Menu): void {
     return this.handleDelete(row.id);
   }
 
@@ -238,6 +237,10 @@ export default class MenuComponent implements OnInit {
         nzOnOk: () => firstValueFrom(this.http.post('/system/menu/save', this.modalModel))
       }
     );
+  }
+
+  onRefreshClick(): void {
+    this.loadMenus();
   }
 
   private loadMenus(): void {
@@ -307,14 +310,13 @@ export default class MenuComponent implements OnInit {
                       node.disabled = true;
                     }
                     if (node.menuType === 'D') {
-                      return true;
+                      return;
                     }
                     if (node.menuType === 'M') {
                       node.isLeaf = true;
                       node.children = [];
-                      return true;
+                      return;
                     }
-                    return false;
                   });
 
                   return nodes;
@@ -382,19 +384,6 @@ export default class MenuComponent implements OnInit {
             },
             wrappers: ['field-wrapper']
           },
-
-          {
-            type: 'number',
-            key: 'sort',
-            props: {
-              label: '排序号',
-              nzMax: 9999,
-              nzMin: 0,
-              nzPrecision: 0,
-              nzStep: 0,
-              required: true
-            }
-          },
           {
             type: 'radio',
             key: 'frame',
@@ -425,6 +414,18 @@ export default class MenuComponent implements OnInit {
             },
             expressions: {
               hide: f => f.model.menuType === 'B'
+            }
+          },
+          {
+            type: 'number',
+            key: 'sort',
+            props: {
+              label: '排序号',
+              nzMax: 9999,
+              nzMin: 0,
+              nzPrecision: 0,
+              nzStep: 0,
+              required: true
             }
           },
           {
