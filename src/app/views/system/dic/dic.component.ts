@@ -1,3 +1,4 @@
+import { CdkFixedSizeVirtualScroll, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, TemplateRef } from '@angular/core';
@@ -23,6 +24,7 @@ import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { FetcherService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
+import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormatEmitEvent } from 'ng-zorro-antd/core/tree';
@@ -32,7 +34,9 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzListModule } from 'ng-zorro-antd/list';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
@@ -76,12 +80,16 @@ import { normalTree } from '@commons/utils';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    InputPasswordComponent
+    InputPasswordComponent,
+    NzListModule,
+    NzSkeletonModule,
+    NzAvatarModule
   ],
   templateUrl: './dic.component.html',
   styleUrl: './dic.component.less'
 })
 export default class DicComponent {
+  selected?: Dict;
   gridOptions = { nzGutter: 15, colNzSpan: 8, labelNzFlex: '60px' };
   collapsed = true;
 
@@ -160,18 +168,7 @@ export default class DicComponent {
   ];
 
   searchText = '';
-  nodes: NzTreeNodeOptions[] = [];
-  nodes$ = this.http.get<NzTreeNodeOptions[]>('/system/user/office/tree').pipe(
-    catchError(() => of([])),
-    shareReplay(1),
-    map(list => {
-      const newList = NzxUtils.clone(list);
-      normalTree(newList, node => {
-        node.expanded = true;
-      });
-      return newList;
-    })
-  );
+  dic$ = this.http.post<Dict[]>('/system/dict/list', {});
 
   constructor(
     private http: HttpClient,
@@ -179,26 +176,10 @@ export default class DicComponent {
     private modalService: NzxModalService,
     private fetcherService: FetcherService,
     private messageService: NzMessageService
-  ) {
-    this.onSearchTextChange('');
-  }
+  ) {}
 
   onCollapsedChange(): void {
     this.searchFields = [...this.searchFields];
-  }
-
-  onSearchTextChange(text: string): void {
-    this.nodes$.pipe(first()).subscribe(nodes => {
-      if (!nodes || !nodes.length) {
-        return;
-      }
-      this.nodes = NzxUtils.filterTree(nodes, node => {
-        if (node.children && node.children.length) {
-          return true;
-        }
-        return node.title.toLowerCase().includes(text.toLowerCase());
-      });
-    });
   }
 
   onDeleteClick(row: UserInfo, table: NzxTableComponent): void {
@@ -208,7 +189,7 @@ export default class DicComponent {
   onBatchDelete(table: NzxTableComponent): void {
     const id = table.nzData.filter(v => v.checked).map(v => v.id);
     if (!id.length) {
-      this.messageService.error('请选择至少一条用户信息');
+      this.messageService.error('请选择至少一条用户信息 ');
       return;
     }
     this.handleDelete(id, table);
@@ -379,7 +360,7 @@ export default class DicComponent {
         key: 'officeId',
         props: {
           label: '所属部门',
-          options: this.nodes$,
+          options: this.dic$,
           required: true
         }
       },
@@ -452,7 +433,7 @@ interface Dict {
   /**
    * 字典值
    */
-  value: string | number;
+  value: string;
   /**
    * 字典类型：0系统类，1业务类
    */
@@ -462,7 +443,7 @@ interface Dict {
    */
   sort: number;
   /**
-   * 数据类型,0:string 0: number
+   * 数据类型,0:string 1: number
    */
   dataType: 0 | 1;
   /**

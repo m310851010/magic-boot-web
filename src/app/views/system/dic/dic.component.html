@@ -1,29 +1,57 @@
 <div class="full-height-less flex-horizontal">
-  <div style="width: 280px">
+  <div style="width: 350px">
     <nz-card [nzTitle]="titleTemplate" nzSize="small" class="flex-card card-body-less full-height">
       <div class="flex-vertical flex-main">
         <div class="search-box">
           <nz-input-group nzSearch nzSuffixIcon="search">
-            <input
-              nz-input
-              placeholder="请输入关键字查询"
-              [(ngModel)]="searchText"
-              (ngModelChange)="onSearchTextChange($event)"
-            />
+            <input nz-input placeholder="请输入关键字查询" [(ngModel)]="searchText" />
           </nz-input-group>
         </div>
 
         <div class="flex-main relative">
-          <nz-tree
-            #nzTreeComponent
-            class="full-overflow"
-            style="padding-left: 10px"
-            nzBlockNode
-            [nzData]="nodes"
-            [nzSelectMode]="true"
-            [nzMultiple]="false"
-            (nzClick)="onSelectedChange($event, nzTreeComponent, table)"
-          ></nz-tree>
+          <div class="full-overflow ant-list ant-list-sm ant-list-split">
+            <div
+              class="ant-list-item dic-item"
+              *ngFor="let item of dic$ | async"
+              (click)="selected = item"
+              [class.active]="selected === item"
+            >
+              <div class="ant-list-item-meta">
+                <div class="ant-list-item-meta-avatar">
+                  @if (item.dictType === 0) {
+                  <nz-avatar nzText="系统"></nz-avatar>
+                  } @else {
+                  <nz-avatar nzText="业务" class="biz-avatar-color"></nz-avatar>
+                  }
+                </div>
+                <div class="ant-list-item-meta-content">
+                  <div style="font-weight: 600" class="flex-between">
+                    <div class="segmented-text-ellipsis">
+                      {{ item.label }}
+                    </div>
+
+                    <div class="mr-xs">
+                      @if (item.dataType === 0) {
+                      <nz-tag nzColor="success">文本</nz-tag>
+                      } @else {
+                      <nz-tag nzColor="processing">数字</nz-tag>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="ant-list-item-meta-description segmented-text-ellipsis">{{ item.value }}</div>
+                </div>
+              </div>
+              <div class="item-actions">
+                <button nz-button nzType="link" nzSize="small" title="编辑字典">
+                  <span nz-icon nzType="edit"></span>
+                </button>
+                <button nz-button nzType="link" nzSize="small" title="删除字典">
+                  <span nz-icon nzType="delete"></span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,0 +1,26 @@
+:host {
+  .dic-item {
+    .item-actions{
+      visibility: hidden;
+    }
+
+    &.active{
+     background-color: var(--ant-primary-color-outline);
+      .item-actions {
+        visibility: visible;
+      }
+    }
+
+    &:hover:not(.active) {
+      background: rgba(0,0,0,.03);
+      .item-actions {
+        visibility: visible;
+      }
+    }
+  }
+  .biz-avatar-color{
+    color: #f56a00; background-color: #fde3cf
+  }
+
+
+}
