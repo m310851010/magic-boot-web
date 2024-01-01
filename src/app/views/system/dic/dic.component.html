@@ -1,1 +1,124 @@
-1111
+<div class="full-height-less flex-horizontal">
+  <div style="width: 280px">
+    <nz-card [nzTitle]="titleTemplate" nzSize="small" class="flex-card card-body-less full-height">
+      <div class="flex-vertical flex-main">
+        <div class="search-box">
+          <nz-input-group nzSearch nzSuffixIcon="search">
+            <input
+              nz-input
+              placeholder="请输入关键字查询"
+              [(ngModel)]="searchText"
+              (ngModelChange)="onSearchTextChange($event)"
+            />
+          </nz-input-group>
+        </div>
+
+        <div class="flex-main relative">
+          <nz-tree
+            #nzTreeComponent
+            class="full-overflow"
+            style="padding-left: 10px"
+            nzBlockNode
+            [nzData]="nodes"
+            [nzSelectMode]="true"
+            [nzMultiple]="false"
+            (nzClick)="onSelectedChange($event, nzTreeComponent, table)"
+          ></nz-tree>
+        </div>
+      </div>
+
+      <ng-template #titleTemplate>
+        <div class="flex-between">
+          <div>数据字典</div>
+          <button nz-button nzType="link" nzSize="small">
+            <span nz-icon nzType="plus"></span>
+            新增字典
+          </button>
+        </div>
+      </ng-template>
+    </nz-card>
+  </div>
+
+  <div class="flex-main relative">
+    <nzx-page class="full-overflow">
+      <nzx-header>
+        <form nz-form [formGroup]="searchForm">
+          <ma-form-search
+            [table]="table"
+            [form]="searchForm"
+            [showArrow]="true"
+            [(collapsed)]="collapsed"
+            (collapsedChange)="onCollapsedChange()"
+          >
+            <formly-form
+              [form]="searchForm"
+              [fields]="searchFields"
+              [model]="searchModel"
+              [options]="{ formState: gridOptions }"
+            ></formly-form>
+          </ma-form-search>
+        </form>
+      </nzx-header>
+
+      <nzx-content>
+        <nzx-table #table [nzxColumns]="columns" api="/system/user/list" [params]="getParams">
+          <div title>
+            <nz-space>
+              <ng-container *auth="'user:save'">
+                <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal(modalTemplate, table)">
+                  <span nz-icon nzType="plus"></span>
+                  新增用户
+                </button>
+              </ng-container>
+
+              <ng-container *auth="'user:delete'">
+                <button *nzSpaceItem nz-button nzDanger (click)="onBatchDelete(table)">
+                  <span nz-icon nzType="delete"></span>
+                  批量删除
+                </button>
+              </ng-container>
+            </nz-space>
+          </div>
+          <ng-template named="buttons" let-row>
+            <ng-container *ngIf="row.id !== '1'">
+              <a *auth="'user:update'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
+              <a *auth="'user:resetPassword'" (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
+              <a *auth="'user:change:status'" (click)="onToggleStatus(row)" class="mr-xs">
+                {{ row.isLogin ? '启用' : '停用' }}
+              </a>
+              <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="ant-btn-dangerous ant-btn-link">
+                删除
+              </a>
+            </ng-container>
+          </ng-template>
+
+          <ng-template named="role" let-row>
+            <ng-container *ngIf="row.roleNames?.length; else emptyTemplate">
+              <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
+            </ng-container>
+            <ng-template #emptyTemplate>--</ng-template>
+          </ng-template>
+          <ng-template named="status" let-row>
+            <nz-tag [nzColor]="row.isLogin ? 'error' : 'success'">{{ row.isLogin ? '停用' : '正常' }}</nz-tag>
+          </ng-template>
+        </nzx-table>
+      </nzx-content>
+    </nzx-page>
+  </div>
+</div>
+
+<ng-template #modalTemplate>
+  <form nz-form [formGroup]="modalForm">
+    <formly-form
+      [formly-box]="[]"
+      [form]="modalForm"
+      [fields]="modalFields"
+      [model]="modalModel"
+      [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
+    >
+      <ng-template named="pwd">
+        <ma-input-password formControlName="password" placeholder="请输入密码"></ma-input-password>
+      </ng-template>
+    </formly-form>
+  </form>
+</ng-template>
