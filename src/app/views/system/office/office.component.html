@@ -63,9 +63,9 @@
   <nz-tree-select
     class="full-width"
     [(ngModel)]="transferOfficeId"
-    nzPlaceHolder="请选择目标部门"
-    nzShowSearch
-    [nzAllowClear]="false"
     [nzNodes]="$any(offices)"
+    nzPlaceHolder="请选择要转移的部门"
+    nzShowSearch
+    nzAllowClear
   ></nz-tree-select>
 </ng-template>

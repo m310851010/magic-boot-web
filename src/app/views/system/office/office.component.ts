@@ -257,7 +257,13 @@ export default class OfficeComponent implements OnInit {
     this.modalService.create({
       nzTitle: '选择转移部门',
       nzContent: officeTemplate,
-      nzOnOk: () => userPicker.saveSelectedUsers(users, this.transferOfficeId)
+      nzOnOk: () => {
+        if (!this.transferOfficeId) {
+          this.messageService.warning('请选择要转移的部门');
+          return false;
+        }
+        return userPicker.saveSelectedUsers(users, this.transferOfficeId);
+      }
     });
   }
 
