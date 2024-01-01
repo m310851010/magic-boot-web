@@ -16,23 +16,10 @@
       [nzxFit]="true"
       (refreshClick)="onRefreshClick()"
     >
-      <div title>
-        <nz-space>
-          <ng-container *auth="'menu:save'">
-            <button *nzSpaceItem nz-button nzType="primary" (click)="onNewOpenModal({}, modalTemplate, table)">
-              <span nz-icon nzType="plus"></span>
-              新增部门
-            </button>
-          </ng-container>
-
-          <ng-container *auth="'menu:delete'">
-            <button *nzSpaceItem nz-button nzDanger (click)="onBatchDelete(table)">
-              <span nz-icon nzType="delete"></span>
-              批量删除
-            </button>
-          </ng-container>
-        </nz-space>
-      </div>
+      <button title *auth="'menu:save'" nz-button nzType="primary" (click)="onNewOpenModal({}, modalTemplate, table)">
+        <span nz-icon nzType="plus"></span>
+        新增部门
+      </button>
 
       <ng-template named="status" let-row>
         <nz-tag [nzColor]="row.status ? 'error' : 'success'">{{ row.status ? '停用' : '正常' }}</nz-tag>
@@ -55,4 +42,30 @@
       </ng-template>
     </formly-form>
   </form>
+</ng-template>
+
+<ma-user-picker
+  #userPicker
+  nzTitle="用户列表"
+  [(maSelectedId)]="selectedId"
+  [maPermission]="{ addButton: 'office:user:list' }"
+  maSelectedUserUrl="/system/office/selected/users"
+  maUnSelectedUserUrl="/system/office/unselected/users"
+  maSaveSelectedUserUrl="/system/office/add/users"
+>
+  <button nz-button (click)="onTransferOpenModal(userPicker, officeTemplate)">
+    <span nz-icon nzType="transfer-user"></span>
+    转移部门
+  </button>
+</ma-user-picker>
+
+<ng-template #officeTemplate>
+  <nz-tree-select
+    class="full-width"
+    [(ngModel)]="transferOfficeId"
+    nzPlaceHolder="请选择目标部门"
+    nzShowSearch
+    [nzAllowClear]="false"
+    [nzNodes]="$any(offices)"
+  ></nz-tree-select>
 </ng-template>

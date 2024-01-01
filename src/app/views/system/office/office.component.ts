@@ -36,11 +36,14 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
+import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
+import { UserPickerComponent } from '@commons/component/user-picker';
 import { Constant } from '@commons/constant';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
+import { normalTree } from '@commons/utils';
 
 import { getMaxSort } from '../menu/menu-utils';
 
@@ -78,7 +81,9 @@ import { getMaxSort } from '../menu/menu-utils';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    IconPickerComponent
+    IconPickerComponent,
+    UserPickerComponent,
+    NzTreeSelectModule
   ],
   templateUrl: './office.component.html',
   styleUrl: './office.component.less'
@@ -104,8 +109,15 @@ export default class OfficeComponent implements OnInit {
   modalModel: Partial<Office> = {};
   modalFields: FormlyFieldConfig[] = [];
 
+  selectedId?: string;
+
+  /**
+   * 转移的部门id
+   */
+  transferOfficeId?: string;
+
   private officeType$ = this.dicService.getDic('OFFICE_TYPE');
-  private offices: Office[] = [];
+  offices: Office[] = [];
   officesSnapshot: Office[] = [];
   private offices$ = this.http.get<Office[]>('/system/office/tree');
   columns: NzxColumn<Office>[] = [
@@ -137,12 +149,17 @@ export default class OfficeComponent implements OnInit {
           click: (row: Office) => this.onUpdateOpenModal({ ...row, children: [] }, this.modalTemplate, this.table)
         },
         {
+          text: '用户列表',
+          permission: 'office:user:list',
+          click: (row: Office) => (this.selectedId = row.id)
+        },
+        {
           ...DeleteButton,
           permission: 'office:delete',
           click: (row: Office) => this.onDeleteClick(row)
         }
       ],
-      nzWidth: '180px'
+      nzWidth: '230px'
     }
   ];
 
@@ -192,19 +209,10 @@ export default class OfficeComponent implements OnInit {
     });
   }
 
+  onUserListOpenModal(): void {}
+
   onDeleteClick(row: Office): void {
     return this.handleDelete(row.id);
-  }
-
-  onBatchDelete(table: NzxTableComponent): void {
-    const ids = NzxUtils.flatTree(table.nzData)
-      .filter(node => node.checked)
-      .map(node => node.id);
-    if (!ids.length) {
-      this.messageService.error('请选择至少一条菜单');
-      return;
-    }
-    return this.handleDelete(ids);
   }
 
   private handleDelete(id: string | string[]): void {
@@ -232,10 +240,34 @@ export default class OfficeComponent implements OnInit {
     this.loadData();
   }
 
+  /**
+   * 打开转移用户modal
+   * @param userPicker
+   * @param officeTemplate
+   */
+  onTransferOpenModal(userPicker: UserPickerComponent, officeTemplate: TemplateRef<{}>): void {
+    const users = userPicker.getUsersFromSelectedTable();
+    if (!users.length) {
+      this.messageService.warning('请先选择用户');
+      return;
+    }
+
+    this.transferOfficeId = this.selectedId;
+
+    this.modalService.create({
+      nzTitle: '选择转移部门',
+      nzContent: officeTemplate,
+      nzOnOk: () => userPicker.saveSelectedUsers(users, this.transferOfficeId)
+    });
+  }
+
   private loadData(): void {
-    this.offices$.subscribe(menus => {
-      this.offices = menus;
-      this.officesSnapshot = menus;
+    this.offices$.subscribe(tree => {
+      normalTree(tree, node => {
+        node.expanded = true;
+      });
+      this.offices = tree;
+      this.officesSnapshot = tree;
     });
   }
 
@@ -421,6 +453,9 @@ interface Office {
 
   // 树结构需要的属性
   expand: boolean;
+  key: string;
+  title: string;
   isLeaf: boolean;
   disabled: boolean;
+  expanded: boolean;
 }

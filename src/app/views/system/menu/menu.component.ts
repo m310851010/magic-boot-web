@@ -143,7 +143,7 @@ export default class MenuComponent implements OnInit {
           click: (row: Menu) => this.onDeleteClick(row)
         }
       ],
-      nzWidth: '180px'
+      nzWidth: '160px'
     }
   ];
 

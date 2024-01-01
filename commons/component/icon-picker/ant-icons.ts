@@ -431,6 +431,7 @@ export const antIcons: string[] = [
   'ellipsis-vertical',
   'login-log',
   'setting-center',
+  'transfer-user',
   'user-group'
   /*</ICON>*/
 ];

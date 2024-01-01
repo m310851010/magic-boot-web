@@ -1,0 +1,51 @@
+<ng-template #userModalTemplate let-data>
+  <nzx-page style="height: 600px">
+    <nzx-header>
+      <form nz-form [formGroup]="data.form">
+        <ma-form-search [form]="data.form" [buttonAlignRight]="true" [table]="userTable">
+          <formly-form
+            [form]="data.form"
+            [fields]="data.fields"
+            [model]="data.model"
+            [options]="{ formState: { nzGutter: 0, colNzSpan: 8, labelNzFlex: '60px' } }"
+          ></formly-form>
+        </ma-form-search>
+      </form>
+    </nzx-header>
+
+    <nzx-content>
+      <nzx-table #userTable [api]="data.url" [nzxColumns]="data.columns" [params]="data.getParams" scrollY="395px">
+        <div title>
+          <nz-space *ngIf="data.allocate">
+            <ng-container *auth="maPermission?.addButton">
+              <button *nzSpaceItem nz-button nzType="primary" (click)="onUnselectedUserModal(userModalTemplate)">
+                <span nz-icon nzType="plus"></span>
+                添加用户
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="maRemoveText">
+              <ng-container *auth="maPermission?.removeButton">
+                <button *nzSpaceItem nz-button nzDanger (click)="onBatchCancelUsers(userTable)">
+                  <span nz-icon nzType="delete"></span>
+                  批量{{ maRemoveText }}
+                </button>
+              </ng-container>
+            </ng-container>
+
+            <div *nzSpaceItem>
+              <ng-content></ng-content>
+            </div>
+          </nz-space>
+        </div>
+        <ng-template named="status" let-row>
+          <nz-tag [nzColor]="row.isLogin ? 'error' : 'success'">{{ row.isLogin ? '停用' : '正常' }}</nz-tag>
+        </ng-template>
+
+        <ng-template named="buttons" let-row>
+          <a *auth="maPermission?.removeButton" (click)="onCancelUsers(row, userTable)">{{ maRemoveText }}</a>
+        </ng-template>
+      </nzx-table>
+    </nzx-content>
+  </nzx-page>
+</ng-template>
