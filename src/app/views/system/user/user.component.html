@@ -1,6 +1,11 @@
 <div class="full-height-less flex-horizontal">
   <div style="width: 280px">
-    <nz-card nzTitle="组织机构" nzSize="small" [nzExtra]="nzExtraTemplate" class="flex-card card-body-less card-border-right full-height">
+    <nz-card
+      nzTitle="组织机构"
+      nzSize="small"
+      [nzExtra]="nzExtraTemplate"
+      class="flex-card card-body-less card-border-right full-height"
+    >
       <div class="flex-vertical flex-main">
         <div class="search-box">
           <nz-input-group nzSearch nzSuffixIcon="search">
@@ -106,7 +111,9 @@
             <ng-template #emptyTemplate>--</ng-template>
           </ng-template>
           <ng-template named="status" let-row>
-            <nz-tag [nzColor]="(row.isLogin | dicItem: status$ | async)!['color']">{{ row.isLogin | dicLabel: status$ | async }}</nz-tag>
+            <nz-tag [nzColor]="(row.isLogin | dicItem: status$ | async)?.['color']">
+              {{ row.isLogin | dicLabel: status$ | async }}
+            </nz-tag>
           </ng-template>
         </nzx-table>
       </nzx-content>

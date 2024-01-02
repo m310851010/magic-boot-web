@@ -22,7 +22,9 @@
       </button>
 
       <ng-template named="status" let-row>
-        <nz-tag [nzColor]="(row.status | dicItem: status$ | async)!['color']">{{ row.status | dicLabel: status$ | async }}</nz-tag>
+        <nz-tag [nzColor]="(row.status | dicItem: status$ | async)?.['color']">
+          {{ row.status | dicLabel: status$ | async }}
+        </nz-tag>
       </ng-template>
     </nzx-table>
   </nzx-content>

@@ -25,7 +25,7 @@
                 <div class="ant-list-item-meta-avatar">
                   <nz-avatar
                     [nzText]="(item.dictType | dicLabel: dicType$ | async)!"
-                    [ngClass]="item.status !== 1 ? (item.dictType | dicItem: dicType$ | async)!['clazz'] : null"
+                    [ngClass]="item.status !== 1 ? (item.dictType | dicItem: dicType$ | async)?.['clazz'] : null"
                   ></nz-avatar>
                 </div>
                 <div class="ant-list-item-meta-content">
@@ -39,8 +39,11 @@
                     </div>
 
                     <div>
-                      <nz-tag [nzColor]="(item.dataType | dicItem: dataType$ | async)!['color']">
-                        {{ item.dataType | dicLabel: dataType$ | async }}
+                      <nz-tag
+                        *ngIf="item.dataType | dicLabel: dataType$ | async as dataTypeLabel"
+                        [nzColor]="(item.dataType | dicItem: dataType$ | async)?.['color']"
+                      >
+                        {{ dataTypeLabel }}
                       </nz-tag>
                     </div>
                   </div>
@@ -133,8 +136,11 @@
       </div>
 
       <ng-template named="status" let-row>
-        <nz-tag [nzColor]="(row.status | dicItem: status$ | async)!['color']">
-          {{ row.status | dicLabel: status$ | async }}
+        <nz-tag
+          *ngIf="row.status | dicLabel: status$ | async as statusLabel"
+          [nzColor]="(row.status | dicItem: status$ | async)?.['color']"
+        >
+          {{ statusLabel }}
         </nz-tag>
       </ng-template>
     </nzx-table>
