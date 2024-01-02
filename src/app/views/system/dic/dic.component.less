@@ -1,14 +1,14 @@
 :host {
   .dic-item {
-    .item-actions{
-      visibility: hidden;
-    }
-
     &.active{
-     background-color: var(--ant-primary-color-outline);
+      background-color: var(--ant-primary-color-outline);
       .item-actions {
         visibility: visible;
       }
+    }
+
+    .disabled-label {
+      text-decoration: line-through;
     }
 
     &:hover:not(.active) {
@@ -17,9 +17,19 @@
         visibility: visible;
       }
     }
+
+    .item-actions{
+      visibility: hidden;
+    }
   }
   .biz-avatar-color{
-    color: #f56a00; background-color: #fde3cf
+    color: #f56a00;
+    background-color: #fde3cf
+  }
+
+  .sys-avatar-color{
+    color: #019965;
+    background-color: #cae4c9
   }
 
 

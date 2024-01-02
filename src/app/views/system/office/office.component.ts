@@ -121,7 +121,6 @@ export default class OfficeComponent implements OnInit {
   officesSnapshot: Office[] = [];
   private offices$ = this.http.get<Office[]>('/system/office/tree');
   columns: NzxColumn<Office>[] = [
-    { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'name', thText: '部门名称', showExpand: true },
     {
       name: 'type',
