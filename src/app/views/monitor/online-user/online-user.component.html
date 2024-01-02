@@ -1,0 +1,30 @@
+<nzx-page class="full-overflow">
+  <nzx-header>
+    <form nz-form [formGroup]="searchForm">
+      <ma-form-search
+        [table]="table"
+        [form]="searchForm"
+        [showArrow]="true"
+        [(collapsed)]="collapsed"
+        (collapsedChange)="onCollapsedChange()"
+      >
+        <formly-form
+          [form]="searchForm"
+          [fields]="searchFields"
+          [model]="searchModel"
+          [options]="{ formState: gridOptions }"
+        ></formly-form>
+      </ma-form-search>
+    </form>
+  </nzx-header>
+
+  <nzx-content>
+    <nzx-table
+      #table
+      [nzxColumns]="columns"
+      api="/monitor/online/list"
+      [params]="getParams"
+      nzTableLayout="fixed"
+    ></nzx-table>
+  </nzx-content>
+</nzx-page>

@@ -1,0 +1,32 @@
+<nzx-page class="full-overflow">
+  <nzx-header>
+    <form nz-form [formGroup]="searchForm">
+      <ma-form-search
+        [table]="table"
+        [form]="searchForm"
+        [showArrow]="true"
+        [(collapsed)]="collapsed"
+        (collapsedChange)="onCollapsedChange()"
+      >
+        <formly-form
+          [form]="searchForm"
+          [fields]="searchFields"
+          [model]="searchModel"
+          [options]="{ formState: gridOptions }"
+        ></formly-form>
+      </ma-form-search>
+    </form>
+  </nzx-header>
+
+  <nzx-content>
+    <nzx-table #table [nzxColumns]="columns" api="/monitor/log/login/list" [params]="getParams" nzTableLayout="fixed">
+      <ng-template named="typeTemplate" let-row>
+        @if (row.type == '成功') {
+        <span style="color: var(--ant-primary-color)">成功</span>
+        } @else {
+        <span style="color: var(--ant-error-color)">失败</span>
+        }
+      </ng-template>
+    </nzx-table>
+  </nzx-content>
+</nzx-page>

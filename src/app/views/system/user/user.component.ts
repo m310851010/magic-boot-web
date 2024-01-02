@@ -38,12 +38,12 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { sm3 } from 'sm-crypto-v2';
 
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
 import { CommonService } from '@commons/service/common.service';
 import { normalTree } from '@commons/utils';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
 
 @Component({
   selector: 'ma-user',
@@ -51,7 +51,7 @@ import { DicItemPipe } from '@commons/component/dic-item.pipe';
   imports: [
     CommonModule,
     NzxLayoutPageModule,
-    ReactiveFormsModule,
+
     NzFormlyModule,
     FormlyNzInputModule,
     FormlyNzFormFieldModule,
@@ -68,6 +68,7 @@ import { DicItemPipe } from '@commons/component/dic-item.pipe';
     NzInputModule,
     NzTreeModule,
     FormsModule,
+    ReactiveFormsModule,
     FormSearchComponent,
     NzxTableModule,
     NzxDirectiveModule,

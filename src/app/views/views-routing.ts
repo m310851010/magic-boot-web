@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+
 import { RouteData } from '@commons';
 
 export default [
@@ -10,6 +11,7 @@ export default [
   },
   { path: 'error', loadChildren: () => import('./error/error-routing') },
   { path: 'system', loadChildren: () => import('./system/system-routing') },
+  { path: 'monitor', loadChildren: () => import('./monitor/monitor-routing') },
   {
     path: '**',
     loadComponent: () => import('./error/not-found-404.component').then(m => m.NotFound404Component),

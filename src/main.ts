@@ -1,13 +1,12 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import { AppComponent } from './app/app.component';
+
 import { NzxUtils } from '@xmagic/nzx-antd/util';
 
-bootstrapApplication(AppComponent, appConfig).catch((err) =>
-  console.error(err),
-);
+import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
 
-// @ts-ignore
+bootstrapApplication(AppComponent, appConfig).catch(err => console.error(err));
+
 Date.prototype.toJSON = function () {
-  return this.getTime();
+  return NzxUtils.formatDate(this, 'yyyy-MM-dd HH:mm:ss');
 };
