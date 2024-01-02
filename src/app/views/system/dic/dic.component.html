@@ -19,11 +19,9 @@
             >
               <div class="ant-list-item-meta">
                 <div class="ant-list-item-meta-avatar">
-                  @if (item.dictType === 0) {
-                  <nz-avatar nzText="系统" [class.sys-avatar-color]="item.status !== 1"></nz-avatar>
-                  } @else {
-                  <nz-avatar nzText="业务" [class.biz-avatar-color]="item.status !== 1"></nz-avatar>
-                  }
+                  <nz-avatar [nzText]="(item.dictType | dicLabel: dicType$ | async)!"
+                             [ngClass]="item.status !== 1 ? (item.dictType | dicItem: dicType$ | async)!['clazz'] : null"
+                  ></nz-avatar>
                 </div>
                 <div class="ant-list-item-meta-content">
                   <div style="font-weight: 600" class="flex-between">
@@ -34,11 +32,7 @@
                     </div>
 
                     <div>
-                      @if (item.dataType === 0) {
-                      <nz-tag nzColor="success">文本</nz-tag>
-                      } @else {
-                      <nz-tag nzColor="processing">数字</nz-tag>
-                      }
+                      <nz-tag [nzColor]="(item.dataType | dicItem: dataType$ | async)!['color']">{{ item.dataType | dicLabel: dataType$ | async }}</nz-tag>
                     </div>
                   </div>
 
@@ -90,14 +84,8 @@
         </nz-space>
       </div>
 
-      <ng-template named="role" let-row>
-        <ng-container *ngIf="row.roleNames?.length; else emptyTemplate">
-          <nz-tag nzColor="processing" *ngFor="let role of row.roleNames">{{ role }}</nz-tag>
-        </ng-container>
-        <ng-template #emptyTemplate>--</ng-template>
-      </ng-template>
       <ng-template named="status" let-row>
-        <nz-tag [nzColor]="row.status ? 'error' : 'success'">{{ row.status ? '停用' : '正常' }}</nz-tag>
+        <nz-tag [nzColor]="(row.status | dicItem: status$ | async)!['color']">{{ row.status | dicLabel: status$ | async }}</nz-tag>
       </ng-template>
     </nzx-table>
 

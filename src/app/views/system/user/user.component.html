@@ -106,7 +106,7 @@
             <ng-template #emptyTemplate>--</ng-template>
           </ng-template>
           <ng-template named="status" let-row>
-            <nz-tag [nzColor]="row.isLogin ? 'error' : 'success'">{{ row.isLogin ? '停用' : '正常' }}</nz-tag>
+            <nz-tag [nzColor]="(row.isLogin | dicItem: status$ | async)!['color']">{{ row.isLogin | dicLabel: status$ | async }}</nz-tag>
           </ng-template>
         </nzx-table>
       </nzx-content>

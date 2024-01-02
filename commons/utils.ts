@@ -1,21 +1,45 @@
 import { map, OperatorFunction } from 'rxjs';
 
 import { DicItem } from '@xmagic/nzx-antd/service';
-import { NzxUtils, TreeNode } from '@xmagic/nzx-antd/util';
+import { NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 /**
  * 把字典转换为Map结构
  */
-export function dicMap<T extends DicItem>(): OperatorFunction<DicItem[], Record<string, T>> {
+export function dicMap<T extends DicItem>(): OperatorFunction<DicItem[] | null | undefined, Record<string, T>> {
+  return source =>
+    source.pipe(
+      map(list => {
+        const result: Record<string, T> = {};
+        if (!list) {
+          return result;
+        }
+        for (const it of list) {
+          result[it.value] = it as T;
+        }
+        return result;
+      })
+    );
+}
+
+/**
+ * 获取字典Label
+ */
+export function dicLabel<T extends DicItem>(
+  key: string | number,
+  defaultValue: string = '--'
+): OperatorFunction<DicItem[], Record<string, T>> {
   return source =>
     source.pipe(
       map(list => {
         const result: Record<string, T> = {};
         for (const it of list) {
-          result[it.value] = it as T;
+          if (it.value == key) {
+            return it.label;
+          }
         }
-        return result;
+        return defaultValue == null ? '--' : defaultValue;
       })
     );
 }
@@ -27,7 +51,7 @@ export function dicMap<T extends DicItem>(): OperatorFunction<DicItem[], Record<
  * @param callback
  */
 export function listToMap<T, V>(
-  list: T[],
+  list: T[] | undefined | null,
   key: keyof T | null | undefined,
   callback?: (item: T) => V
 ): Record<string, V> {

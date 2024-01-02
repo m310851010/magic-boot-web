@@ -40,7 +40,7 @@
         } @else { -- }
       </ng-template>
       <ng-template named="menuTypeTemplate" let-row>
-        <nz-tag [nzColor]="menuTypeMap[row.menuType]?.color">{{ menuTypeMap[row.menuType]?.label }}</nz-tag>
+        <nz-tag [nzColor]="(row.menuType | dicItem: menuType$ | async)!['color']">{{ row.menuType | dicLabel: menuType$ | async }}</nz-tag>
       </ng-template>
     </nzx-table>
   </nzx-content>

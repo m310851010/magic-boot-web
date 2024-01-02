@@ -44,7 +44,7 @@ import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/
 import { FormSearchComponent } from '@commons/component/form-search';
 import { UserPickerComponent } from '@commons/component/user-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { listToMap, normalTree } from '@commons/utils';
+import { dicLabel, listToMap, normalTree } from '@commons/utils';
 
 @Component({
   selector: 'ma-role',
@@ -122,11 +122,7 @@ export default class RoleComponent {
     {
       name: 'permission',
       thText: '权限范围',
-      format: value =>
-        this.permission$.pipe(
-          map(v => this.dicService.listToMap(v)),
-          map(dic => dic[value])
-        )
+      format: value => this.permission$.pipe(dicLabel(value))
     },
     { name: 'desc', thText: '角色描述' },
     { name: 'createDate', thText: '创建时间', nzWidth: '170px' },

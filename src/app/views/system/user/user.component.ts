@@ -20,7 +20,7 @@ import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxModalOptions } from '@xmagic/nzx-antd/modal/nzx-modal.service';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { FetcherService } from '@xmagic/nzx-antd/service';
+import { DicService, FetcherService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -40,9 +40,10 @@ import { sm3 } from 'sm-crypto-v2';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
-import { Constant } from '@commons/constant';
 import { CommonService } from '@commons/service/common.service';
 import { normalTree } from '@commons/utils';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
 
 @Component({
   selector: 'ma-user',
@@ -77,12 +78,16 @@ import { normalTree } from '@commons/utils';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    InputPasswordComponent
+    InputPasswordComponent,
+    DicLabelPipe,
+    DicItemPipe
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.less'
 })
 export default class UserComponent {
+  status$ = this.dicService.getDic('STATUS');
+
   gridOptions = { nzGutter: 15, colNzSpan: 8, labelNzFlex: '60px' };
   collapsed = true;
 
@@ -136,7 +141,7 @@ export default class UserComponent {
           key: 'isLogin',
           props: {
             label: '状态',
-            options: Constant.STATUS_OPTIONS,
+            options: this.status$,
             nzAllowClear: true
           },
           expressions: {
@@ -179,7 +184,8 @@ export default class UserComponent {
     private commonService: CommonService,
     private modalService: NzxModalService,
     private fetcherService: FetcherService,
-    private messageService: NzMessageService
+    private messageService: NzMessageService,
+    private dicService: DicService
   ) {
     this.onSearchTextChange('');
   }
@@ -382,7 +388,7 @@ export default class UserComponent {
                 defaultValue: 0,
                 props: {
                   label: '状态',
-                  options: Constant.STATUS_OPTIONS,
+                  options: this.status$,
                   required: true
                 }
               }

@@ -1,5 +1,3 @@
-import { OptionItem } from '@xmagic/nzx-antd/checkbox';
-
 /**
  * 常量定义
  */
@@ -17,14 +15,6 @@ class ConstantClass {
    * 登录后的用户信息
    */
   USER_INFO_KEY = `${this.prefix}USER_INFO_TOKEN`;
-
-  /**
-   * 用户状态
-   */
-  STATUS_OPTIONS: OptionItem[] = [
-    { label: '正常', value: 0 },
-    { label: '停用', value: 1 }
-  ];
 }
 
 /**

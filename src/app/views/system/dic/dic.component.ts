@@ -27,7 +27,6 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
-import { Constant } from '@commons/constant';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
@@ -35,6 +34,10 @@ import { SearchPipe } from '@commons/component/search.pipe';
 import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
 import { tap } from 'rxjs/operators';
 import { getMaxSort } from '../menu/menu-utils';
+import { DicService } from '@xmagic/nzx-antd/service';
+import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
 
 @Component({
   selector: 'ma-dic',
@@ -63,7 +66,10 @@ import { getMaxSort } from '../menu/menu-utils';
     NzAvatarModule,
     NzSpaceModule,
     NzEmptyModule,
-    SearchPipe
+    SearchPipe,
+    NzxPipeModule,
+    DicLabelPipe,
+    DicItemPipe
   ],
   templateUrl: './dic.component.html',
   styleUrl: './dic.component.less'
@@ -111,9 +117,14 @@ export default class DicComponent implements OnInit {
   searchText = '';
   rootDic: Dict[] = [];
 
+  dicType$ = this.dicService.getDic('DICT_TYPE');
+  dataType$ = this.dicService.getDic('DATA_TYPE');
+  status$ = this.dicService.getDic('STATUS');
+
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
+    private dicService: DicService,
     private modalService: NzxModalService,
     private messageService: NzMessageService
   ) {}
@@ -155,7 +166,7 @@ export default class DicComponent implements OnInit {
   }
 
   onItemDeleteClick(row: Dict, table: NzxTableComponent): void {
-    this.handleDelete(row.id, table);
+    this.handleDelete(row.id, table).then();
   }
 
   onItemBatchDelete(table: NzxTableComponent): void {
@@ -164,7 +175,7 @@ export default class DicComponent implements OnInit {
       this.messageService.error('请选择至少一条字典项 ');
       return;
     }
-    this.handleDelete(id, table, '选中的字典项删除后不可恢复, 确定删除?');
+    this.handleDelete(id, table, '选中的字典项删除后不可恢复, 确定删除?').then();
   }
 
   private handleDelete(id: string | string[], table: NzxTableComponent, message?: string): Promise<boolean> {
@@ -211,10 +222,7 @@ export default class DicComponent implements OnInit {
         props: {
           label: '字典类型',
           required: true,
-          options: [
-            { value: 0, label: '系统' },
-            { value: 1, label: '业务' }
-          ]
+          options: this.dicType$
         }
       },
       {
@@ -224,10 +232,7 @@ export default class DicComponent implements OnInit {
         props: {
           label: '数据类型',
           required: true,
-          options: [
-            { value: 0, label: '文本' },
-            { value: 1, label: '数字' }
-          ]
+          options: this.dataType$
         }
       }
     ];
@@ -327,7 +332,7 @@ export default class DicComponent implements OnInit {
             defaultValue: 0,
             props: {
               label: '状态',
-              options: Constant.STATUS_OPTIONS,
+              options: this.status$,
               required: true
             }
           },
@@ -394,7 +399,7 @@ interface Dict {
    */
   value: string;
   /**
-   * 字典类型：0系统类，1业务类
+   * 字典类型：0系统类，1业务类, 字典 DICT_TYPE
    */
   dictType: 0 | 1;
   /**

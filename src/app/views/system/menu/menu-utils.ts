@@ -7,5 +7,5 @@ export function getMaxSort<T extends { sort: number }>(list: T[]) {
       }
     });
   }
-  return maxSort + 10;
+  return maxSort + 1;
 }

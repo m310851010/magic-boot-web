@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { firstValueFrom, map, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -21,7 +20,7 @@ import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalOptions, NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { DicItem, DicService } from '@xmagic/nzx-antd/service';
+import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -41,11 +40,12 @@ import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { UserPickerComponent } from '@commons/component/user-picker';
-import { Constant } from '@commons/constant';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { normalTree } from '@commons/utils';
+import { dicLabel, normalTree } from '@commons/utils';
 
 import { getMaxSort } from '../menu/menu-utils';
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 
 @Component({
   selector: 'ma-office',
@@ -83,7 +83,9 @@ import { getMaxSort } from '../menu/menu-utils';
     FormlyCommonModule,
     IconPickerComponent,
     UserPickerComponent,
-    NzTreeSelectModule
+    NzTreeSelectModule,
+    DicItemPipe,
+    DicLabelPipe
   ],
   templateUrl: './office.component.html',
   styleUrl: './office.component.less'
@@ -126,7 +128,7 @@ export default class OfficeComponent implements OnInit {
       name: 'type',
       thText: '分类',
       nzWidth: '100px',
-      format: type => this.officeType$.pipe(map(list => this.dicService.listToMap(list)[type]))
+      format: type => this.officeType$.pipe(dicLabel(type))
     },
     { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
     { name: 'leader', thText: '主管' },
@@ -161,6 +163,8 @@ export default class OfficeComponent implements OnInit {
       nzWidth: '230px'
     }
   ];
+
+  status$ = this.dicService.getDic('STATUS');
 
   constructor(
     private http: HttpClient,
@@ -207,8 +211,6 @@ export default class OfficeComponent implements OnInit {
       nzOnOk: () => firstValueFrom(this.http.post('/system/office/update', this.modalModel))
     });
   }
-
-  onUserListOpenModal(): void {}
 
   onDeleteClick(row: Office): void {
     return this.handleDelete(row.id);
@@ -343,7 +345,7 @@ export default class OfficeComponent implements OnInit {
             props: {
               label: '状态',
               required: true,
-              options: Constant.STATUS_OPTIONS
+              options: this.status$
             }
           },
           {

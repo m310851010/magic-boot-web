@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { firstValueFrom, map } from 'rxjs';
-import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -21,7 +20,7 @@ import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
 import { NzxModalService, NzxModalOptions } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { DicItem, DicService } from '@xmagic/nzx-antd/service';
+import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -40,9 +39,11 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicMap } from '@commons/utils';
 
 import { getMaxSort } from './menu-utils';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
+import { dicLabel } from '@commons/utils';
 
 @Component({
   selector: 'ma-menu',
@@ -78,7 +79,9 @@ import { getMaxSort } from './menu-utils';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    IconPickerComponent
+    IconPickerComponent,
+    DicLabelPipe,
+    DicItemPipe
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.less'
@@ -86,6 +89,10 @@ import { getMaxSort } from './menu-utils';
 export default class MenuComponent implements OnInit {
   @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
   @ViewChild('table') table!: NzxTableComponent;
+
+  menuType$ = this.dicService.getDic('MENU_TYPE');
+  showStatus$ = this.dicService.getDic('SHOW_STATUS');
+
   searchForm = new FormGroup({});
   searchModel: { searchValue?: string } = {};
   searchFields: FormlyFieldConfig[] = [
@@ -116,7 +123,12 @@ export default class MenuComponent implements OnInit {
     { name: 'menuType', thText: '菜单类型', tdTemplate: 'menuTypeTemplate', nzWidth: '80px' },
     { name: 'componentName', thText: '组件' },
     { name: 'sort', thText: '排序号', nzWidth: '70px' },
-    { name: 'isShow', thText: '显示状态', format: isShow => (isShow ? '显示' : '隐藏'), nzWidth: '80px' },
+    {
+      name: 'isShow',
+      thText: '显示状态',
+      format: isShow => this.showStatus$.pipe(dicLabel(isShow)),
+      nzWidth: '80px'
+    },
     {
       name: 'id',
       thText: '操作',
@@ -147,8 +159,6 @@ export default class MenuComponent implements OnInit {
     }
   ];
 
-  menuTypeMap: Record<string, DicItem & { color: string }> = {};
-  menuTypes: DicItem[] = [];
   constructor(
     private http: HttpClient,
     private commonService: CommonService,
@@ -158,14 +168,6 @@ export default class MenuComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.dicService
-      .getDic('MENU_TYPE')
-      .pipe(
-        tap(list => (this.menuTypes = list)),
-        dicMap<DicItem & { color: string }>()
-      )
-      .subscribe(v => (this.menuTypeMap = v));
-
     this.loadMenus();
   }
 
@@ -266,7 +268,7 @@ export default class MenuComponent implements OnInit {
         defaultValue: 'M',
         props: {
           label: '菜单类型',
-          options: this.menuTypes
+          options: this.menuType$
         }
       },
       {
@@ -407,10 +409,7 @@ export default class MenuComponent implements OnInit {
             props: {
               label: '显示状态',
               required: true,
-              options: [
-                { value: 1, label: '显示' },
-                { value: 0, label: '隐藏' }
-              ]
+              options: this.showStatus$
             },
             expressions: {
               hide: f => f.model.menuType === 'B'
@@ -482,7 +481,7 @@ interface Menu {
   icon?: string;
   id: string;
   /**
-   * 0 隐藏 1 显示
+   * 0 隐藏 1 显示, 字典 SHOW_STATUS
    */
   isShow: 0 | 1;
   keepAlive: 0 | 1;
