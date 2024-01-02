@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -11,34 +12,34 @@ import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzRadioModule } from '@xmagic/nz-formly/radio';
+import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxModalOptions } from '@xmagic/nzx-antd/modal/nzx-modal.service';
+import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
+import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzxFormUtils, NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
-import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { SearchPipe } from '@commons/component/search.pipe';
-import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
-import { tap } from 'rxjs/operators';
-import { getMaxSort } from '../menu/menu-utils';
-import { DicService } from '@xmagic/nzx-antd/service';
-import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
+import { SearchPipe } from '@commons/component/search.pipe';
+import { CommonService, DeleteButton } from '@commons/service/common.service';
+
+import { getMaxSort } from '../menu/menu-utils';
 
 @Component({
   selector: 'ma-dic',

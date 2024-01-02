@@ -1,6 +1,11 @@
 <div class="full-height-less flex-horizontal">
   <div style="width: 350px">
-    <nz-card [nzTitle]="titleTemplate" [nzExtra]="nzExtraTemplate" nzSize="small" class="flex-card card-body-less card-border-right full-height" >
+    <nz-card
+      [nzTitle]="titleTemplate"
+      [nzExtra]="nzExtraTemplate"
+      nzSize="small"
+      class="flex-card card-body-less card-border-right full-height"
+    >
       <div class="flex-vertical flex-main">
         <div class="search-box">
           <nz-input-group nzSearch nzSuffixIcon="search">
@@ -12,27 +17,31 @@
           <div class="full-overflow ant-list ant-list-sm ant-list-split">
             <div
               class="ant-list-item dic-item"
-              *ngFor="let item of rootDic | search : ['label', 'value']: searchText"
+              *ngFor="let item of rootDic | search: ['label', 'value'] : searchText"
               (click)="onDicClick(item)"
               [class.active]="selected === item"
-
             >
               <div class="ant-list-item-meta">
                 <div class="ant-list-item-meta-avatar">
-                  <nz-avatar [nzText]="(item.dictType | dicLabel: dicType$ | async)!"
-                             [ngClass]="item.status !== 1 ? (item.dictType | dicItem: dicType$ | async)!['clazz'] : null"
+                  <nz-avatar
+                    [nzText]="(item.dictType | dicLabel: dicType$ | async)!"
+                    [ngClass]="item.status !== 1 ? (item.dictType | dicItem: dicType$ | async)!['clazz'] : null"
                   ></nz-avatar>
                 </div>
                 <div class="ant-list-item-meta-content">
                   <div style="font-weight: 600" class="flex-between">
-                    <div class="segmented-text-ellipsis"
-                         [class.disabled-label]="item.status === 1"
-                         [class.ant-list-item-meta-description]="item.status === 1">
+                    <div
+                      class="segmented-text-ellipsis"
+                      [class.disabled-label]="item.status === 1"
+                      [class.ant-list-item-meta-description]="item.status === 1"
+                    >
                       {{ item.label }}
                     </div>
 
                     <div>
-                      <nz-tag [nzColor]="(item.dataType | dicItem: dataType$ | async)!['color']">{{ item.dataType | dicLabel: dataType$ | async }}</nz-tag>
+                      <nz-tag [nzColor]="(item.dataType | dicItem: dataType$ | async)!['color']">
+                        {{ item.dataType | dicLabel: dataType$ | async }}
+                      </nz-tag>
                     </div>
                   </div>
 
@@ -40,10 +49,23 @@
                 </div>
               </div>
               <div class="item-actions">
-                <button *auth="'dict:update'" nz-button nzType="link" title="编辑字典" (click)="onUpdateRootDicOpenModal($event, item, modalTemplate)">
+                <button
+                  *auth="'dict:update'"
+                  nz-button
+                  nzType="link"
+                  title="编辑字典"
+                  (click)="onUpdateRootDicOpenModal($event, item, modalTemplate)"
+                >
                   <span nz-icon nzType="edit"></span>
                 </button>
-                <button *auth="'dict:delete'" nz-button nzType="link" title="删除字典" nzDanger (click)="onRootDicDeleteClick($event, item)">
+                <button
+                  *auth="'dict:delete'"
+                  nz-button
+                  nzType="link"
+                  title="删除字典"
+                  nzDanger
+                  (click)="onRootDicDeleteClick($event, item)"
+                >
                   <span nz-icon nzType="delete"></span>
                 </button>
               </div>
@@ -55,7 +77,13 @@
       <ng-template #titleTemplate>
         <div class="flex-between">
           <div>数据字典</div>
-          <button *auth="'dict:save'" nz-button nzType="link" nzSize="small" (click)="onNewRootDicOpenModal(modalTemplate)">
+          <button
+            *auth="'dict:save'"
+            nz-button
+            nzType="link"
+            nzSize="small"
+            (click)="onNewRootDicOpenModal(modalTemplate)"
+          >
             <span nz-icon nzType="plus"></span>
             新增字典
           </button>
@@ -77,8 +105,15 @@
     </nz-card>
   </div>
 
-  <div class="flex-main relative" style="padding: 8px;background-color: #fff">
-    <nzx-table *ngIf="selected" #table [nzxColumns]="columns" api="/system/dict/list" [nzShowPagination]="false" [params]="getParams">
+  <div class="flex-main relative" style="padding: 8px; background-color: #fff">
+    <nzx-table
+      *ngIf="selected"
+      #table
+      [nzxColumns]="columns"
+      api="/system/dict/list"
+      [nzShowPagination]="false"
+      [params]="getParams"
+    >
       <div title>
         <nz-space>
           <ng-container *auth="'dict:save'">
@@ -98,14 +133,15 @@
       </div>
 
       <ng-template named="status" let-row>
-        <nz-tag [nzColor]="(row.status | dicItem: status$ | async)!['color']">{{ row.status | dicLabel: status$ | async }}</nz-tag>
+        <nz-tag [nzColor]="(row.status | dicItem: status$ | async)!['color']">
+          {{ row.status | dicLabel: status$ | async }}
+        </nz-tag>
       </ng-template>
     </nzx-table>
 
     <div *ngIf="!selected" class="flex-center-middle full-height">
       <nz-empty *ngIf="!selected" nzNotFoundContent="请先点击左侧的数据字典"></nz-empty>
     </div>
-
   </div>
 </div>
 
@@ -117,7 +153,6 @@
       [fields]="modalFields"
       [model]="modalModel"
       [options]="{ formState: { nzGutter: 10, colNzSpan: 12, labelNzFlex: '80px' } }"
-    >
-    </formly-form>
+    ></formly-form>
   </form>
 </ng-template>

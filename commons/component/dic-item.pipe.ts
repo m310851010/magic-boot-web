@@ -1,8 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { map, Observable } from 'rxjs';
+
 import { DicItem, DicService } from '@xmagic/nzx-antd/service';
-import { dicMap } from '../utils';
 import { NzxUtils } from '@xmagic/nzx-antd/util';
+
+import { dicMap } from '../utils';
 
 @Pipe({
   name: 'dicItem',

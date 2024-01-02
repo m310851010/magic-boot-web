@@ -36,14 +36,14 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
+import { dicLabel } from '@commons/utils';
 
 import { getMaxSort } from './menu-utils';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { dicLabel } from '@commons/utils';
 
 @Component({
   selector: 'ma-menu',
@@ -251,7 +251,6 @@ export default class MenuComponent implements OnInit {
       this.menusSnapshot = menus;
     });
   }
-
   private openModal(
     model: Partial<Menu>,
     options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {

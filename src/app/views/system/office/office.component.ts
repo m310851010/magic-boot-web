@@ -37,6 +37,8 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 
+import { DicItemPipe } from '@commons/component/dic-item.pipe';
+import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { UserPickerComponent } from '@commons/component/user-picker';
@@ -44,8 +46,6 @@ import { CommonService, DeleteButton } from '@commons/service/common.service';
 import { dicLabel, normalTree } from '@commons/utils';
 
 import { getMaxSort } from '../menu/menu-utils';
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 
 @Component({
   selector: 'ma-office',
@@ -254,7 +254,6 @@ export default class OfficeComponent implements OnInit {
     }
 
     this.transferOfficeId = this.selectedId;
-
     this.modalService.create({
       nzTitle: '选择转移部门',
       nzContent: officeTemplate,
