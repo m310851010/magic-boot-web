@@ -1,6 +1,6 @@
 <div class="full-height-less flex-horizontal">
   <div style="width: 350px">
-    <nz-card [nzTitle]="titleTemplate" nzSize="small" class="flex-card card-body-less card-border-right full-height" >
+    <nz-card [nzTitle]="titleTemplate" [nzExtra]="nzExtraTemplate" nzSize="small" class="flex-card card-body-less card-border-right full-height" >
       <div class="flex-vertical flex-main">
         <div class="search-box">
           <nz-input-group nzSearch nzSuffixIcon="search">
@@ -61,6 +61,19 @@
           </button>
         </div>
       </ng-template>
+
+      <ng-template #nzExtraTemplate>
+        <span nz-icon nzType="ellipsis-vertical" class="cursor-pointer" nz-dropdown [nzDropdownMenu]="menu"></span>
+      </ng-template>
+
+      <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu style="width: 200px">
+          <li nz-menu-item (click)="loadData()">
+            <span nz-icon nzType="reload" class="mr-sm"></span>
+            刷新
+          </li>
+        </ul>
+      </nz-dropdown-menu>
     </nz-card>
   </div>
 

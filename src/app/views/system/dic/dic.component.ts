@@ -38,6 +38,7 @@ import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { DicItemPipe } from '@commons/component/dic-item.pipe';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 @Component({
   selector: 'ma-dic',
@@ -69,7 +70,8 @@ import { DicItemPipe } from '@commons/component/dic-item.pipe';
     SearchPipe,
     NzxPipeModule,
     DicLabelPipe,
-    DicItemPipe
+    DicItemPipe,
+    NzDropDownModule
   ],
   templateUrl: './dic.component.html',
   styleUrl: './dic.component.less'
@@ -133,7 +135,7 @@ export default class DicComponent implements OnInit {
     this.loadData();
   }
 
-  private loadData(): void {
+  loadData(): void {
     this.http.post<Dict[]>('/system/dict/list', { pid: '0' }).subscribe(list => {
       this.rootDic = list;
       if (this.selected) {

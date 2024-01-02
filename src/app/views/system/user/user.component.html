@@ -32,13 +32,13 @@
       </ng-template>
 
       <nz-dropdown-menu #menu="nzDropdownMenu">
-        <ul nz-menu>
+        <ul nz-menu style="width: 200px">
           <li nz-menu-item (click)="onToggleExpandAll(true, nzTreeComponent)">
-            <span nz-icon nzType="node-expand"></span>
+            <span nz-icon nzType="node-expand" class="mr-sm"></span>
             展开全部
           </li>
           <li nz-menu-item (click)="onToggleExpandAll(false, nzTreeComponent)">
-            <span nz-icon nzType="node-collapse"></span>
+            <span nz-icon nzType="node-collapse" class="mr-sm"></span>
             折叠全部
           </li>
         </ul>
