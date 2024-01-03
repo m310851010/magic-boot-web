@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class StrengthMeterComponent implements OnInit {
   @Input() score: ScoreLevel = null;
-  @Input() set password(pwd: string) {
+  @Input() set password(pwd: string | null) {
     this.score = this.getScore(pwd);
   }
 
@@ -21,7 +21,7 @@ export class StrengthMeterComponent implements OnInit {
    * 获取密码强度
    * @param value
    */
-  getScore(value: string): ScoreLevel {
+  getScore(value: string | null): ScoreLevel {
     if (!value) {
       return null;
     }

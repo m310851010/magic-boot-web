@@ -15,7 +15,6 @@ export default [
   {
     path: '**',
     loadComponent: () => import('./error/not-found-404.component').then(m => m.NotFound404Component),
-    title: '404',
     data: { ignore: true }
   }
 ] as Route[];
