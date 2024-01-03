@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -8,13 +8,19 @@ import { FormlyFieldBetweenDatetimeModule } from '@xmagic/nz-formly/between-date
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
-import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
-import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
-import { NzxColumn, NzxTableModule } from '@xmagic/nzx-antd/table';
+import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
 import { NzFormModule } from 'ng-zorro-antd/form';
 
 import { FormSearchComponent } from '@commons/component/form-search';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzxCheckboxModule } from '@xmagic/nzx-antd/checkbox';
+import { DicService } from '@xmagic/nzx-antd/service';
+import { NzxModalService } from '@xmagic/nzx-antd/modal';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'ma-online-user',
@@ -31,17 +37,23 @@ import { FormSearchComponent } from '@commons/component/form-search';
     ReactiveFormsModule,
     NzFormModule,
     NzxTableModule,
-    NzxLayoutPageModule
+    NzxLayoutPageModule,
+    NzAlertModule,
+    NzxCheckboxModule,
+    FormsModule
   ],
   templateUrl: './online-user.component.html',
   styleUrl: './online-user.component.less'
 })
 export default class OnlineUserComponent {
+  @ViewChild('modalTemplate') modalTemplate!: TemplateRef<{}>;
+  @ViewChild('table') table!: NzxTableComponent<OnlineUser>;
+
   gridOptions = { nzGutter: 15, colNzSpan: 8, labelNzFlex: '80px' };
   collapsed = true;
 
   searchForm = new FormGroup({});
-  searchModel: Partial<LoginLog> = {};
+  searchModel: Partial<OnlineUser> = {};
   searchFields: FormlyFieldConfig[] = [
     {
       type: 'row',
@@ -66,32 +78,24 @@ export default class OnlineUserComponent {
           props: {
             label: '登录时间',
             nzShowTime: true
-          },
-          expressions: {
-            hide: () => this.collapsed
           }
         }
       ]
     }
   ];
 
-  getParams: () => Partial<LoginLog> = () => this.searchModel;
-  columns: NzxColumn<LoginLog>[] = [
+  noLoginTime$ = this.dicService.getDic('NO_LOGIN_TIME');
+
+  getParams: () => Partial<OnlineUser> = () => this.searchModel;
+  columns: NzxColumn<OnlineUser>[] = [
     { isIndex: true },
     {
       name: 'username',
-      thText: '登录账号'
+      thText: '登录名称'
     },
     {
-      name: 'failPassword',
-      thText: '失败密码',
-      nzEllipsis: true
-    },
-    {
-      name: 'type',
-      thText: '登录状态',
-      nzWidth: '100px',
-      tdTemplate: 'typeTemplate'
+      name: 'officeName',
+      thText: '所属机构'
     },
     {
       name: 'address',
@@ -99,8 +103,7 @@ export default class OnlineUserComponent {
     },
     {
       name: 'ip',
-      thText: 'ip',
-      nzWidth: '150px'
+      thText: 'IP'
     },
     {
       name: 'browser',
@@ -108,27 +111,72 @@ export default class OnlineUserComponent {
     },
     {
       name: 'os',
-      thText: '系统',
+      thText: '操作系统',
       nzEllipsis: true
     },
     {
       name: 'createDate',
       thText: '操作时间',
       nzWidth: '170px'
+    },
+    {
+      thText: '操作',
+      type: 'buttons',
+      nzWidth: '100px',
+      buttons: [
+        {
+          permission: 'online:logout',
+          text: '强制下线',
+          click: (row: OnlineUser) => this.onOpenModal(row, this.modalTemplate, this.table)
+        }
+      ]
     }
   ];
 
-  onCollapsedChange(): void {
-    this.searchFields = [...this.searchFields];
+  onlineUser!: OnlineUser;
+  time = [0];
+  lastTime = this.time;
+
+  constructor(
+    private http: HttpClient,
+    private dicService: DicService,
+    private modalService: NzxModalService,
+    private messageService: NzMessageService
+  ) {}
+
+  onTimeChange(value: number[]) {
+    if (!value.length) {
+      setTimeout(() => (this.time = this.lastTime));
+    } else {
+      this.lastTime = value;
+    }
+  }
+
+  onOpenModal(onlineUser: OnlineUser, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+    this.onlineUser = onlineUser;
+    this.time = [0];
+    this.lastTime = this.time;
+    this.modalService.create({
+      nzTitle: '强制下线',
+      nzWidth: 650,
+      nzContent,
+      nzOnOk: () =>
+        firstValueFrom(
+          this.http
+            .get('/monitor/online/logout', { params: { id: onlineUser.id, time: this.time[0] } })
+            .pipe(tap(() => table.refresh(false)))
+        )
+    });
   }
 }
 
-interface LoginLog {
+interface OnlineUser {
   id: string;
   username: string;
   failPassword: string;
   type: string;
   browser: string;
+  officeName: string;
   os: string;
   address: string;
   ip: string;

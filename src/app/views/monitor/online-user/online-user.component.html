@@ -4,9 +4,7 @@
       <ma-form-search
         [table]="table"
         [form]="searchForm"
-        [showArrow]="true"
         [(collapsed)]="collapsed"
-        (collapsedChange)="onCollapsedChange()"
       >
         <formly-form
           [form]="searchForm"
@@ -28,3 +26,13 @@
     ></nzx-table>
   </nzx-content>
 </nzx-page>
+
+<ng-template #modalTemplate>
+  <nz-alert nzType="warning" nzShowIcon [nzDescription]="'点击确定后，用户【' + onlineUser.username + '】会被强制下线。选择封禁时间后该用户将在指定时间内禁止登录！'"></nz-alert>
+  <nz-form-item class="mt-xl">
+    <nz-form-label>封禁时间</nz-form-label>
+    <nz-form-control>
+      <nzx-checkbox [(ngModel)]="time" [nzxOptions]="(noLoginTime$ | async)!" [nzxMultiple]="false" (ngModelChange)="onTimeChange($event)"></nzx-checkbox>
+    </nz-form-control>
+  </nz-form-item>
+</ng-template>

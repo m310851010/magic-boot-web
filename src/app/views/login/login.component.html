@@ -30,7 +30,7 @@
         </nz-form-control>
       </nz-form-item>
 
-      <nz-form-item>
+      <nz-form-item *ngIf="codeEnable$ | async">
         <nz-form-control nzErrorTip="请输入验证码">
           <div class="ant-input" style="padding: 0">
             <div class="login-verify" (click.once)="changeCaptcha()">

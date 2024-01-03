@@ -1,6 +1,6 @@
-import { NgIf } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 
@@ -15,6 +15,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { InputPasswordComponent } from '@commons/component/input-password';
 
 import { LoginService, CaptchaInfo } from './login.service';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'ma-login',
@@ -29,7 +30,8 @@ import { LoginService, CaptchaInfo } from './login.service';
     NzxDirectiveModule,
     NzButtonModule,
     NzCheckboxModule,
-    InputPasswordComponent
+    InputPasswordComponent,
+    AsyncPipe
   ],
   providers: [LoginService]
 })
@@ -38,6 +40,8 @@ export class LoginComponent implements OnInit {
   captcha?: CaptchaInfo;
 
   loginLoading = false;
+
+  codeEnable$ = this.loginService.codeEnable();
   constructor(
     protected fb: FormBuilder,
     protected router: Router,
@@ -47,8 +51,11 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.validateForm = this.fb.group({
       username: ['admin', [Validators.required]],
-      password: ['000000', [Validators.required]],
-      verifyCode: ['', [Validators.required]]
+      password: ['000000', [Validators.required]]
+    });
+
+    this.codeEnable$.pipe(filter(v => v)).subscribe(v => {
+      this.validateForm.addControl('verifyCode', new FormControl(null, [Validators.required]));
     });
     this.changeCaptcha();
   }

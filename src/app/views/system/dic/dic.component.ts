@@ -304,7 +304,7 @@ export default class DicComponent implements OnInit {
                   }
 
                   // 字典项 校验字典项值数据类型
-                  if (options.table && this.selected?.dataType === 1 && !/^\d+\.?\d*$/.test(control.value)) {
+                  if (options.table && this.selected?.dataType === 1 && !/^-?\d+\.?\d*$/.test(control.value)) {
                     return { numValidator: { message: '字典项值必须是数字' } };
                   }
 

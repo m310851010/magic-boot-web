@@ -1,12 +1,13 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { filter, Observable, switchMap } from 'rxjs';
+import { filter, map, Observable, shareReplay, switchMap } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { LOADING_ENABLED, NzxStorageService } from '@xmagic/nzx-antd/service';
+import { LOADING_ENABLED, NzxStorageService, synced } from '@xmagic/nzx-antd/service';
 import { sm3 } from 'sm-crypto-v2';
 
 import { Constant } from '@commons/constant';
+import { NzxUtils } from '@xmagic/nzx-antd/util';
 
 @Injectable()
 export class LoginService {
@@ -43,6 +44,16 @@ export class LoginService {
     return this.http.get<CaptchaInfo>('/system/security/verification/code', {
       context: new HttpContext().set(LOADING_ENABLED, false)
     });
+  }
+
+  /**
+   * 是否验证码
+   */
+  codeEnable(): Observable<boolean> {
+    return this.http.get<string>('/system/config/getCodeEnable').pipe(
+      map(v => v === 'true'),
+      shareReplay(1)
+    );
   }
 }
 
