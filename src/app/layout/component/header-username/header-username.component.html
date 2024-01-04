@@ -3,7 +3,7 @@
     nzIcon="user"
     nzSize="default"
     class="avatar"
-    [nzSrc]="userInfo?.headPortrait ? env.basePath + userInfo?.headPortrait : undefined"
+    [nzSrc]="userInfo?.avatar ? env.basePath + userInfo?.avatar : undefined"
   ></nz-avatar>
   <span>{{ userInfo?.username }}</span>
 </div>
@@ -12,7 +12,7 @@
   <ul nz-menu style="min-width: 150px">
     <li nz-menu-item routerLink="/main/system/profile">
       <i nz-icon nzType="user" class="mr-sm"></i>
-      用户信息
+      个人中心
     </li>
 
     <li nz-menu-item (click)="updatePassword()">

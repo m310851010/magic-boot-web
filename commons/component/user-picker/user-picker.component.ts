@@ -226,7 +226,7 @@ export class UserPickerComponent implements OnInit, OnChanges {
       { name: 'name', thText: '姓名' },
       { name: 'officeName', thText: '所属部门' },
       { name: 'phone', thText: '手机号' },
-      { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '60px' },
+      { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '60px' },
       { name: 'createDate', thText: '创建时间', nzWidth: '170px' }
     ];
   }

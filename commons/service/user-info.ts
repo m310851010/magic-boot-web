@@ -86,29 +86,27 @@ export interface UserInfo {
    * 名称
    */
   name: string;
+  nickName: string;
   /**
-   * 性别, 1-男 2-女
+   * 性别, 1-男 0-女
    */
-  sex: 1 | 2;
-  /**
-   * 用户状态 1:正常 2:禁用 3:删除 4:锁定
-   */
-  status: 1 | 2 | 3 | 4;
-  phone: string;
-  email: string;
+  sex: 0 | 1;
+
+  phone?: string;
+  email?: string;
   /**
    * 头像
    */
-  headPortrait: string;
+  avatar?: string;
   /**
    * 组织机构id
    */
   officeId: string;
   officeName: string;
   /**
-   * 禁止登录：0未禁用，1已禁用
+   * 用户状态 0正常，1禁用
    */
-  isLogin: 0 | 1;
+  status: 0 | 1;
   /**
    * 创建时间
    */

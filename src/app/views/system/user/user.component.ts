@@ -6,6 +6,7 @@ import { catchError, first, firstValueFrom, map, of, shareReplay } from 'rxjs';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
+import { FormlyNzCheckboxModule } from '@xmagic/nz-formly/checkbox';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
@@ -43,6 +44,7 @@ import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
 import { CommonService } from '@commons/service/common.service';
+import { UserInfo } from '@commons/service/user-info';
 import { normalTree } from '@commons/utils';
 
 @Component({
@@ -51,7 +53,6 @@ import { normalTree } from '@commons/utils';
   imports: [
     CommonModule,
     NzxLayoutPageModule,
-
     NzFormlyModule,
     FormlyNzInputModule,
     FormlyNzFormFieldModule,
@@ -60,6 +61,7 @@ import { normalTree } from '@commons/utils';
     FormlyNzTreeSelectModule,
     FormlyNzRadioModule,
     FormlyRefTemplateModule,
+    FormlyNzCheckboxModule,
     FormlyModule,
     NzFormModule,
     NzButtonModule,
@@ -88,16 +90,17 @@ import { normalTree } from '@commons/utils';
 })
 export default class UserComponent {
   status$ = this.dicService.getDic('STATUS');
+  sex$ = this.dicService.getDic('SEX');
 
   gridOptions = { nzGutter: 15, colNzSpan: 8, labelNzFlex: '60px' };
   collapsed = true;
 
   modalForm = new FormGroup({});
-  modalModel: Partial<UserInfo> = {};
+  modalModel: Partial<UserDetail> = {};
   modalFields: FormlyFieldConfig[] = [];
 
   searchForm = new FormGroup({});
-  searchModel: Partial<UserInfo> = {};
+  searchModel: Partial<UserDetail> = {};
   searchFields: FormlyFieldConfig[] = [
     {
       type: 'row',
@@ -139,7 +142,7 @@ export default class UserComponent {
         },
         {
           type: 'select',
-          key: 'isLogin',
+          key: 'status',
           props: {
             label: '状态',
             options: this.status$,
@@ -153,15 +156,15 @@ export default class UserComponent {
     }
   ];
 
-  getParams: () => Partial<UserInfo> = () => this.searchModel;
-  columns: NzxColumn<UserInfo>[] = [
+  getParams: () => Partial<UserDetail> = () => this.searchModel;
+  columns: NzxColumn<UserDetail>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'username', thText: '账号' },
     { name: 'name', thText: '姓名' },
     { name: 'officeName', thText: '所属部门' },
     { name: 'roleNames', thText: '角色', tdTemplate: 'role' },
     { name: 'phone', thText: '手机号' },
-    { name: 'isLogin', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
+    { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
     { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
     { name: 'id', thText: '操作', tdTemplate: 'buttons', nzWidth: '180px' }
   ];
@@ -209,7 +212,7 @@ export default class UserComponent {
     });
   }
 
-  onDeleteClick(row: UserInfo, table: NzxTableComponent): void {
+  onDeleteClick(row: UserDetail, table: NzxTableComponent): void {
     this.handleDelete(row.id, table);
   }
 
@@ -230,7 +233,7 @@ export default class UserComponent {
    * 重置密码
    * @param row
    */
-  onResetPasswordClick(row: UserInfo): void {
+  onResetPasswordClick(row: UserDetail): void {
     this.modalService.confirm({
       nzContent: `确定重置用户【${row.name || row.username}】的密码`,
       nzOnOk: () => {
@@ -245,15 +248,15 @@ export default class UserComponent {
    * 切换用户状态
    * @param row
    */
-  onToggleStatus(row: UserInfo): void {
-    const isLogin = row.isLogin === 0 ? 1 : 0;
-    this.http.get<number>('/system/user/change/status', { params: { isLogin, id: row.id } }).subscribe(count => {
+  onToggleStatus(row: UserDetail): void {
+    const status = row.status === 0 ? 1 : 0;
+    this.http.get<number>('/system/user/change/status', { params: { status, id: row.id } }).subscribe(count => {
       if (count) {
         this.messageService.success('修改成功!');
       } else {
         this.messageService.error('修改失败,用户不存在或已被删除!');
       }
-      row.isLogin = isLogin;
+      row.status = status;
     });
   }
 
@@ -286,7 +289,8 @@ export default class UserComponent {
           return firstValueFrom(
             this.http.post('/system/user/save', {
               ...this.modalModel,
-              password: this.modalModel.password ? sm3(this.modalModel.password) : null
+              password: this.modalModel.password ? sm3(this.modalModel.password) : null,
+              sex: NzxUtils.isArray(this.modalModel.sex) ? this.modalModel.sex[0] : this.modalModel.sex
             })
           );
         }
@@ -294,17 +298,23 @@ export default class UserComponent {
     );
   }
 
-  onUpdateOpenModal(model: Partial<UserInfo>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
+  onUpdateOpenModal(model: Partial<UserDetail>, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.openModal(model, {
       nzTitle: '修改用户',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/user/update', this.modalModel))
+      nzOnOk: () =>
+        firstValueFrom(
+          this.http.post('/system/user/update', {
+            ...this.modalModel,
+            sex: NzxUtils.isArray(this.modalModel.sex) ? this.modalModel.sex[0] : this.modalModel.sex
+          })
+        )
     });
   }
 
   private openModal(
-    model: Partial<UserInfo>,
+    model: Partial<UserDetail>,
     options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
       nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
       table: NzxTableComponent;
@@ -372,27 +382,53 @@ export default class UserComponent {
           },
           {
             type: 'input',
+            key: 'nickName',
+            props: {
+              label: '昵称',
+              maxLength: 64
+            }
+          },
+          {
+            type: 'input',
             key: 'phone',
             props: {
-              label: '手机号',
-              maxLength: 11
+              label: '手机号'
             },
             validators: {
               validation: ['mobile']
+            }
+          },
+          {
+            type: 'input',
+            key: 'email',
+            props: {
+              label: '邮箱'
+            },
+            validators: {
+              validation: ['email']
             }
           },
           model.id === '1'
             ? {}
             : {
                 type: 'radio',
-                key: 'isLogin',
+                key: 'status',
                 defaultValue: 0,
                 props: {
                   label: '状态',
                   options: this.status$,
                   required: true
                 }
-              }
+              },
+          {
+            type: 'checkbox',
+            key: 'sex',
+            props: {
+              label: '性别',
+              options: this.sex$,
+              nzxMultiple: false
+            }
+          }
         ]
       },
       {
@@ -438,24 +474,16 @@ export default class UserComponent {
 /**
  * 用户信息
  */
-interface UserInfo {
-  createDate: string;
-  headPortrait?: string;
-  id: string;
-  isLogin: 0 | 1;
-  name?: string;
+interface UserDetail extends UserInfo {
   roleNames: string[];
   /**
    * 角色ID列表
    */
   roles: string[];
   officeName: string;
-  officeId: string;
-  phone?: string;
-  username: string;
-  password?: string;
   /**
    * 查询条件
    */
   officeCode?: string;
+  password?: string;
 }

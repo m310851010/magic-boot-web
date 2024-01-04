@@ -96,7 +96,7 @@
               <a *auth="'user:update'" (click)="onUpdateOpenModal(row, modalTemplate, table)" class="mr-xs">修改</a>
               <a *auth="'user:resetPassword'" (click)="onResetPasswordClick(row)" class="mr-xs">重置密码</a>
               <a *auth="'user:change:status'" (click)="onToggleStatus(row)" class="mr-xs">
-                {{ row.isLogin ? '启用' : '停用' }}
+                {{ row.status ? '启用' : '停用' }}
               </a>
               <a *auth="'user:delete'" (click)="onDeleteClick(row, table)" class="ant-btn-dangerous ant-btn-link">
                 删除
@@ -111,8 +111,8 @@
             <ng-template #emptyTemplate>--</ng-template>
           </ng-template>
           <ng-template named="status" let-row>
-            <nz-tag [nzColor]="(row.isLogin | dicItem: status$ | async)?.['color']">
-              {{ row.isLogin | dicLabel: status$ | async }}
+            <nz-tag [nzColor]="(row.status | dicItem: status$ | async)?.['color']">
+              {{ row.status | dicLabel: status$ | async }}
             </nz-tag>
           </ng-template>
         </nzx-table>
