@@ -1,8 +1,34 @@
 <div class="flex-horizontal">
   <div style="width: 500px;" class="mr-m bg-white">
-    <nz-card nzTitle="个人信息" ></nz-card>
+    <nz-card nzTitle="个人信息"  class="shadow-card">
+      <div class="flex-center">
+        <div class="user-info-head">
+          <img src="http://vue.ruoyi.vip/static/img/profile.473f5971.jpg" alt="">
+        </div>
+      </div>
+
+      <div class="ant-list ant-list-split mt-xl">
+        <div class="ant-list-item" *ngFor="let item of userProps">
+          <div><span nz-icon [nzType]="item.icon" class="mr-xs"></span>{{item.label}}</div>
+          <div>{{item.value | defaultify}}</div>
+        </div>
+      </div>
+
+    </nz-card>
   </div>
   <div class="flex-main bg-white">
-    <nz-card nzTitle="基本资料" ></nz-card>
+    <nz-card nzTitle="基本资料" class="shadow-card full-height">
+      <form nz-form [formGroup]="form">
+        <formly-form
+          [form]="form"
+          [fields]="fields"
+          [model]="model"
+          [options]="{ formState: {labelNzFlex: '80px' } }"
+        ></formly-form>
+      </form>
+        <div style="margin-left: 80px">
+          <button nz-button nzType="primary" (click)="onSaveClick()">保存</button>
+        </div>
+    </nz-card>
   </div>
 </div>

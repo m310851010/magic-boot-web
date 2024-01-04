@@ -95,6 +95,7 @@ export interface UserInfo {
    */
   status: 1 | 2 | 3 | 4;
   phone: string;
+  email: string;
   /**
    * 头像
    */
@@ -103,12 +104,17 @@ export interface UserInfo {
    * 组织机构id
    */
   officeId: string;
+  officeName: string;
   /**
    * 禁止登录：0未禁用，1已禁用
    */
   isLogin: 0 | 1;
   /**
-   * 密码
+   * 创建时间
    */
-  password?: string;
+  createDate: string;
+  /**
+   * 角色名称
+   */
+  roleNames: string[];
 }

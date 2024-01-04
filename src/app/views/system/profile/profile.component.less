@@ -1,0 +1,36 @@
+:host {
+  .shadow-card {
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, .1);
+  }
+
+  .user-info-head {
+    position: relative;
+    height: 120px;
+    width: 120px;
+
+    img {
+      height: 100%;
+      width: 100%;
+      border-radius: 50%;
+    }
+  }
+
+  .user-info-head:hover:after {
+    content: "+";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    color: #eee;
+    background: rgba(0, 0, 0, .5);
+    font-size: 30px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    cursor: pointer;
+    line-height: 120px;
+    border-radius: 50%;
+    text-align: center;
+  }
+}
