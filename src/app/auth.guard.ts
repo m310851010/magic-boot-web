@@ -21,25 +21,39 @@ export const authGuard: CanActivateChildFn = (childRoute, state) => {
     route = route.firstChild;
   }
 
-  const ignoreAuth = route.data['ignore'];
-  if (ignoreAuth) {
+  const { ignore, permission } = route.data;
+  // 忽略权限校验
+  if (ignore) {
     return true;
   }
+
   const menuService = inject(MenuInfoService);
   const router = inject(Router);
   let isAuth = false;
+
   return menuService
     .getMenus()
     .pipe(first())
     .pipe(
       map(menus => {
-        NzxUtils.forEachTree(menus, m => {
-          if (m.url === state.url) {
-            isAuth = true;
-            return false;
-          }
-          return true;
-        });
+        // 配置permission时优先使用permission对比
+        if (permission) {
+          NzxUtils.forEachTree(menus, m => {
+            if (m.permission === permission) {
+              isAuth = true;
+              return false;
+            }
+            return true;
+          });
+        } else {
+          NzxUtils.forEachTree(menus, m => {
+            if (m.url === state.url) {
+              isAuth = true;
+              return false;
+            }
+            return true;
+          });
+        }
 
         if (!isAuth) {
           const prefix = state.url.indexOf('/main/') === 0 ? '/main' : '';

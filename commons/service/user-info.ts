@@ -47,6 +47,10 @@ export interface Menu {
   componentName: string;
   isShow: boolean;
   alwaysShow: boolean;
+  /**
+   * 权限码，如果permission为空则取菜单的path与路由的path进行比较，通常不用设置，只有当路由为通配符时才需要设置permission
+   */
+  permission?: string;
   children?: Menu[];
 
   // 附加属性

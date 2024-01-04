@@ -33,8 +33,6 @@ export class HeaderUsernameComponent implements OnInit {
       .subscribe(info => (this.userInfo = info));
   }
 
-  updateUserInfo(): void {}
-
   updatePassword(): void {
     this.updatePasswordService.showPasswordDialog().subscribe(() => this.notifyService.logout({ timeout: false }));
   }
