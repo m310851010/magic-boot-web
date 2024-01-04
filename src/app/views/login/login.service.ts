@@ -1,13 +1,12 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { filter, map, Observable, shareReplay, switchMap } from 'rxjs';
+import { map, Observable, shareReplay } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { LOADING_ENABLED, NzxStorageService, synced } from '@xmagic/nzx-antd/service';
+import { LOADING_ENABLED, NzxStorageService } from '@xmagic/nzx-antd/service';
 import { sm3 } from 'sm-crypto-v2';
 
 import { Constant } from '@commons/constant';
-import { NzxUtils } from '@xmagic/nzx-antd/util';
 
 @Injectable()
 export class LoginService {

@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
@@ -8,19 +11,15 @@ import { FormlyFieldBetweenDatetimeModule } from '@xmagic/nz-formly/between-date
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
+import { NzxCheckboxModule } from '@xmagic/nzx-antd/checkbox';
 import { NzxLayoutPageModule } from '@xmagic/nzx-antd/layout-page';
+import { NzxModalService } from '@xmagic/nzx-antd/modal';
+import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxColumn, NzxTableComponent, NzxTableModule } from '@xmagic/nzx-antd/table';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzFormModule } from 'ng-zorro-antd/form';
 
 import { FormSearchComponent } from '@commons/component/form-search';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzxCheckboxModule } from '@xmagic/nzx-antd/checkbox';
-import { DicService } from '@xmagic/nzx-antd/service';
-import { NzxModalService } from '@xmagic/nzx-antd/modal';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { firstValueFrom } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'ma-online-user',
@@ -140,11 +139,10 @@ export default class OnlineUserComponent {
   constructor(
     private http: HttpClient,
     private dicService: DicService,
-    private modalService: NzxModalService,
-    private messageService: NzMessageService
+    private modalService: NzxModalService
   ) {}
 
-  onTimeChange(value: number[]) {
+  onTimeChange(value: number[]): void {
     if (!value.length) {
       setTimeout(() => (this.time = this.lastTime));
     } else {

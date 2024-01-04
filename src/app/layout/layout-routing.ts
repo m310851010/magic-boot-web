@@ -7,7 +7,6 @@ const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
-    title: '主页',
     loadChildren: () => import('../views/views-routing')
   }
 ];

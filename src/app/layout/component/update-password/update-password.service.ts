@@ -30,9 +30,11 @@ export class UpdatePasswordService {
             .subscribe(val => {
               if (val) {
                 this.userService.clearCache();
-                modalRef.close();
-                obs.next();
-                obs.complete();
+                this.modalService.success({ nzContent: '密码修改成功，请重新登录！' }).afterClose.subscribe(() => {
+                  modalRef.close();
+                  obs.next();
+                  obs.complete();
+                });
               }
             });
           return false;

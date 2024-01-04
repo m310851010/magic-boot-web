@@ -4,6 +4,7 @@ import { AbstractControl, FormControl, FormGroup, ValidationErrors } from '@angu
 import { Observable, of } from 'rxjs';
 
 import { NzxFormUtils } from '@xmagic/nzx-antd/util';
+import { sm3 } from 'sm-crypto-v2';
 
 @Component({
   selector: 'ma-update-password',
@@ -11,7 +12,11 @@ import { NzxFormUtils } from '@xmagic/nzx-antd/util';
   styleUrls: ['./update-password.component.less']
 })
 export class UpdatePasswordComponent implements OnInit {
-  validateForm!: FormGroup;
+  validateForm!: FormGroup<{
+    password: FormControl<null>;
+    newPassword: FormControl<null>;
+    confirmPassword: FormControl<null>;
+  }>;
   constructor(protected http: HttpClient) {}
 
   getMessage = NzxFormUtils.getMessage;
@@ -31,10 +36,12 @@ export class UpdatePasswordComponent implements OnInit {
   }
 
   submitForm(): Observable<boolean> {
-    if (!NzxFormUtils.validate(this.validateForm)) {
+    if (!NzxFormUtils.validate(this.validateForm, { updateValueAndValidity: true })) {
       return of(false);
     }
-    return this.http.post<boolean>('/system/password', null);
+    const password = sm3(this.validateForm.controls.password.value!);
+    const newPassword = sm3(this.validateForm.controls.newPassword.value!);
+    return this.http.post<boolean>('/system/user/update-password', { password, newPassword });
   }
 
   /**
