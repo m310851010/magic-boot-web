@@ -8,6 +8,7 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { ProgressColorPipe } from './progress-color.pipe';
 
 @Component({
   selector: 'ma-server',
@@ -20,7 +21,8 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzToolTipModule,
     NzDescriptionsModule,
     NzxPipeModule,
-    NzIconModule
+    NzIconModule,
+    ProgressColorPipe
   ],
   templateUrl: './server.component.html',
   styleUrl: './server.component.less'
