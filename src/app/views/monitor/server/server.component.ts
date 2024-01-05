@@ -10,5 +10,7 @@ import { Component } from '@angular/core';
   styleUrl: './server.component.less'
 })
 export default class ServerComponent {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.http.get('/monitor/monitor/server').subscribe();
+  }
 }

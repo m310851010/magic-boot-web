@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 
-import { HttpLoadingService, LogoutService } from '@xmagic/nzx-antd/http-interceptor';
+import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxModalModule, NzxModalService } from '@xmagic/nzx-antd/modal';
-import { loadingService } from '@xmagic/nzx-antd/service';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 
 import { MenuInfoService } from '@commons/service/menu-info.service';
@@ -20,7 +19,6 @@ import { UserService } from '@commons/service/user.service';
 export class AppComponent implements OnInit {
   constructor(
     private modalService: NzxModalService,
-    private loading: HttpLoadingService,
     private notifyService: LogoutService,
     private userService: UserService,
     private menuService: MenuInfoService,
@@ -28,8 +26,6 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loading.subscribe(status => loadingService.loading(status));
-
     this.notifyService.onLogout(error => {
       this.userService.clearCache();
       this.menuService.clearCache();

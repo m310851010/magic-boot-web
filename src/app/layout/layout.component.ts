@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, first, map, mergeMap, takeUntil, tap } from 'rxjs';
 import { MenuInfoService } from '@commons/service/menu-info.service';
@@ -6,6 +6,7 @@ import { Menu } from '@commons/service/user-info';
 
 import { NzDestroyService } from 'ng-zorro-antd/core/services';
 import { RouteData } from '@commons';
+import { HttpLoadingService } from '@xmagic/nzx-antd/http-interceptor';
 
 @Component({
   selector: 'ma-layout',
@@ -16,11 +17,15 @@ import { RouteData } from '@commons';
 export class LayoutComponent implements OnInit {
   pathTraces: Menu[] = [];
   routeData?: RouteData;
+  loading = false;
+
   constructor(
     private destroy$: NzDestroyService,
     private menuService: MenuInfoService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private loadingService: HttpLoadingService,
+    private destroyRef: DestroyRef
   ) {
     this.router.events
       .pipe(
@@ -45,6 +50,14 @@ export class LayoutComponent implements OnInit {
         })
       )
       .subscribe(v => (this.routeData = v.route.data as RouteData));
+
+    // 显示loading状态，如果不是layout子路由不会自动loading
+    const loadingSub = this.loadingService.subscribe(status => this.setLoadingStatus(status));
+    destroyRef.onDestroy(() => loadingSub.unsubscribe());
+  }
+
+  private setLoadingStatus(status: boolean) {
+    setTimeout(() => (this.loading = status));
   }
 
   ngOnInit(): void {}

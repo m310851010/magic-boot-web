@@ -13,8 +13,8 @@
       </nz-breadcrumb-item>
     </nz-breadcrumb>
 
-    <div class="flex-main">
-      <router-outlet></router-outlet>
-    </div>
+    <nz-spin [nzSpinning]="loading" nzSize="default" class="flex-main" nzTip="加载中...">
+        <router-outlet></router-outlet>
+    </nz-spin>
   </div>
 </ma-base-layout>

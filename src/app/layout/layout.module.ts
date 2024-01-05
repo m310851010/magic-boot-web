@@ -35,6 +35,7 @@ import { TabContextmenuComponent } from './component/tab-contextmenu/tab-context
 import { UpdatePasswordComponent } from './component/update-password/update-password.component';
 import { LayoutRouting } from './layout-routing';
 import { LayoutComponent } from './layout.component';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { LayoutComponent } from './layout.component';
     LayoutRouting,
     FormsModule,
     NzInputModule,
-    NgTemplateOutlet
+    NgTemplateOutlet,
+    NzSpinModule
   ],
   providers: [LayoutService]
 })
