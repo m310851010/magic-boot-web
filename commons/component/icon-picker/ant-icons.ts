@@ -432,6 +432,7 @@ export const antIcons: string[] = [
   'login-log',
   'setting-center',
   'transfer-user',
-  'user-group'
+  'user-group',
+  'cpu'
   /*</ICON>*/
 ];
