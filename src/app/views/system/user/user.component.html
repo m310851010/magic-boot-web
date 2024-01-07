@@ -111,8 +111,8 @@
             <ng-template #emptyTemplate>--</ng-template>
           </ng-template>
           <ng-template named="status" let-row>
-            <nz-tag [nzColor]="(row.status | dicItem: status$ | async)?.['color']">
-              {{ row.status | dicLabel: status$ | async }}
+            <nz-tag [nzColor]="(row.status | dic: status$ : true | async)?.['color']">
+              {{ row.status | dic: status$ | async }}
             </nz-tag>
           </ng-template>
         </nzx-table>

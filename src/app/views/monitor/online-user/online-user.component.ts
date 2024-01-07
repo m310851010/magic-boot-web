@@ -133,8 +133,7 @@ export default class OnlineUserComponent {
   ];
 
   onlineUser!: OnlineUser;
-  time = [0];
-  lastTime = this.time;
+  time = 0;
 
   constructor(
     private http: HttpClient,
@@ -142,18 +141,9 @@ export default class OnlineUserComponent {
     private modalService: NzxModalService
   ) {}
 
-  onTimeChange(value: number[]): void {
-    if (!value.length) {
-      setTimeout(() => (this.time = this.lastTime));
-    } else {
-      this.lastTime = value;
-    }
-  }
-
   onOpenModal(onlineUser: OnlineUser, nzContent: TemplateRef<{}>, table: NzxTableComponent): void {
     this.onlineUser = onlineUser;
-    this.time = [0];
-    this.lastTime = this.time;
+    this.time = 0;
     this.modalService.create({
       nzTitle: '强制下线',
       nzWidth: 650,
@@ -161,7 +151,7 @@ export default class OnlineUserComponent {
       nzOnOk: () =>
         firstValueFrom(
           this.http
-            .get('/monitor/online/logout', { params: { id: onlineUser.id, time: this.time[0] } })
+            .get('/monitor/online/logout', { params: { id: onlineUser.id, time: this.time } })
             .pipe(tap(() => table.refresh(false)))
         )
     });

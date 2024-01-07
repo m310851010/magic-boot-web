@@ -2,8 +2,8 @@
   <div style="width: 500px" class="mr-m bg-white">
     <nz-card nzTitle="个人信息" class="shadow-card">
       <div class="flex-center">
-        <div class="user-info-head">
-          <img src="http://vue.ruoyi.vip/static/img/profile.473f5971.jpg" alt="" />
+        <div class="user-info-head" (click)="onAvatarClick(avatarTemplate)">
+          <nz-avatar nzIcon="user" [nzSize]="150" [nzSrc]="avatar"></nz-avatar>
         </div>
       </div>
 
@@ -34,3 +34,54 @@
     </nz-card>
   </div>
 </div>
+
+<ng-template #avatarTemplate>
+  <div nz-row [nzGutter]="20">
+    <div nz-col nzFlex="450px" style="height: 320px">
+      <div class="full-overflow">
+        <img #imageRef [src]="cropperImage" alt="" style="display: block" />
+      </div>
+    </div>
+
+    <div nz-col nzFlex="auto">
+      <div class="img-preview" style="width: 180px; height: 180px"></div>
+
+      <div class="flex-horizontal mt-xl">
+        <div class="img-preview mr-m" style="height: 105px; width: 105px"></div>
+        <div class="img-preview" style="height: 65px; width: 65px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div nz-row [nzGutter]="20" class="flex-between avatar-toolbar">
+    <nz-button-group>
+      <button nz-button title="放大图片" (click)="cropper.zoom(0.1)"><span nz-icon nzType="zoom-in"></span></button>
+      <button nz-button title="缩小图片" (click)="cropper.zoom(-0.1)"><span nz-icon nzType="zoom-out"></span></button>
+      <button nz-button title="向左旋转图片" (click)="cropper.rotate(-45)">
+        <span nz-icon nzType="rotate-left"></span>
+      </button>
+      <button nz-button title="向右旋转图片" (click)="cropper.rotate(45)">
+        <span nz-icon nzType="rotate-right"></span>
+      </button>
+      <button nz-button title="水平翻转图片" (click)="onScaleX()">
+        <span nz-icon nzType="swap"></span>
+      </button>
+      <button nz-button title="垂直翻转图片" (click)="onScaleY()">
+        <span nz-icon nzType="swap" style="transform: rotate(90deg)"></span>
+      </button>
+      <button nz-button title="重置" (click)="resetCropper()"><span nz-icon nzType="sync"></span></button>
+    </nz-button-group>
+
+    <button nz-button nzType="link" (click)="fileRef.click()">
+      <input
+        #fileRef
+        type="file"
+        style="display: none"
+        accept=".png,.jpeg,.jpg,.gif,.bmp"
+        (change)="onFileChange($event)"
+      />
+      <span nz-icon nzType="upload"></span>
+      选择图片
+    </button>
+  </div>
+</ng-template>

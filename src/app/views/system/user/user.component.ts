@@ -39,8 +39,6 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { sm3 } from 'sm-crypto-v2';
 
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
 import { CommonService } from '@commons/service/common.service';
@@ -81,9 +79,7 @@ import { normalTree } from '@commons/utils';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    InputPasswordComponent,
-    DicLabelPipe,
-    DicItemPipe
+    InputPasswordComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.less'
@@ -126,7 +122,6 @@ export default class UserComponent {
             label: '角色',
             options: '/system/user/role/list' as any,
             nzMode: 'multiple',
-            nzShowArrow: true,
             nzAllowClear: true
           }
         },
@@ -289,8 +284,7 @@ export default class UserComponent {
           return firstValueFrom(
             this.http.post('/system/user/save', {
               ...this.modalModel,
-              password: this.modalModel.password ? sm3(this.modalModel.password) : null,
-              sex: NzxUtils.isArray(this.modalModel.sex) ? this.modalModel.sex[0] : this.modalModel.sex
+              password: this.modalModel.password ? sm3(this.modalModel.password) : null
             })
           );
         }
@@ -303,13 +297,7 @@ export default class UserComponent {
       nzTitle: '修改用户',
       nzContent,
       table,
-      nzOnOk: () =>
-        firstValueFrom(
-          this.http.post('/system/user/update', {
-            ...this.modalModel,
-            sex: NzxUtils.isArray(this.modalModel.sex) ? this.modalModel.sex[0] : this.modalModel.sex
-          })
-        )
+      nzOnOk: () => firstValueFrom(this.http.post('/system/user/update', this.modalModel))
     });
   }
 
@@ -447,7 +435,6 @@ export default class UserComponent {
           label: '角色',
           options: '/system/role/all' as any,
           nzMode: 'multiple',
-          nzShowArrow: true,
           nzAllowClear: true
         }
       }

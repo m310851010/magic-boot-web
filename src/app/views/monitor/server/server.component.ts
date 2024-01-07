@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { NzGridModule } from 'ng-zorro-antd/grid';
+
+import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
-import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
-import { NzIconModule } from 'ng-zorro-antd/icon';
+
 import { ProgressColorPipe } from './progress-color.pipe';
 
 @Component({

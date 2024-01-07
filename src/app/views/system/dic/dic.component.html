@@ -24,8 +24,8 @@
               <div class="ant-list-item-meta">
                 <div class="ant-list-item-meta-avatar">
                   <nz-avatar
-                    [nzText]="(item.dictType | dicLabel: dicType$ | async)!"
-                    [ngClass]="item.status !== 1 ? (item.dictType | dicItem: dicType$ | async)?.['clazz'] : null"
+                    [nzText]="$any(item.dictType | dic: dicType$ : false | async)"
+                    [ngClass]="item.status !== 1 ? (item.dictType | dic: dicType$ : true | async)?.['clazz'] : null"
                   ></nz-avatar>
                 </div>
                 <div class="ant-list-item-meta-content">
@@ -40,8 +40,8 @@
 
                     <div>
                       <nz-tag
-                        *ngIf="item.dataType | dicLabel: dataType$ | async as dataTypeLabel"
-                        [nzColor]="(item.dataType | dicItem: dataType$ | async)?.['color']"
+                        *ngIf="item.dataType | dic: dataType$ | async as dataTypeLabel"
+                        [nzColor]="(item.dataType | dic: dataType$ : true | async)?.['color']"
                       >
                         {{ dataTypeLabel }}
                       </nz-tag>
@@ -137,8 +137,8 @@
 
       <ng-template named="status" let-row>
         <nz-tag
-          *ngIf="row.status | dicLabel: status$ | async as statusLabel"
-          [nzColor]="(row.status | dicItem: status$ | async)?.['color']"
+          *ngIf="row.status | dic: status$ | async as statusLabel"
+          [nzColor]="(row.status | dic: status$ : true | async)?.['color']"
         >
           {{ statusLabel }}
         </nz-tag>

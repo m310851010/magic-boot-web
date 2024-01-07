@@ -44,7 +44,7 @@ import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/
 import { FormSearchComponent } from '@commons/component/form-search';
 import { UserPickerComponent } from '@commons/component/user-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicLabel, listToMap, normalTree } from '@commons/utils';
+import { dicMapLabel, normalTree } from '@commons/utils';
 
 @Component({
   selector: 'ma-role',
@@ -122,7 +122,7 @@ export default class RoleComponent {
     {
       name: 'permission',
       thText: '权限范围',
-      format: value => this.permission$.pipe(dicLabel(value))
+      format: value => this.permission$.pipe(dicMapLabel(value))
     },
     { name: 'desc', thText: '角色描述' },
     { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
@@ -267,8 +267,8 @@ export default class RoleComponent {
       reqs.push(this.http.get<string[]>('/system/role/office/list', params));
     }
     forkJoin(reqs).subscribe(([menuKeys, officeKeys]) => {
-      menuChecked = listToMap(menuKeys, null, () => true);
-      officeChecked = listToMap(officeKeys, null, () => true);
+      menuChecked = NzxUtils.listToMap(menuKeys, null, () => true);
+      officeChecked = NzxUtils.listToMap(officeKeys, null, () => true);
 
       this.openModal(model, {
         nzTitle: '分配权限',

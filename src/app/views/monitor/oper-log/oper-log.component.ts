@@ -82,9 +82,7 @@ export default class OperLogComponent {
           key: 'costTime',
           props: {
             label: '耗时区间',
-            nzxType: 'number',
-            nzxEndFormatter: (v: any) => v,
-            nzxStartFormatter: (v: any) => v
+            nzxType: 'number'
           },
           expressions: {
             hide: () => this.collapsed

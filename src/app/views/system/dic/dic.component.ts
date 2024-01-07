@@ -34,8 +34,6 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { SearchPipe } from '@commons/component/search.pipe';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
 
@@ -70,8 +68,6 @@ import { getMaxSort } from '../menu/menu-utils';
     NzEmptyModule,
     SearchPipe,
     NzxPipeModule,
-    DicLabelPipe,
-    DicItemPipe,
     NzDropDownModule
   ],
   templateUrl: './dic.component.html',

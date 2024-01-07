@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  basePath: '/ma-boot'
+  basePath: '/ma-boot-api'
 };

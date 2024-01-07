@@ -37,13 +37,11 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { UserPickerComponent } from '@commons/component/user-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicLabel, normalTree } from '@commons/utils';
+import { dicMapLabel, normalTree } from '@commons/utils';
 
 import { getMaxSort } from '../menu/menu-utils';
 
@@ -83,9 +81,7 @@ import { getMaxSort } from '../menu/menu-utils';
     FormlyCommonModule,
     IconPickerComponent,
     UserPickerComponent,
-    NzTreeSelectModule,
-    DicItemPipe,
-    DicLabelPipe
+    NzTreeSelectModule
   ],
   templateUrl: './office.component.html',
   styleUrl: './office.component.less'
@@ -128,7 +124,7 @@ export default class OfficeComponent implements OnInit {
       name: 'type',
       thText: '分类',
       nzWidth: '100px',
-      format: type => this.officeType$.pipe(dicLabel(type))
+      format: type => this.officeType$.pipe(dicMapLabel(type))
     },
     { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
     { name: 'leader', thText: '主管' },

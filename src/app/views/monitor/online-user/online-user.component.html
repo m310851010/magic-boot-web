@@ -38,7 +38,7 @@
         [(ngModel)]="time"
         [nzxOptions]="(noLoginTime$ | async)!"
         [nzxMultiple]="false"
-        (ngModelChange)="onTimeChange($event)"
+        [nzxRequired]="true"
       ></nzx-checkbox>
     </nz-form-control>
   </nz-form-item>

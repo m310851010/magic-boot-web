@@ -1,129 +1,168 @@
 <div nz-row [nzGutter]="[10, 10]">
   <div nz-col [nzSpan]="6">
-    <ng-container *ngTemplateOutlet="cardTemplate; context:{
-    data: {
-    title: 'CPU监控',
-    subTitle: 'CPU当前总使用率',
-    value: detail.cpu.totalUseRate,
-    props: [
-        {label: 'CPU系统使用率', value: detail.cpu.sysUseRate, showPercent: true},
-        {label: 'CPU用户使用率', value: detail.cpu.userUseRate, showPercent: true},
-        {label: 'CPU当前总使用率', value: detail.cpu.totalUseRate, showPercent: true},
-        {label: 'CPU当前等待率', value: detail.cpu.waitRate, showPercent: true},
-        {label: 'CPU当前空闲率', value: detail.cpu.freeRate, showPercent: true}
-      ]
-    }
-    }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        cardTemplate;
+        context: {
+          data: {
+            title: 'CPU监控',
+            subTitle: 'CPU当前总使用率',
+            value: detail.cpu.totalUseRate,
+            props: [
+              { label: 'CPU系统使用率', value: detail.cpu.sysUseRate, showPercent: true },
+              { label: 'CPU用户使用率', value: detail.cpu.userUseRate, showPercent: true },
+              { label: 'CPU当前总使用率', value: detail.cpu.totalUseRate, showPercent: true },
+              { label: 'CPU当前等待率', value: detail.cpu.waitRate, showPercent: true },
+              { label: 'CPU当前空闲率', value: detail.cpu.freeRate, showPercent: true }
+            ]
+          }
+        }
+      "
+    ></ng-container>
   </div>
 
   <div nz-col [nzSpan]="6">
-    <ng-container *ngTemplateOutlet="cardTemplate; context:{
-    data: {
-    title: '内存信息',
-    subTitle: '内存使用率',
-    value: detail.memory.useRate,
-    props: [
-        {label: '内存总量', value: detail.memory.total},
-        {label: '内存已用', value: detail.memory.used},
-        {label: '内存剩余', value: detail.memory.free},
-        {label: '内存使用率', value: detail.memory.useRate, showPercent: true},
-      ]
-    }
-    }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        cardTemplate;
+        context: {
+          data: {
+            title: '内存信息',
+            subTitle: '内存使用率',
+            value: detail.memory.useRate,
+            props: [
+              { label: '内存总量', value: detail.memory.total },
+              { label: '内存已用', value: detail.memory.used },
+              { label: '内存剩余', value: detail.memory.free },
+              { label: '内存使用率', value: detail.memory.useRate, showPercent: true }
+            ]
+          }
+        }
+      "
+    ></ng-container>
   </div>
 
   <div nz-col [nzSpan]="6">
-    <ng-container *ngTemplateOutlet="cardTemplate; context:{
-    data: {
-    title: '存储信息',
-    subTitle: '存储使用率',
-    value: detail.storage.useRate,
-    props: [
-        {label: '存储总量', value: detail.storage.total},
-        {label: '存储已用', value: detail.storage.used},
-        {label: '存储剩余', value: detail.storage.free},
-        {label: '存储使用率', value: detail.storage.useRate, showPercent: true},
-      ]
-    }
-    }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        cardTemplate;
+        context: {
+          data: {
+            title: '存储信息',
+            subTitle: '存储使用率',
+            value: detail.storage.useRate,
+            props: [
+              { label: '存储总量', value: detail.storage.total },
+              { label: '存储已用', value: detail.storage.used },
+              { label: '存储剩余', value: detail.storage.free },
+              { label: '存储使用率', value: detail.storage.useRate, showPercent: true }
+            ]
+          }
+        }
+      "
+    ></ng-container>
   </div>
 
   <div nz-col [nzSpan]="6">
-    <ng-container *ngTemplateOutlet="cardTemplate; context:{
-    data: {
-    title: 'JVM监控',
-    subTitle: 'JVM内存使用率',
-    value: detail.jvm.useRate,
-    props: [
-        {label: 'JVM总分配内存', value: detail.jvm.memoryTotal},
-        {label: 'JVM已用内存', value: detail.jvm.memoryUsed},
-        {label: 'JVM剩余内存', value: detail.jvm.memoryFree},
-        {label: 'JVM内存使用率', value: detail.jvm.useRate, showPercent: true},
-      ]
-    }
-    }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        cardTemplate;
+        context: {
+          data: {
+            title: 'JVM监控',
+            subTitle: 'JVM内存使用率',
+            value: detail.jvm.useRate,
+            props: [
+              { label: 'JVM总分配内存', value: detail.jvm.memoryTotal },
+              { label: 'JVM已用内存', value: detail.jvm.memoryUsed },
+              { label: 'JVM剩余内存', value: detail.jvm.memoryFree },
+              { label: 'JVM内存使用率', value: detail.jvm.useRate, showPercent: true }
+            ]
+          }
+        }
+      "
+    ></ng-container>
   </div>
 </div>
 
 <div nz-row [nzGutter]="[10, 10]">
   <div nz-col nzSpan="12">
-    <ng-container *ngTemplateOutlet="infoTemplate; context:{
-    data: {
-    title: 'CPU信息',
-    icon: 'cpu',
-    props: [
-        {label: 'CPU名称', value: detail.cpu.name | defaultify },
-        {label: 'CPU数量', value: (detail.cpu.physicalNum| defaultify) + ' 颗物理CPU'},
-        {label: 'CPU物理核心数', value: (detail.cpu.physicalCoreNum | defaultify) + ' 个物理核心'},
-        {label: 'CPU逻辑核心数', value: (detail.cpu.logicalCoreNum | defaultify) + ' 个逻辑核心'},
-      ]
-    }
-    }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        infoTemplate;
+        context: {
+          data: {
+            title: 'CPU信息',
+            icon: 'cpu',
+            props: [
+              { label: 'CPU名称', value: detail.cpu.name | defaultify },
+              { label: 'CPU数量', value: (detail.cpu.physicalNum | defaultify) + ' 颗物理CPU' },
+              { label: 'CPU物理核心数', value: (detail.cpu.physicalCoreNum | defaultify) + ' 个物理核心' },
+              { label: 'CPU逻辑核心数', value: (detail.cpu.logicalCoreNum | defaultify) + ' 个逻辑核心' }
+            ]
+          }
+        }
+      "
+    ></ng-container>
   </div>
   <div nz-col nzSpan="12">
-    <ng-container *ngTemplateOutlet="infoTemplate; context:{
-    data: {
-    title: '服务器信息',
-    props: [
-        {label: '服务器名称', value: detail.server.name | defaultify },
-        {label: '服务器操作系统', value: detail.server.os | defaultify},
-        {label: '服务器IP', value: detail.server.ip | defaultify},
-        {label: '服务器架构', value: detail.server.arch | defaultify},
-      ]
-    }
-    }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="
+        infoTemplate;
+        context: {
+          data: {
+            title: '服务器信息',
+            props: [
+              { label: '服务器名称', value: detail.server.name | defaultify },
+              { label: '服务器操作系统', value: detail.server.os | defaultify },
+              { label: '服务器IP', value: detail.server.ip | defaultify },
+              { label: '服务器架构', value: detail.server.arch | defaultify }
+            ]
+          }
+        }
+      "
+    ></ng-container>
   </div>
 </div>
 
 <div nz-row [nzGutter]="[10, 10]">
   <div nz-col nzSpan="24">
-    <ng-container *ngTemplateOutlet="infoTemplate; context:{
-        data: {
-        title: 'JVM信息',
-        icon: 'coffee',
-        props: [
-            {label: 'JVM名称', value: detail.jvm.name | defaultify },
-            {label: 'JVM版本', value: detail.jvm.version | defaultify},
-            {label: 'JVM启动时间', value: detail.jvm.startTime | defaultify},
-            {label: 'JVM运行时长', value: detail.jvm.runTime | defaultify},
-            {label: 'Java版本', value: detail.jvm.javaVersion | defaultify},
-            {label: 'Java安装路径', value: detail.jvm.javaPath | defaultify},
-          ]
+    <ng-container
+      *ngTemplateOutlet="
+        infoTemplate;
+        context: {
+          data: {
+            title: 'JVM信息',
+            icon: 'coffee',
+            props: [
+              { label: 'JVM名称', value: detail.jvm.name | defaultify },
+              { label: 'JVM版本', value: detail.jvm.version | defaultify },
+              { label: 'JVM启动时间', value: detail.jvm.startTime | defaultify },
+              { label: 'JVM运行时长', value: detail.jvm.runTime | defaultify },
+              { label: 'Java版本', value: detail.jvm.javaVersion | defaultify },
+              { label: 'Java安装路径', value: detail.jvm.javaPath | defaultify }
+            ]
+          }
         }
-        }"></ng-container>
+      "
+    ></ng-container>
   </div>
 </div>
 
 <ng-template #cardTemplate let-data="data">
   <nz-card [nzTitle]="data.title" class="card-body-center">
     <div nz-tooltip nzTooltipPlacement="top" [nzTooltipTitle]="nzTooltipTitle" class="progress-wrapper">
-      <nz-progress nzType="dashboard" [nzStrokeColor]="data.value | progressColor" [nzPercent]="data.value" nzGapPosition="bottom"
+      <nz-progress
+        nzType="dashboard"
+        [nzStrokeColor]="data.value | progressColor"
+        [nzPercent]="data.value"
+        nzGapPosition="bottom"
       ></nz-progress>
     </div>
-    <div>{{data.subTitle}}</div>
+    <div>{{ data.subTitle }}</div>
     <ng-template #nzTooltipTitle>
       <div class="flex-between" *ngFor="let prop of data.props">
-        <div>{{prop.label}}：</div>
+        <div>{{ prop.label }}：</div>
         <div>{{ prop.value }}@if(prop.showPercent) {%}</div>
       </div>
     </ng-template>
@@ -133,12 +172,14 @@
 <ng-template #infoTemplate let-data="data">
   <nz-card [nzTitle]="nzCardTitle" nzSize="small">
     <nz-descriptions nzSize="small" [nzColumn]="1" nzBordered>
-      <nz-descriptions-item *ngFor="let prop of data.props" [nzTitle]="prop.label">{{prop.value}}</nz-descriptions-item>
+      <nz-descriptions-item *ngFor="let prop of data.props" [nzTitle]="prop.label">
+        {{ prop.value }}
+      </nz-descriptions-item>
     </nz-descriptions>
   </nz-card>
 
   <ng-template #nzCardTitle>
     <span nz-icon [nzType]="data.icon || 'desktop'" class="mr-sm"></span>
-    <span>{{data.title}}</span>
+    <span>{{ data.title }}</span>
   </ng-template>
 </ng-template>

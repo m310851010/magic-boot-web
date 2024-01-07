@@ -18,6 +18,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResizableModule } from 'ng-zorro-antd/resizable';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 
@@ -26,7 +27,6 @@ import { StrengthMeterComponent } from '@commons/component/strength-meter';
 
 import { BaseLayoutComponent } from './base-layout/base-layout.component';
 import { HeaderMenuSearchComponent } from './component/header-menu-search/header-menu-search.component';
-import { HeaderNotifyComponent } from './component/header-notify/header-notify.component';
 import { HeaderUsernameComponent } from './component/header-username/header-username.component';
 import { LayoutService } from './component/layout.service';
 import { PageProgressComponent } from './component/page-progress/page-progress.component';
@@ -35,7 +35,6 @@ import { TabContextmenuComponent } from './component/tab-contextmenu/tab-context
 import { UpdatePasswordComponent } from './component/update-password/update-password.component';
 import { LayoutRouting } from './layout-routing';
 import { LayoutComponent } from './layout.component';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 @NgModule({
   declarations: [
@@ -43,7 +42,6 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
     PageProgressComponent,
     TabContextmenuComponent,
     UpdatePasswordComponent,
-    HeaderNotifyComponent,
     HeaderMenuSearchComponent,
     HeaderUsernameComponent,
     SliderMenuComponent,

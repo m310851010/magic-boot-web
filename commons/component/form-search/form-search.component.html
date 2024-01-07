@@ -17,7 +17,7 @@
       查询
     </button>
     <button *ngIf="showReset" nz-button type="button" (click)="form && form.reset(); resetClick.emit($event)">
-      <span nz-icon nzType="undo"></span>
+      <span nz-icon nzType="sync"></span>
       重置
     </button>
     <button *ngIf="showArrow" nz-button nzType="link" (click)="onToggleCollapse()" nzSize="small">

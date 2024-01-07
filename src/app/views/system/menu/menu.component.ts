@@ -36,12 +36,10 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 
-import { DicItemPipe } from '@commons/component/dic-item.pipe';
-import { DicLabelPipe } from '@commons/component/dic-label.pipe';
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
 import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicLabel } from '@commons/utils';
+import { dicMapLabel } from '@commons/utils';
 
 import { getMaxSort } from './menu-utils';
 
@@ -79,9 +77,7 @@ import { getMaxSort } from './menu-utils';
     NzTagModule,
     NzxHttpInterceptorModule,
     FormlyCommonModule,
-    IconPickerComponent,
-    DicLabelPipe,
-    DicItemPipe
+    IconPickerComponent
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.less'
@@ -126,7 +122,7 @@ export default class MenuComponent implements OnInit {
     {
       name: 'isShow',
       thText: '显示状态',
-      format: isShow => this.showStatus$.pipe(dicLabel(isShow)),
+      format: isShow => this.showStatus$.pipe(dicMapLabel(isShow)),
       nzWidth: '80px'
     },
     {
