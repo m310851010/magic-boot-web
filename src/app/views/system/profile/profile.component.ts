@@ -1,6 +1,5 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FileChangeEvent } from '@angular/compiler-cli/src/perform_watch';
 import { Component, ElementRef, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { first, firstValueFrom, mergeMap, Observable } from 'rxjs';
@@ -14,7 +13,6 @@ import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { DicService } from '@xmagic/nzx-antd/service';
-import { NzxUploadModule } from '@xmagic/nzx-antd/upload';
 import { NzxFormUtils } from '@xmagic/nzx-antd/util';
 import Cropper from 'cropperjs';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
