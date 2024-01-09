@@ -18,7 +18,6 @@
       true,
       {
         "ignoreTypes": [
-          "/^g2-/",
           "/^nz-/",
           "/^app-/"
         ]
