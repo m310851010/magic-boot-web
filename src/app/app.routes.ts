@@ -11,6 +11,7 @@ export const routes: Routes = [
     canActivateChild: [authGuard],
     loadChildren: () => import('./layout/layout.module').then(m => m.LayoutModule)
   },
+
   {
     path: '**',
     loadComponent: () => import('./views/error/not-found-404.component').then(m => m.NotFound404Component)

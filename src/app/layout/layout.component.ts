@@ -1,12 +1,12 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, first, map, mergeMap, takeUntil, tap } from 'rxjs';
-import { MenuInfoService } from '@commons/service/menu-info.service';
-import { Menu } from '@commons/service/user-info';
 
-import { NzDestroyService } from 'ng-zorro-antd/core/services';
 import { RouteData } from '@commons';
 import { HttpLoadingService } from '@xmagic/nzx-antd/http-interceptor';
+import { NzDestroyService } from 'ng-zorro-antd/core/services';
+
+import { Menu, MenuInfoService } from '@commons/service';
 
 @Component({
   selector: 'ma-layout',

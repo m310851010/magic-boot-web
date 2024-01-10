@@ -3,7 +3,7 @@ import { ReplaySubject } from 'rxjs';
 
 import { NzxUtils } from '@xmagic/nzx-antd/util';
 
-import { AppInfo, Menu } from '@commons/service/user-info';
+import { AppInfo, Menu } from '@commons/service';
 
 @Injectable()
 export class LayoutService {
@@ -252,7 +252,7 @@ export class LayoutService {
    * @param appCode
    * @private
    */
-  private deleteTab(index: number[], appCode: string) {
+  private deleteTab(index: number[], appCode: string): void {
     const tabSetInfo = this.tabMap[appCode];
     if (!tabSetInfo) {
       return;
@@ -394,7 +394,7 @@ export class LayoutService {
    * @param tab
    * @private
    */
-  private expandMenu(appCode: string, tab: Menu) {
+  private expandMenu(appCode: string, tab: Menu): void {
     const app = this.appMap[appCode];
 
     // 处理选中的菜单
@@ -422,7 +422,7 @@ export class LayoutService {
    * @param appCode
    * @private
    */
-  private setMenuSelected(appCode: string, menuItem?: Menu) {
+  private setMenuSelected(appCode: string, menuItem?: Menu): void {
     const app = this.appMap[appCode];
     if (app.prevMenu) {
       app.prevMenu.selected = false;

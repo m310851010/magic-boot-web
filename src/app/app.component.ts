@@ -5,8 +5,7 @@ import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxModalModule, NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 
-import { MenuInfoService } from '@commons/service/menu-info.service';
-import { UserService } from '@commons/service/user.service';
+import { MenuInfoService, UserService } from '@commons/service';
 
 @Component({
   selector: 'ma-root',

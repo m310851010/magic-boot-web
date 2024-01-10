@@ -4,6 +4,7 @@ import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { firstValueFrom, map } from 'rxjs';
 
+import { dicMapLabel } from '@commons';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
@@ -38,8 +39,7 @@ import { NzTreeModule } from 'ng-zorro-antd/tree';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { IconPickerComponent } from '@commons/component/icon-picker';
-import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicMapLabel } from '@commons/utils';
+import { CommonService, DeleteButton } from '@commons/service';
 
 import { getMaxSort } from './menu-utils';
 

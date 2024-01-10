@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
 
-import { UserService } from '@commons/service/user.service';
+import { UserService } from '@commons/service';
 
 import { UpdatePasswordComponent } from './update-password.component';
 

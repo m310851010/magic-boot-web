@@ -3,9 +3,7 @@ import { first } from 'rxjs';
 
 import { LogoutService } from '@xmagic/nzx-antd/http-interceptor';
 
-import { EnvService } from '@commons/service/env.service';
-import { UserInfo } from '@commons/service/user-info';
-import { UserService } from '@commons/service/user.service';
+import { EnvService, UserInfo, UserService } from '@commons/service';
 
 import { UpdatePasswordService } from '../update-password/update-password.service';
 

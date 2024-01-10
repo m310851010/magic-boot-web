@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { NzxUtils } from '@xmagic/nzx-antd/util';
 import { NzOptionSelectionChange } from 'ng-zorro-antd/auto-complete';
 
-import { Menu } from '@commons/service/user-info';
+import { Menu } from '@commons/service';
 
 @Component({
   selector: 'ma-header-menu-search',

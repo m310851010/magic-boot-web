@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewChild
 
 import { NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 
-import { AppInfo, Menu } from '@commons/service/user-info';
+import { AppInfo, Menu } from '@commons/service';
 
 import { CloseType, LayoutService, TabSetInfo } from '../layout.service';
 
@@ -33,7 +33,7 @@ export class TabContextmenuComponent implements OnInit {
    * @param evt
    */
   @HostListener('contextmenu', ['$event'])
-  contextMenuEventHandler(evt: MouseEvent) {
+  contextMenuEventHandler(evt: MouseEvent): void {
     this.nzContextMenuService.create(evt, this.menu);
   }
 

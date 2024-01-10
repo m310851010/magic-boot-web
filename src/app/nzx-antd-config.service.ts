@@ -7,7 +7,7 @@ import { HttpRequestOptions } from '@xmagic/nzx-antd/nzx-antd.service';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { UserService } from '@commons/service/user.service';
+import { UserService } from '@commons/service';
 
 import { environment } from '../environments/environment';
 

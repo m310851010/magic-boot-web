@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+import { Constant } from '@commons';
 import { LOADING_ENABLED, NzxStorageService } from '@xmagic/nzx-antd/service';
 import { sm3 } from 'sm-crypto-v2';
-
-import { Constant } from '@commons/constant';
 
 @Injectable()
 export class LoginService {

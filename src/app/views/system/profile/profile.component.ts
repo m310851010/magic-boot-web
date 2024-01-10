@@ -5,6 +5,7 @@ import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { first, firstValueFrom, mergeMap, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+import { blobToB64, getFileInfo } from '@commons';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { FormlyNzCheckboxModule } from '@xmagic/nz-formly/checkbox';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
@@ -22,10 +23,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { EnvService } from '@commons/service/env.service';
-import { UserInfo } from '@commons/service/user-info';
-import { UserService } from '@commons/service/user.service';
-import { blobToB64, getFileInfo } from '@commons/utils';
+import { EnvService, UserInfo, UserService } from '@commons/service';
 
 @Component({
   selector: 'ma-profile',

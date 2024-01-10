@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
-import { AppInfo, Menu } from '@commons/service/user-info';
+import { AppInfo, Menu } from '@commons/service';
 
 @Component({
   selector: 'ma-slider-menu',

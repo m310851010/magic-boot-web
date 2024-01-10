@@ -10,7 +10,7 @@ import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxModalModule } from '@xmagic/nzx-antd/modal';
 import { NZ_I18N, zh_CN } from 'ng-zorro-antd/i18n';
 
-import { EnvService } from '@commons/service/env.service';
+import { EnvService } from '@commons/service';
 
 import { routes } from './app.routes';
 import { NzxAntdConfigService } from './nzx-antd-config.service';

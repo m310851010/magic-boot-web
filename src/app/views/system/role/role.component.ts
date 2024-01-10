@@ -4,6 +4,7 @@ import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { first, firstValueFrom, forkJoin, map, Observable, shareReplay } from 'rxjs';
 
+import { dicMapLabel, normalTree } from '@commons';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
@@ -43,8 +44,7 @@ import { NzTreeComponent, NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { UserPickerComponent } from '@commons/component/user-picker';
-import { CommonService, DeleteButton } from '@commons/service/common.service';
-import { dicMapLabel, normalTree } from '@commons/utils';
+import { CommonService, DeleteButton } from '@commons/service';
 
 @Component({
   selector: 'ma-role',

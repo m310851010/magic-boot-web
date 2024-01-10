@@ -31,7 +31,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { FormSearchComponent } from '@commons/component/form-search';
-import { UserInfo } from '@commons/service/user-info';
+import { UserInfo } from '@commons/service';
 
 @Component({
   selector: 'ma-user-picker',

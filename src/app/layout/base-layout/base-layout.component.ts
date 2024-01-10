@@ -3,8 +3,7 @@ import { first } from 'rxjs';
 
 import { NzResizeEvent } from 'ng-zorro-antd/resizable';
 
-import { MenuInfoService } from '@commons/service/menu-info.service';
-import { Menu } from '@commons/service/user-info';
+import { Menu, MenuInfoService } from '@commons/service';
 
 import { UpdatePasswordService } from '../component/update-password/update-password.service';
 

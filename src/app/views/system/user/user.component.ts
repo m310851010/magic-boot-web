@@ -4,6 +4,7 @@ import { Component, TemplateRef } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { catchError, first, firstValueFrom, map, of, shareReplay } from 'rxjs';
 
+import { normalTree } from '@commons';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
 import { FormlyNzCheckboxModule } from '@xmagic/nz-formly/checkbox';
@@ -41,9 +42,7 @@ import { sm3 } from 'sm-crypto-v2';
 
 import { FormSearchComponent } from '@commons/component/form-search';
 import { InputPasswordComponent } from '@commons/component/input-password';
-import { CommonService } from '@commons/service/common.service';
-import { UserInfo } from '@commons/service/user-info';
-import { normalTree } from '@commons/utils';
+import { CommonService, UserInfo } from '@commons/service';
 
 @Component({
   selector: 'ma-user',

@@ -35,7 +35,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { SearchPipe } from '@commons/component/search.pipe';
-import { CommonService, DeleteButton } from '@commons/service/common.service';
+import { CommonService, DeleteButton } from '@commons/service';
 
 import { getMaxSort } from '../menu/menu-utils';
 

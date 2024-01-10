@@ -4,8 +4,7 @@ import { first, map } from 'rxjs';
 
 import { NzxUtils } from '@xmagic/nzx-antd/util';
 
-import { MenuInfoService } from '@commons/service/menu-info.service';
-import { UserService } from '@commons/service/user.service';
+import { MenuInfoService, UserService } from '@commons/service';
 
 export const loginGuard: CanActivateFn = (route, state) => {
   const userService = inject(UserService);
