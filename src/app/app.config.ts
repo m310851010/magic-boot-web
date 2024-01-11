@@ -1,6 +1,6 @@
 import { registerLocaleData } from '@angular/common';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import zh from '@angular/common/locales/zh';
+// import zh from '@angular/common/locales/zh';
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withComponentInputBinding, withHashLocation } from '@angular/router';
@@ -14,9 +14,12 @@ import { EnvService } from '@commons/service';
 
 import { routes } from './app.routes';
 import { NzxAntdConfigService } from './nzx-antd-config.service';
+import zh from './zh';
 import { environment } from '../environments/environment';
 
 registerLocaleData(zh);
+
+window.environment = Object.assign(environment, window.environment || {});
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,7 +29,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(NzxModalModule, NzxHttpInterceptorModule),
     provideHttpClient(withInterceptorsFromDi()),
     NzxAntdConfigService,
-    { provide: EnvService, useValue: environment },
+    { provide: EnvService, useValue: window.environment },
     { provide: NzxAntdService, useExisting: NzxAntdConfigService }
   ]
 };

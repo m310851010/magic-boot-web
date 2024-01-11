@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  basePath: '/ma-boot-api'
+  basePath: 'http://localhost:8089/ma-boot-api',
+  pluginPathAi: 'http://localhost:4501'
 };

@@ -4,12 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build -c production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
   "private": true,
   "dependencies": {
+    "@angular-architects/native-federation": "^17.0.7",
     "@angular/animations": "^17.0.0",
     "@angular/common": "^17.0.0",
     "@angular/compiler": "^17.0.0",
@@ -22,6 +23,7 @@
     "@xmagic/nz-formly": "^17.0.1",
     "@xmagic/nzx-antd": "^17.0.10",
     "cropperjs": "^1.6.1",
+    "es-module-shims": "^1.5.12",
     "ng-zorro-antd": "^17.0.1",
     "rxjs": "~7.8.0",
     "sm-crypto-v2": "^1.7.0",

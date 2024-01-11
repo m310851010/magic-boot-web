@@ -24,9 +24,16 @@
       "dom"
     ],
     "paths": {
-      "@commons": ["./commons"],
-      "@commons/*": ["./commons/*"]
-    }
+      "@commons": ["./commons/index.ts"],
+      "@commons/service": ["./commons/service/index.ts"],
+      "@commons/component/form-search": ["./commons/component/form-search/index.ts"],
+      "@commons/component/icon-picker": ["./commons/component/icon-picker/index.ts"],
+      "@commons/component/input-password": ["./commons/component/input-password/index.ts"],
+      "@commons/component/strength-meter": ["./commons/component/strength-meter/index.ts"],
+      "@commons/component/user-picker": ["./commons/component/user-picker/index.ts"],
+      "@commons/component/search.pipe": ["./commons/component/search.pipe.ts"]
+    },
+    "types": ["./@types/global.d.ts"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

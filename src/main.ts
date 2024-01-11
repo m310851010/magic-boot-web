@@ -1,12 +1,6 @@
-import { bootstrapApplication } from '@angular/platform-browser';
+import { initFederation } from '@angular-architects/native-federation';
 
-import { NzxUtils } from '@xmagic/nzx-antd/util';
-
-import { AppComponent } from './app/app.component';
-import { appConfig } from './app/app.config';
-
-bootstrapApplication(AppComponent, appConfig).catch(err => console.error(err));
-
-Date.prototype.toJSON = function () {
-  return NzxUtils.formatDate(this, 'yyyy-MM-dd HH:mm:ss');
-};
+initFederation()
+  .catch(err => console.error(err))
+  .then(_ => import('./bootstrap'))
+  .catch(err => console.error(err));

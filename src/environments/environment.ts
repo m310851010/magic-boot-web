@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  basePath: '/ma-boot-api'
+  basePath: 'http://localhost:8089/ma-boot-api',
+  pluginPathAi: './assets/plugins/chat-ai-plugin'
 };
