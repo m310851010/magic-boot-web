@@ -8,5 +8,6 @@ import { Injectable } from '@angular/core';
 })
 export class EnvService {
   basePath!: string;
+  layout!: 'default' | 'tab';
   constructor() {}
 }

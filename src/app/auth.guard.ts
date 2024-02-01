@@ -55,8 +55,7 @@ export const authGuard: CanActivateChildFn = (childRoute, state) => {
         }
 
         if (!isAuth) {
-          const prefix = state.url.indexOf('/main/') === 0 ? '/main' : '';
-          router.navigate([`${prefix}/error/403`], { skipLocationChange: true }).then();
+          router.navigate([`/error/403`], { skipLocationChange: true }).then();
         }
         return isAuth;
       })

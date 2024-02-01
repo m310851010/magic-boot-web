@@ -1,5 +1,5 @@
 import { Component, DestroyRef, OnInit } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, first, map, mergeMap, takeUntil, tap } from 'rxjs';
 
 import { RouteData } from '@commons';
@@ -7,11 +7,27 @@ import { HttpLoadingService } from '@xmagic/nzx-antd/http-interceptor';
 import { NzDestroyService } from 'ng-zorro-antd/core/services';
 
 import { Menu, MenuInfoService } from '@commons/service';
+import { LayoutModule } from '../layout.module';
+import { NzBreadCrumbComponent, NzBreadCrumbItemComponent } from 'ng-zorro-antd/breadcrumb';
+import { NzSpinComponent } from 'ng-zorro-antd/spin';
+import { NgForOf, NgIf } from '@angular/common';
+import { NzIconDirective } from 'ng-zorro-antd/icon';
 
 @Component({
   selector: 'ma-layout',
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.less',
+  standalone: true,
+  imports: [
+    LayoutModule,
+    NzBreadCrumbComponent,
+    NzBreadCrumbItemComponent,
+    NzSpinComponent,
+    NgIf,
+    NgForOf,
+    NzIconDirective,
+    RouterOutlet
+  ],
   providers: [NzDestroyService]
 })
 export class LayoutComponent implements OnInit {

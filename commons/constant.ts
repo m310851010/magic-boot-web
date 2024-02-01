@@ -21,3 +21,14 @@ class ConstantClass {
  * 常量定义
  */
 export const Constant = new ConstantClass();
+
+/**
+ * 布局方式，在路由中配置，用法：
+ * @example
+ *
+ */
+export enum Layouts {
+  BLANK = 'BLANK',
+  DEFAULT = 'DEFAULT',
+  TABS = 'TABS'
+}

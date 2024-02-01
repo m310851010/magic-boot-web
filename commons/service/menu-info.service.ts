@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay } from 'rxjs';
+import { map, Observable, shareReplay } from 'rxjs';
 
 import { Menu } from './user-info';
+import { NzxUtils } from '@xmagic/nzx-antd/util';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,15 @@ export class MenuInfoService {
     if (this.menus$) {
       return this.menus$;
     }
-    this.menus$ = this.http.post<Menu[]>(url, {}).pipe(shareReplay(1));
+    this.menus$ = this.http.post<Menu[]>(url, {}).pipe(
+      shareReplay(1),
+      map(v => {
+        NzxUtils.forEachTree(v, node => {
+          if (node.url) node.url = node.url.replace(/^\/main\//, '/');
+        });
+        return v;
+      })
+    );
     return this.menus$;
   }
 

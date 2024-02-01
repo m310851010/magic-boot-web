@@ -10,7 +10,7 @@ import { UpdatePasswordService } from '../component/update-password/update-passw
 @Component({
   selector: 'ma-base-layout',
   templateUrl: './base-layout.component.html',
-  styleUrls: ['./base-layout.component.less', './../layout.component.less'],
+  styleUrls: ['./base-layout.component.less', '../default-layout/layout.component.less'],
   providers: [UpdatePasswordService]
 })
 export class BaseLayoutComponent implements OnInit {

@@ -6,7 +6,6 @@ import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAutocompleteModule } from 'ng-zorro-antd/auto-complete';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -18,7 +17,6 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzPopoverModule } from 'ng-zorro-antd/popover';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzResizableModule } from 'ng-zorro-antd/resizable';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 
@@ -33,8 +31,7 @@ import { PageProgressComponent } from './component/page-progress/page-progress.c
 import { SliderMenuComponent } from './component/slider-menu/slider-menu.component';
 import { TabContextmenuComponent } from './component/tab-contextmenu/tab-contextmenu.component';
 import { UpdatePasswordComponent } from './component/update-password/update-password.component';
-import { LayoutRouting } from './layout-routing';
-import { LayoutComponent } from './layout.component';
+import { RouterLink } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -44,8 +41,7 @@ import { LayoutComponent } from './layout.component';
     UpdatePasswordComponent,
     HeaderMenuSearchComponent,
     HeaderUsernameComponent,
-    SliderMenuComponent,
-    LayoutComponent
+    SliderMenuComponent
   ],
   imports: [
     NzLayoutModule,
@@ -65,17 +61,16 @@ import { LayoutComponent } from './layout.component';
     NzFormModule,
     ReactiveFormsModule,
     InputPasswordComponent,
-    NzBreadCrumbModule,
     NzxDirectiveModule,
     NgIf,
     NgForOf,
     NzIconModule,
-    LayoutRouting,
     FormsModule,
     NzInputModule,
     NgTemplateOutlet,
-    NzSpinModule
+    RouterLink
   ],
+  exports: [BaseLayoutComponent],
   providers: [LayoutService]
 })
 export class LayoutModule {}
