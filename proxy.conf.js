@@ -1,7 +1,7 @@
 const PROXY_CONFIG = [
   {
     context: ['/ma-boot-api/'],
-    target: 'http://localhost:8090',
+    target: 'http://localhost:8089',
     changeOrigin: true,
     secure: false,
     logLevel: 'debug'
