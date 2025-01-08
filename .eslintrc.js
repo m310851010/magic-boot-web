@@ -114,13 +114,7 @@ module.exports = {
           }
         ],
         '@typescript-eslint/no-unused-expressions': 'off',
-        '@typescript-eslint/explicit-function-return-type': [
-          'error',
-          {
-            allowExpressions: true,
-            allowConciseArrowFunctionExpressionsStartingWithVoid: true
-          }
-        ],
+        '@typescript-eslint/explicit-function-return-type': 'off',
         'prefer-arrow/prefer-arrow-functions': 'off',
         'import/no-duplicates': 'error',
         'import/no-unused-modules': 'error',

@@ -24,6 +24,7 @@
               <div class="ant-list-item-meta">
                 <div class="ant-list-item-meta-avatar">
                   <nz-avatar
+                    class="dic-item-avatar"
                     [nzText]="$any(item.dictType | dic: dicType$ : false | async)"
                     [ngClass]="item.status !== 1 ? (item.dictType | dic: dicType$ : true | async)?.['clazz'] : null"
                   ></nz-avatar>

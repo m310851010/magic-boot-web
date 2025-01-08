@@ -24,3 +24,31 @@
 .@{dropdown-prefix-cls} {
   background-color: @white;
 }
+
+.full-max-modal {
+  /* 确保模态框最大化 */
+  .ant-modal {
+    top: 10px !important;
+    left: 10px !important;
+    bottom: 10px !important;
+    right: 10px !important;
+    max-width: initial !important;
+    margin: 0 !important;
+    width: initial !important;
+    height: initial !important;
+    padding: 0 !important;
+    position: fixed;
+  }
+
+  /* 确保内容区域能够自动调整 */
+  .ant-modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .ant-modal-body {
+    overflow-y: auto; /* 允许滚动 */
+    flex-grow: 1; /* 内容区域填充剩余空间 */
+  }
+}

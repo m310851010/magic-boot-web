@@ -1,1 +1,7 @@
 <p>dashboard works!</p>
+<ma-input-type
+  style="width: 200px; display: block"
+  #t
+  [(ngModel)]="value"
+  (ngModelChange)="onChange($event, t)"
+></ma-input-type>

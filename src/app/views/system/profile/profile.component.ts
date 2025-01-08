@@ -15,6 +15,7 @@ import { NzxModalService } from '@xmagic/nzx-antd/modal';
 import { NzxPipeModule } from '@xmagic/nzx-antd/pipe';
 import { DicService } from '@xmagic/nzx-antd/service';
 import { NzxFormUtils } from '@xmagic/nzx-antd/util';
+// @ts-ignore
 import Cropper from 'cropperjs';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
