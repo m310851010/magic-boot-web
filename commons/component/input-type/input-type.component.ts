@@ -41,7 +41,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
       ></nz-input-number>
 
       <nzx-checkbox
-        style="line-height: 30px;"
+        style="line-height: 32px;"
         class="flex-main text-center nowrap"
         *ngIf="_dataType === 'boolean'"
         [nzxOptions]="options"
@@ -53,7 +53,6 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 
       <nz-date-picker
         *ngIf="_dataType === 'date'"
-        style="height: 30px;"
         class="full-width"
         [(ngModel)]="_value"
         (ngModelChange)="onModelChange($event)"
@@ -85,7 +84,7 @@ export class InputTypeComponent implements ControlValueAccessor, OnInit {
     string: '字符',
     number: '数字',
     boolean: '布尔',
-    date: '日期' // 添加日期类型
+    date: '日期'
   };
   menuItems: NzxCheckboxOption[] = [];
 

@@ -155,7 +155,7 @@
       <nz-progress
         nzType="dashboard"
         [nzStrokeColor]="data.value | progressColor"
-        [nzPercent]="data.value"
+        [nzPercent]="data.value || 0"
         nzGapPosition="bottom"
       ></nz-progress>
     </div>
