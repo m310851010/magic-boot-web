@@ -14,6 +14,8 @@ export class SearchPipe implements PipeTransform {
       return value;
     }
 
+    searchText = searchText.toLowerCase();
+    console.log(value);
     return value.filter(v => {
       for (const key of propNames) {
         if (v[key] && (v[key]! as string).toLowerCase().includes(searchText!)) {

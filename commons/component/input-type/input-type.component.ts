@@ -19,7 +19,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
     NzInputNumberModule,
     NzxCheckboxModule,
     NzSelectModule,
-    NzDatePickerModule // 引入日期选择器模块
+    NzDatePickerModule
   ],
   template: `
     <nz-input-group nzCompact style="display: flex">
@@ -55,6 +55,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
         *ngIf="_dataType === 'date'"
         class="full-width"
         [(ngModel)]="_value"
+        [nzShowTime]="showTime"
         (ngModelChange)="onModelChange($event)"
         (focus)="onTouched()"
         [nzPlaceHolder]="placeholder ?? ''"
@@ -69,7 +70,6 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
       ></nz-select>
     </nz-input-group>
   `,
-  styleUrl: './input-type.component.less',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -90,6 +90,10 @@ export class InputTypeComponent implements ControlValueAccessor, OnInit {
 
   @Input() disabled: boolean = false;
   @Input() placeholder?: string = '';
+  /**
+   * 是否显示时间选择器
+   */
+  @Input() showTime = false;
 
   _dataType?: InputTypesType;
   @Input() set dataType(value: InputTypesType) {
@@ -143,12 +147,20 @@ export class InputTypeComponent implements ControlValueAccessor, OnInit {
   ngOnInit(): void {}
 
   writeValue(value: ValueType): void {
-    this._value = value;
+    this._value = null;
+    this._dataType = 'string';
+
     if (value == null) {
       return;
     }
+    const dataType = typeof value as InputTypesType;
+    const isDate = NzxUtils.isDate(value);
+    if (!this._dataTypeMap[dataType] && !isDate) {
+      return;
+    }
 
-    this._dataType = typeof value as InputTypesType;
+    this._dataType = isDate ? 'date' : dataType;
+    this._value = value;
     this._value = this.convertValue(value, this._dataType);
   }
 

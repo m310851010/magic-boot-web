@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
@@ -12,6 +12,7 @@ import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzRadioModule } from '@xmagic/nz-formly/radio';
+import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
 import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
@@ -38,6 +39,9 @@ import { SearchPipe } from '@commons/component/search.pipe';
 import { CommonService, DeleteButton } from '@commons/service';
 
 import { getMaxSort } from '../menu/menu-utils';
+import { FormlyNzDatePickerModule } from '@xmagic/nz-formly/date-picker';
+import { FormlyNzTimePickerModule } from '@xmagic/nz-formly/time-picker';
+import { dicMapLabel } from '@commons';
 
 @Component({
   selector: 'ma-dic',
@@ -51,6 +55,9 @@ import { getMaxSort } from '../menu/menu-utils';
     FormlyNzGridModule,
     FormlyNzRadioModule,
     FormlyNzTextareaModule,
+    FormlyNzSelectModule,
+    FormlyNzDatePickerModule,
+    FormlyNzTimePickerModule,
     FormlyModule,
     NzFormModule,
     NzButtonModule,
@@ -89,11 +96,15 @@ export default class DicComponent implements OnInit {
   columns: NzxColumn<Dict>[] = [
     { nzShowCheckAll: true, nzShowCheckbox: true },
     { name: 'label', thText: '字典名称' },
-    { name: 'value', thText: '字典值' },
-    { name: 'status', thText: '状态', tdTemplate: 'status' },
+    {
+      name: 'value',
+      thText: '字典值',
+      format: v => (this.selected?.dataType === 2 ? this.yn$.pipe(dicMapLabel(v)) : v)
+    },
+    { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
     { name: 'extJson', thText: '扩展json' },
     { name: 'sort', thText: '排序号', nzWidth: '70px' },
-    { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
+    { name: 'createDate', thText: '创建时间', nzWidth: '150px' },
     {
       name: 'id',
       thText: '操作',
@@ -113,12 +124,19 @@ export default class DicComponent implements OnInit {
     }
   ];
 
+  afterFetch = (resp: any) => {
+    resp.list.forEach((item: any) => {
+      console.log(item);
+    });
+    return {};
+  };
   searchText = '';
   rootDic: Dict[] = [];
 
   dicType$ = this.dicService.getDic('DICT_TYPE');
   dataType$ = this.dicService.getDic('DATA_TYPE');
   status$ = this.dicService.getDic('STATUS');
+  yn$ = this.dicService.getDic('YN').pipe(map(ls => ls.map(v => ({ label: v.label, value: `${v.value}` }))));
 
   constructor(
     private http: HttpClient,
@@ -225,7 +243,7 @@ export default class DicComponent implements OnInit {
         }
       },
       {
-        type: 'radio',
+        type: 'select',
         key: 'dataType',
         defaultValue: 0,
         props: {
@@ -244,8 +262,8 @@ export default class DicComponent implements OnInit {
         nzTitle: '新增字典项',
         nzContent,
         table,
-        nzOnOk: () => {
-          return firstValueFrom(this.http.post('/system/dict/save', this.modalModel));
+        nzOnOk: (_, model) => {
+          return firstValueFrom(this.http.post('/system/dict/save', model));
         }
       }
     );
@@ -256,20 +274,87 @@ export default class DicComponent implements OnInit {
       nzTitle: '修改字典项',
       nzContent,
       table,
-      nzOnOk: () => firstValueFrom(this.http.post('/system/dict/update', this.modalModel))
+      nzOnOk: (_, model) => firstValueFrom(this.http.post('/system/dict/update', model))
     });
   }
 
   private openModal(
     model: Partial<Dict>,
     options: Omit<NzxModalOptions<NzSafeAny, TemplateRef<{}>>, 'nzOnOk'> & {
-      nzOnOk: (instance: NzSafeAny) => Promise<false | void | {}>;
+      nzOnOk: (instance: NzSafeAny, model: Record<string, any>) => Promise<false | void | {}>;
       fields?: FormlyFieldConfig[];
       table?: NzxTableComponent;
     }
   ): void {
+    const validators = {
+      validation: [
+        (control: AbstractControl) => {
+          if (!control.value) {
+            return null;
+          }
+          let list: Dict[];
+          // 字典项
+          if (options.table) {
+            list = options.table.nzData || [];
+          } else {
+            list = this.rootDic || [];
+          }
+
+          // 编辑时有ID
+          if (model.id) {
+            list = list.filter(v => v.id !== model.id);
+          }
+
+          if (list.some(v => v.value === control.value)) {
+            return { exists: { message: '字典值已经存在,请换一个' } };
+          }
+          return null;
+        }
+      ]
+    };
+
+    let valueField: FormlyFieldConfig = {
+      type: 'input',
+      key: 'value',
+      props: {
+        label: '字典值',
+        maxLength: 64,
+        required: true
+      },
+      validators
+    };
+
+    // 字典项
+    if (options.table) {
+      const type = { 0: 'input', 1: 'number', 2: 'radio', 3: 'date-picker', 4: 'time-picker' }[this.selected!.dataType];
+      valueField = {
+        type,
+        key: 'value',
+        props: {
+          label: '字典项值',
+          maxLength: 64,
+          options: this.yn$,
+          required: true
+        },
+        validators
+      };
+    }
+
     this.modalForm = new FormGroup({});
     this.modalModel = NzxUtils.clone(model);
+    if (options.table && this.modalModel.value) {
+      if (this.selected?.dataType === 3) {
+        const _vs = (this.modalModel.value as string).split('-').map(v => +v.trim());
+        this.modalModel.value = new Date(_vs[0], _vs[1], _vs[2])!;
+      } else if (this.selected?.dataType === 4) {
+        const _vs = (this.modalModel.value as string).split(':').map(v => +v.trim());
+        this.modalModel.value = new Date(2025, 1, 1, _vs[0], _vs[1], _vs[2])!;
+      }
+    }
+
+    console.log(this.modalModel);
+    console.log(model);
+
     this.modalFields = [
       {
         type: 'row',
@@ -279,52 +364,12 @@ export default class DicComponent implements OnInit {
             type: 'input',
             key: 'label',
             props: {
-              label: '字典名称',
+              label: options.table ? '字典项名' : '字典名',
               maxLength: 64,
               required: true
             }
           },
-          {
-            type: 'input',
-            key: 'value',
-            props: {
-              label: '字典值',
-              maxLength: 64,
-              required: true
-            },
-            validators: {
-              validation: [
-                (control: AbstractControl) => {
-                  if (!control.value) {
-                    return null;
-                  }
-
-                  // 字典项 校验字典项值数据类型
-                  if (options.table && this.selected?.dataType === 1 && !/^-?\d+\.?\d*$/.test(control.value)) {
-                    return { numValidator: { message: '字典项值必须是数字' } };
-                  }
-
-                  let list: Dict[];
-                  // 字典项
-                  if (options.table) {
-                    list = options.table.nzData || [];
-                  } else {
-                    list = this.rootDic || [];
-                  }
-
-                  // 编辑时有ID
-                  if (model.id) {
-                    list = list.filter(v => v.id !== model.id);
-                  }
-
-                  if (list.some(v => v.value === control.value)) {
-                    return { exists: { message: '字典值已经存在,请换一个' } };
-                  }
-                  return null;
-                }
-              ]
-            }
-          },
+          valueField,
           {
             type: 'radio',
             key: 'status',
@@ -368,7 +413,18 @@ export default class DicComponent implements OnInit {
         if (!NzxFormUtils.validate(this.modalForm)) {
           return false;
         }
-        return options.nzOnOk(instance).then(v => {
+
+        const model = { ...this.modalModel };
+        // 字典项
+        if (options.table && NzxUtils.isDate(model.value)) {
+          if (this.selected?.dataType === 3) {
+            model.value = NzxUtils.formatDate(model.value as Date, 'yyyy-MM-dd');
+          } else if (this.selected?.dataType === 4) {
+            model.value = NzxUtils.formatDate(model.value as Date, 'HH:mm:ss');
+          }
+        }
+
+        return options.nzOnOk(instance, model).then(v => {
           if (v && options.table) {
             options.table.refresh(false);
           }
@@ -396,7 +452,7 @@ interface Dict {
   /**
    * 字典值
    */
-  value: string;
+  value: string | Date | number | boolean;
   /**
    * 字典类型：0系统类，1业务类, 字典 DICT_TYPE
    */
@@ -406,9 +462,9 @@ interface Dict {
    */
   sort: number;
   /**
-   * 数据类型,0:string 1: number
+   * 数据类型,0:string 1: number 2:boolean 3:date 4:time
    */
-  dataType: 0 | 1;
+  dataType: 0 | 1 | 2 | 3 | 4;
   /**
    * 删除标识：0未删除，1已删除
    */
