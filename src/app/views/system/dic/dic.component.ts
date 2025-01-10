@@ -104,7 +104,7 @@ export default class DicComponent implements OnInit {
     { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
     { name: 'extJson', thText: '扩展json' },
     { name: 'sort', thText: '排序号', nzWidth: '70px' },
-    { name: 'createDate', thText: '创建时间', nzWidth: '150px' },
+    { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
     {
       name: 'id',
       thText: '操作',
