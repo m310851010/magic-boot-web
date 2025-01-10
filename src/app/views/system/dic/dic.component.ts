@@ -8,12 +8,14 @@ import { tap } from 'rxjs/operators';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { NzFormlyModule } from '@xmagic/nz-formly';
 import { FormlyCommonModule } from '@xmagic/nz-formly/common';
+import { FormlyNzDatePickerModule } from '@xmagic/nz-formly/date-picker';
 import { FormlyNzFormFieldModule } from '@xmagic/nz-formly/field-wrapper';
 import { FormlyNzGridModule } from '@xmagic/nz-formly/grid';
 import { FormlyNzInputModule } from '@xmagic/nz-formly/input';
 import { FormlyNzRadioModule } from '@xmagic/nz-formly/radio';
 import { FormlyNzSelectModule } from '@xmagic/nz-formly/select';
 import { FormlyNzTextareaModule } from '@xmagic/nz-formly/textarea';
+import { FormlyNzTimePickerModule } from '@xmagic/nz-formly/time-picker';
 import { NzxDirectiveModule } from '@xmagic/nzx-antd/directive';
 import { NzxHttpInterceptorModule } from '@xmagic/nzx-antd/http-interceptor';
 import { NzxModalService } from '@xmagic/nzx-antd/modal';
@@ -39,9 +41,6 @@ import { SearchPipe } from '@commons/component/search.pipe';
 import { CommonService, DeleteButton } from '@commons/service';
 
 import { getMaxSort } from '../menu/menu-utils';
-import { FormlyNzDatePickerModule } from '@xmagic/nz-formly/date-picker';
-import { FormlyNzTimePickerModule } from '@xmagic/nz-formly/time-picker';
-import { dicMapLabel } from '@commons';
 
 @Component({
   selector: 'ma-dic',
@@ -99,7 +98,7 @@ export default class DicComponent implements OnInit {
     {
       name: 'value',
       thText: '字典值',
-      format: v => (this.selected?.dataType === 2 ? this.yn$.pipe(dicMapLabel(v)) : v)
+      format: v => (this.selected?.dataType === 2 ? v === '1' : v)
     },
     { name: 'status', thText: '状态', tdTemplate: 'status', nzWidth: '70px' },
     { name: 'extJson', thText: '扩展json' },
@@ -136,7 +135,6 @@ export default class DicComponent implements OnInit {
   dicType$ = this.dicService.getDic('DICT_TYPE');
   dataType$ = this.dicService.getDic('DATA_TYPE');
   status$ = this.dicService.getDic('STATUS');
-  yn$ = this.dicService.getDic('YN').pipe(map(ls => ls.map(v => ({ label: v.label, value: `${v.value}` }))));
 
   constructor(
     private http: HttpClient,
@@ -333,7 +331,10 @@ export default class DicComponent implements OnInit {
         props: {
           label: '字典项值',
           maxLength: 64,
-          options: this.yn$,
+          options: [
+            { label: '是', value: '1' },
+            { label: '否', value: '0' }
+          ],
           required: true
         },
         validators
@@ -345,15 +346,12 @@ export default class DicComponent implements OnInit {
     if (options.table && this.modalModel.value) {
       if (this.selected?.dataType === 3) {
         const _vs = (this.modalModel.value as string).split('-').map(v => +v.trim());
-        this.modalModel.value = new Date(_vs[0], _vs[1], _vs[2])!;
+        this.modalModel.value = new Date(_vs[0], _vs[1], _vs[2], 0, 0, 0, 0)!;
       } else if (this.selected?.dataType === 4) {
         const _vs = (this.modalModel.value as string).split(':').map(v => +v.trim());
         this.modalModel.value = new Date(2025, 1, 1, _vs[0], _vs[1], _vs[2])!;
       }
     }
-
-    console.log(this.modalModel);
-    console.log(model);
 
     this.modalFields = [
       {
