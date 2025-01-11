@@ -349,15 +349,13 @@ export default class UserComponent {
           model.id
             ? {}
             : {
-                type: 'ref-template',
+                type: 'input',
                 key: 'password',
                 props: {
                   label: '密码',
                   type: 'password',
-                  refName: 'pwd',
                   maxLength: 64
-                },
-                wrappers: ['field-wrapper']
+                }
               },
           {
             type: 'input',

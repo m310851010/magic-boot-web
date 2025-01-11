@@ -124,7 +124,7 @@ export default class RoleComponent {
       thText: '权限范围',
       format: value => this.permission$.pipe(dicMapLabel(value))
     },
-    { name: 'desc', thText: '角色描述' },
+    { name: 'remark', thText: '角色描述' },
     { name: 'createDate', thText: '创建时间', nzWidth: '170px' },
     {
       name: 'id',
@@ -375,7 +375,7 @@ export default class RoleComponent {
       },
       {
         type: 'textarea',
-        key: 'desc',
+        key: 'remark',
         props: {
           label: '备注',
           rows: 4,
@@ -440,7 +440,7 @@ interface Role {
   /**
    * 描述
    */
-  desc?: string;
+  remark?: string;
   /**
    * 权限范围 0：全部数据，1：自定义数据，2：本部门及以下数据，3：本部门数据, 4仅个人数据
    */

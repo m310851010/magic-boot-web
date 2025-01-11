@@ -442,7 +442,7 @@ export default class MenuComponent implements OnInit {
       },
       {
         type: 'textarea',
-        key: 'desc',
+        key: 'remark',
         props: {
           label: '备注',
           rows: 4,
@@ -472,7 +472,7 @@ export default class MenuComponent implements OnInit {
 
 interface Menu {
   componentName?: string;
-  desc?: string;
+  remark?: string;
   icon?: string;
   id: string;
   /**

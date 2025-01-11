@@ -394,14 +394,26 @@ export default class DicComponent implements OnInit {
       },
       {
         type: 'textarea',
-        key: 'extJson',
+        key: 'remark',
         props: {
-          label: '扩展JSON',
-          rows: 4,
-          maxLength: 1000,
-          nzMaxCharacterCount: 1000
+          label: '备注',
+          rows: 2,
+          maxLength: 200,
+          nzMaxCharacterCount: 200
         }
-      }
+      },
+      options.table
+        ? {
+            type: 'textarea',
+            key: 'extJson',
+            props: {
+              label: '扩展JSON',
+              rows: 4,
+              maxLength: 1000,
+              nzMaxCharacterCount: 1000
+            }
+          }
+        : {}
     ];
 
     this.modalService.create({
@@ -478,5 +490,5 @@ interface Dict {
   /**
    * 描述
    */
-  desc?: string;
+  remark?: string;
 }
